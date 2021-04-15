@@ -1,0 +1,71 @@
+<!doctype html>
+<html>
+<head>
+    <title>Radiance dex2front</title>
+</head>
+<body>
+<div>
+    <h3>Common</h3>
+        <button id="buttonRequestVersion" onclick="app.requestVersion()">Get Version</button>
+        <button id="buttonRequestNetwork" onclick="app.requestNetwork()">Get Network</button>
+
+</div>
+
+<br/>
+<div>
+    <h3>Contract</h3>
+    <button id="buttonRunContractMethod" onclick="app.runContractMethod()">Run (Get Kington Messages)</button>
+    <button id="buttonDeploy" onclick="app.deploy()">Deploy</button>
+    <br/>
+    <br/>
+    Set your contract, abi and params in source code to use following method:
+    <br/>
+    <button id="buttonCallContractMethod" onclick="app.callContractMethod()">Call</button>
+</div>
+
+<br/>
+<div>
+    <h3>Wallet</h3>
+    <form id="transferForm" onsubmit="app.transfer(this);return false;">
+        <input type="text" name="address" placeholder="Recipient Address">
+        <input type="text" name="amount" placeholder="Amount">
+        <button id="buttonTransfer">Transfer</button>
+    </form>
+    <div>
+        <form id="confirmTransactionForm" onsubmit="app.confirmTransaction(this);return false;">
+            <input type="text" name="address" placeholder="Wallet Address">
+            <input type="text" name="txid" placeholder="Txid 0x...">
+            <button id="buttonConfirmTransaction">Confirm Transaction</button>
+        </form>
+    </div>
+</div>
+
+<br/>
+<div>
+    <h3>Tokens</h3>
+    <button id="buttonGetTokenList" onclick="app.getTokenList()">Get Token List</button>
+    <br/>
+    <br/>
+    <div>Transfer Token</div>
+    <form id="transferTokenForm" onsubmit="app.transferToken(this);return false;">
+        <input type="text" name="rootAddress" placeholder="Root Address" value="0:9eb29224891052e19f0ade8259bb636bca0cdfc2b5b4fb4f760e2750b7a9488f">
+        <input type="text" name="address" placeholder="To address">
+        <input type="text" name="amount" placeholder="Amount" value="100000000">
+        <button id="buttonTransferToken">Transfer token</button>
+    </form>
+</div>
+<br/>
+<div>
+    <h3>Radiance Team</h3>
+    <button id="buttonRequestKeys" onclick="app.requestKeys()">Generate Keys</button>
+    <button id="buttonGetWallet" onclick="app.getWallet()">Get Wallet</button>
+    <button id="buttonGetPublicKey" onclick="app.getPubKey()">Get Public key</button>
+    <button id="buttonCallContractR1Method" onclick="app.runContractR1Method()">Get DEXpairs</button>
+    <button id="buttonCallContractR2Method" onclick="app.runContractR2Method()">Get DEXpairs2</button>
+</div>
+<br/>
+<div>Look results in console.</div>
+<div id="result"></div>
+<script src="./main.js"></script>
+</body>
+</html>

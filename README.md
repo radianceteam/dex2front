@@ -1,17 +1,19 @@
 # dex2front
-
+## dev mode
 ```
-git clone
+git clone https://github.com/radianceteam/dex2front.git
 cd dex2front
 yarn install
-yarn run serve
+yarn serve
 ```
 Go to http://localhost:8088
 
+## prod mode
+
 ```
 
-yarn run build
-node index.js
+yarn build
+yarn start
 ```
 Go to http://localhost:3000
 

@@ -1,0 +1,31 @@
+{
+  "name": "dex2front",
+  "version": "1.0.0",
+  "description": "dex2front",
+  "repository": "https://github.com/radianceteam/dex2front",
+  "author": "",
+  "license": "Apache-2.0",
+  "private": false,
+  "scripts": {
+    "serve": "webpack-cli serve",
+    "build": "webpack-cli",
+    "start": "node index.js"
+  },
+  "devDependencies": {
+    "copy-webpack-plugin": "^6.2.1",
+    "webpack": "^4.46.0",
+    "webpack-cli": "^4.0.0",
+    "webpack-dev-server": "^3.11.0"
+  },
+  "dependencies": {
+    "@babel/preset-env": "^7.13.15",
+    "@tonclient/appkit": "^0.2.0",
+    "@tonclient/core": "^1.12.0",
+    "@tonclient/lib-web": "^1.12.0",
+    "express": "^4.17.1",
+    "freeton": "^0.6.0",
+    "hex2ascii": "0.0.3",
+    "jscodeshift": "^0.11.0",
+    "webpack-dev-middleware": "^3.7.2"
+  }
+}
