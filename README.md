@@ -18,47 +18,47 @@ yarn start
 Go to http://localhost:3000
 
 
-## async getNetwork()
+## getNetwork()
 - return  `{id: 1, server: "main.ton.dev", explorer: "main.ton.live"}`
 - return  `{id: 2, server: "net.ton.dev", explorer: "net.ton.live"}`
 
-## async getWallet()
+## getWallet()
 - return  `{wallet: <address>, balance: <uint128>}`
 
-## async getPublicKey()
+## getPublicKey()
 - return  `{pubkey: <uint256>}`
 
-## async checkDEXclient(<pubkey>)
-- if DEXclient exist in DEXroot return  `{dexclient: <address>}`
-- if DEXclient !exist in DEXroot return  `{dexclient: <address(0)>}`
+## checkDEXclient(<pubkey>)
+- if `DEXclient` exist in `DEXroot` return  `{dexclient: <address>}`
+- if `DEXclient` !exist in `DEXroot` return  `{dexclient: <address(0)>}`
 
-## async createDEXclient(<pubkey>)
+## createDEXclient(<pubkey>)
 - return  `{dexclient: <address>}`
 
-## async getDEXclient(<dexclient>)
+## getDEXclient(<dexclient>)
 - return  `{connectedRoots: <address[]>}`
 
-## async getDEXclientBalances(connectedRoots)
+## getDEXclientBalances(connectedRoots)
 - return  `{balances: [{symbol:<string>,balance:<uint128>}]}`
 
-## async getTokenList()
+## getTokenList()
 
-## async setTokenList()
+## setTokenList()
 
-## async getDEXpairs()
+## getDEXpairs()
 
-## async createDEXpairs()
+## createDEXpairs()
 
-## async provideLiquidity()
+## provideLiquidity()
 
-## async selectLiquidity()
+## selectLiquidity()
 
-## async wrapTONtoDEX()
+## wrapTONtoDEX()
 
-## async unwrapTONfromDEX()
+## unwrapTONfromDEX()
 
-## async swapA()
+## swapA()
 
-## async swapB()
+## swapB()
 
-## async transferToken()
+## transferToken()
