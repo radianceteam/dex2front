@@ -60,8 +60,34 @@
     <button id="buttonRequestKeys" onclick="app.requestKeys()">Generate Keys</button>
     <button id="buttonGetWallet" onclick="app.getWallet()">Get Wallet</button>
     <button id="buttonGetPublicKey" onclick="app.getPubKey()">Get Public key</button>
+    <button id="buttonCheckPublicKey" onclick="app.checkPubKey()">Check Public key</button>
     <button id="buttonCallContractR1Method" onclick="app.runContractR1Method()">Get DEXpairs</button>
     <button id="buttonCallContractR2Method" onclick="app.runContractR2Method()">Get DEXpairs2</button>
+    <br/>
+    <div>computeDEXclientAddr</div>
+    <form id="computeDEXclientAddrForm" onsubmit="app.computeDEXclientAddr(this);return false;">
+        <input type="number" name="clientId" placeholder="clientId" value="0">
+        <button id="buttonComputeDEXclientAddr">computeDEXclientAddr</button>
+    </form>
+    <br/>
+    <div>createDEXclient</div>
+    <form id="createDEXclientForm" onsubmit="app.createDEXclient(this);return false;">
+        <input type="number" name="clientId" placeholder="clientId" value="0">
+        <button id="buttonCreateDEXclient">createDEXclient</button>
+    </form>
+    <br/>
+    <button id="buttonGetClientRoots" onclick="app.getClientRoots()">Get DEXclient Roots</button>
+    <br/>
+    <div>connectDEXpair</div>
+    <form id="connectDEXpairForm" onsubmit="app.connectDEXpair(this);return false;">
+        <input type="text" name="pairAddr" placeholder="pairAddr">
+        <button id="buttonConnectDEXpair">Connect DEXpair</button>
+    </form>
+
+
+
+
+
 </div>
 <br/>
 <div>Look results in console.</div>
