@@ -125,6 +125,13 @@ window.app = {
       document.getElementById('result').innerHTML += '</br>' + 'checkPubKey: '+ JSON.stringify(result)
       console.log('checkPubKey: '+result.status);
       console.log('checkPubKey: '+result.dexclient);
+      if (result.status == true) {
+        const client = new TonClient({network: { server_address: 'net.ton.dev' }});
+        const balance = (await client.net.query_collection({collection: "accounts",filter: {id: {eq: result.dexclient,},},result: "balance",})).result;
+        document.getElementById('result').innerHTML += '</br>' + ' balance: '+ JSON.stringify(parseInt(balance[0].balance))
+        console.log('balance: '+parseInt(balance[0].balance));
+      }
+
     } catch (e) {
       document.getElementById('result').innerHTML += '</br>' + JSON.stringify(e);
       console.log(e);
@@ -142,12 +149,8 @@ window.app = {
       const pubkey = await signer.getPublicKey();
       const contract = new freeton.Contract(provider, DEXrootContract.abi, Radiance.networks['2'].dexroot);
       const result = await contract.methods.computeDEXclientAddrWithId.run({pubkey:"0x"+pubkey,clientId:form.clientId.value});
-      const client = new TonClient({network: { server_address: 'net.ton.dev' }});
-      const balance = (await client.net.query_collection({collection: "accounts",filter: {id: {eq: result.value0,},},result: "balance",})).result;
-      document.getElementById('result').innerHTML += '</br>' + 'computeDEXclientAddrWithId: '+ JSON.stringify(result)+' balance: '+ JSON.stringify(parseInt(balance[0].balance))
+      document.getElementById('result').innerHTML += '</br>' + 'computeDEXclientAddrWithId: '+ JSON.stringify(result)
       console.log('computeDEXclientAddrWithId: '+result.value0);
-      console.log('balance: '+parseInt(balance[0].balance));
-
     } catch (e) {
       document.getElementById('result').innerHTML += '</br>' + JSON.stringify(e);
       console.log(e);
@@ -193,8 +196,8 @@ window.app = {
       if (rootData.status == true) {
         const dexclient = new freeton.Contract(provider, DEXclientContract.abi, rootData.dexclient);
         const dexclientData = await dexclient.methods.getAllDataPreparation.run();
-        document.getElementById('result').innerHTML += '</br>' + 'getAllDataPreparation: '+ JSON.stringify(dexclientData.rootKeysR)
-        console.log('getAllDataPreparation: '+dexclientData.rootKeysR);
+        document.getElementById('result').innerHTML += '</br>' + 'getAllClienRoots: '+ JSON.stringify(dexclientData.rootKeysR)
+        console.log('getAllClienRoots: '+dexclientData.rootKeysR);
         for (const item of dexclientData.rootKeysR) {
           const tokenRoot = new freeton.Contract(provider, RootTokenContract.abi, item);
           const symbol = await tokenRoot.methods.getSymbol.run();
@@ -215,6 +218,48 @@ window.app = {
       button.disabled = false;
     }
   },
+  async getClientPairs() {
+    const button = document.getElementById('buttonGetClientPairs');
+    button.disabled = true;
+    try {
+      _.checkExtensionAvailability();
+      const provider = _.getProvider();
+      const signer = await provider.getSigner();
+      const pubkey = await signer.getPublicKey();
+      const root = new freeton.Contract(provider, DEXrootContract.abi, Radiance.networks['2'].dexroot);
+      const rootData = await root.methods.checkPubKey.run({pubkey:"0x"+pubkey});
+      if (rootData.status == true) {
+        const dexclient = new freeton.Contract(provider, DEXclientContract.abi, rootData.dexclient);
+        const dexclientData = await dexclient.methods.getAllDataPreparation.run();
+        document.getElementById('result').innerHTML += '</br>' + 'getAllClienPairs: '+ JSON.stringify(dexclientData.pairKeysR)
+        console.log('getAllClienPairs: '+dexclientData.pairKeysR);
+        for (const item of dexclientData.pairKeysR) {
+          const dexpair = new freeton.Contract(provider, DEXpairContract.abi, item);
+          let pairData = await dexpair.methods.getPair.run();
+          let rootA = pairData.addressRootA;
+          let rootB = pairData.addressRootB;
+          const rootTokenA = new freeton.Contract(provider, RootTokenContract.abi, rootA);
+          const rootTokenB = new freeton.Contract(provider, RootTokenContract.abi, rootB);
+          let symbolA = await rootTokenA.methods.getSymbol.run();
+          let symbolB = await rootTokenB.methods.getSymbol.run();
+          symbolA = hex2ascii(symbolA.value0);
+          symbolB = hex2ascii(symbolB.value0);
+          console.log('Pair:'+symbolA+' : '+symbolB+' addr: '+item);
+          document.getElementById('result').innerHTML += '</br>' +'Pair: '+JSON.stringify(symbolA)+' : '+JSON.stringify(symbolB)+' addr: '+JSON.stringify(item);
+
+        }
+      } else {
+        document.getElementById('result').innerHTML += '</br>' + 'DEXclient status false'
+        console.log('DEXclient status false');
+      }
+    } catch (e) {
+      document.getElementById('result').innerHTML += '</br>' + JSON.stringify(e);
+      console.log(e);
+    } finally {
+      button.disabled = false;
+    }
+  },
+
   async connectDEXpair(form) {
     const button = document.getElementById('buttonConnectDEXpair');
     button.disabled = true;

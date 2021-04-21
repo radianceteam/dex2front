@@ -1,92 +1,134 @@
 <!doctype html>
 <html>
 <head>
-    <title>Radiance dex2front</title>
+  <title>Radiance dex2front</title>
 </head>
 <body>
-<div>
+  <div>
     <h3>Common</h3>
-        <button id="buttonRequestVersion" onclick="app.requestVersion()">Get Version</button>
-        <button id="buttonRequestNetwork" onclick="app.requestNetwork()">Get Network</button>
+    <button id="buttonRequestVersion" onclick="app.requestVersion()">Get Version</button>
+    <button id="buttonRequestNetwork" onclick="app.requestNetwork()">Get Network</button>
+  </div>
 
-</div>
+  <!-- <br/>
+  <div>
+  <h3>Contract</h3>
+  <button id="buttonRunContractMethod" onclick="app.runContractMethod()">Run (Get Kington Messages)</button>
+  <button id="buttonDeploy" onclick="app.deploy()">Deploy</button>
+  <br/>
+  <br/>
+  Set your contract, abi and params in source code to use following method:
+  <br/>
+  <button id="buttonCallContractMethod" onclick="app.callContractMethod()">Call</button>
+</div> -->
 
 <br/>
 <div>
-    <h3>Contract</h3>
-    <button id="buttonRunContractMethod" onclick="app.runContractMethod()">Run (Get Kington Messages)</button>
-    <button id="buttonDeploy" onclick="app.deploy()">Deploy</button>
-    <br/>
-    <br/>
-    Set your contract, abi and params in source code to use following method:
-    <br/>
-    <button id="buttonCallContractMethod" onclick="app.callContractMethod()">Call</button>
-</div>
-
-<br/>
-<div>
-    <h3>Wallet</h3>
-    <form id="transferForm" onsubmit="app.transfer(this);return false;">
-        <input type="text" name="address" placeholder="Recipient Address">
-        <input type="text" name="amount" placeholder="Amount">
-        <button id="buttonTransfer">Transfer</button>
+  <h3>Wallet</h3>
+  <form id="transferForm" onsubmit="app.transfer(this);return false;">
+    <input type="text" name="address" placeholder="Recipient Address">
+    <input type="text" name="amount" placeholder="Amount">
+    <button id="buttonTransfer">Transfer</button>
+  </form>
+  <div>
+    <form id="confirmTransactionForm" onsubmit="app.confirmTransaction(this);return false;">
+      <input type="text" name="address" placeholder="Wallet Address">
+      <input type="text" name="txid" placeholder="Txid 0x...">
+      <button id="buttonConfirmTransaction">Confirm Transaction</button>
     </form>
-    <div>
-        <form id="confirmTransactionForm" onsubmit="app.confirmTransaction(this);return false;">
-            <input type="text" name="address" placeholder="Wallet Address">
-            <input type="text" name="txid" placeholder="Txid 0x...">
-            <button id="buttonConfirmTransaction">Confirm Transaction</button>
-        </form>
-    </div>
+  </div>
 </div>
 
 <br/>
 <div>
-    <h3>Tokens</h3>
-    <button id="buttonGetTokenList" onclick="app.getTokenList()">Get Token List</button>
-    <br/>
-    <br/>
-    <div>Transfer Token</div>
-    <form id="transferTokenForm" onsubmit="app.transferToken(this);return false;">
-        <input type="text" name="rootAddress" placeholder="Root Address" value="0:9eb29224891052e19f0ade8259bb636bca0cdfc2b5b4fb4f760e2750b7a9488f">
-        <input type="text" name="address" placeholder="To address">
-        <input type="text" name="amount" placeholder="Amount" value="100000000">
-        <button id="buttonTransferToken">Transfer token</button>
-    </form>
+  <h3>Tokens</h3>
+  <button id="buttonGetTokenList" onclick="app.getTokenList()">Get Token List</button>
+  <br/>
+  <br/>
+  <div>Transfer Token</div>
+  <form id="transferTokenForm" onsubmit="app.transferToken(this);return false;">
+    <input type="text" name="rootAddress" placeholder="Root Address" value="0:9eb29224891052e19f0ade8259bb636bca0cdfc2b5b4fb4f760e2750b7a9488f">
+    <input type="text" name="address" placeholder="To address">
+    <input type="text" name="amount" placeholder="Amount" value="100000000">
+    <button id="buttonTransferToken">Transfer token</button>
+  </form>
 </div>
+
 <br/>
 <div>
-    <h3>Radiance Team</h3>
+  <h3>Radiance Team</h3>
+  <button id="buttonCallContractR1Method" onclick="app.runContractR1Method()">Get All DEXpairs</button>
+  <button id="buttonCallContractR2Method" onclick="app.runContractR2Method()">Get All DEXpairs2</button>
+  <p>
     <button id="buttonRequestKeys" onclick="app.requestKeys()">Generate Keys</button>
-    <button id="buttonGetWallet" onclick="app.getWallet()">Get Wallet</button>
+    <button id="buttonGetWallet" onclick="app.getWallet()">Get Multisig Extraton Wallet</button>
     <button id="buttonGetPublicKey" onclick="app.getPubKey()">Get Public key</button>
-    <button id="buttonCheckPublicKey" onclick="app.checkPubKey()">Check Public key</button>
-    <button id="buttonCallContractR1Method" onclick="app.runContractR1Method()">Get DEXpairs</button>
-    <button id="buttonCallContractR2Method" onclick="app.runContractR2Method()">Get DEXpairs2</button>
-    <br/>
-    <div>computeDEXclientAddr</div>
-    <form id="computeDEXclientAddrForm" onsubmit="app.computeDEXclientAddr(this);return false;">
-        <input type="number" name="clientId" placeholder="clientId" value="0">
-        <button id="buttonComputeDEXclientAddr">computeDEXclientAddr</button>
-    </form>
-    <br/>
-    <div>createDEXclient</div>
-    <form id="createDEXclientForm" onsubmit="app.createDEXclient(this);return false;">
-        <input type="number" name="clientId" placeholder="clientId" value="0">
-        <button id="buttonCreateDEXclient">createDEXclient</button>
-    </form>
-    <br/>
+    <button id="buttonCheckPublicKey" onclick="app.checkPubKey()">Check DEXclient</button>
+  </p>
+  <br/>
+  <div>Compute DEXclient Addr with shardID</div>
+  <form id="computeDEXclientAddrForm" onsubmit="app.computeDEXclientAddr(this);return false;">
+    <input type="number" name="clientId" placeholder="clientId" value="0">
+    <button id="buttonComputeDEXclientAddr">Compute DEXclient Addr</button>
+  </form>
+  <br/>
+  <div>Create DEXclient with shardID</div>
+  <form id="createDEXclientForm" onsubmit="app.createDEXclient(this);return false;">
+    <input type="number" name="clientId" placeholder="clientId" value="0">
+    <button id="buttonCreateDEXclient">Create DEXclient</button>
+  </form>
+  <p>
     <button id="buttonGetClientRoots" onclick="app.getClientRoots()">Get DEXclient Roots</button>
-    <br/>
-    <div>connectDEXpair</div>
-    <form id="connectDEXpairForm" onsubmit="app.connectDEXpair(this);return false;">
-        <input type="text" name="pairAddr" placeholder="pairAddr">
-        <button id="buttonConnectDEXpair">Connect DEXpair</button>
-    </form>
-
-
-
-
+    <button id="buttonGetClientPairs" onclick="app.getClientPairs()">Get DEXclient Pairs</button>
+  </p>
+  <div>Connect DEXpair</div>
+  <form id="connectDEXpairForm" onsubmit="app.connectDEXpair(this);return false;">
+    <input type="text" name="pairAddr" placeholder="pairAddr">
+    <button id="buttonConnectDEXpair">Connect DEXpair</button>
+  </form>
+  <br/>
+  <div>swapA</div>
+  <form id="swapAForm" onsubmit="app.swapA(this);return false;">
+    <input type="text" name="pairAddr" placeholder="pairAddr">
+    <input type="number" name="nanoTokens" placeholder="nanoTokens" value="0">
+    <button id="buttonSwapA">Swap A</button>
+  </form>
+  <br/>
+  <div>swapB</div>
+  <form id="swapBForm" onsubmit="app.swapB(this);return false;">
+    <input type="text" name="pairAddr" placeholder="pairAddr">
+    <input type="number" name="nanoTokens" placeholder="nanoTokens" value="0">
+    <button id="buttonSwapB">Swap B</button>
+  </form>
+  <br/>
+  <div>Compute DEXpair Addr with shardID</div>
+  <form id="computeDEXpairAddrForm" onsubmit="app.computeDEXpairAddr(this);return false;">
+    <input type="number" name="pairId" placeholder="pairId" value="0">
+    <button id="buttonComputeDEXpairAddr">Compute DEXpair Addr</button>
+  </form>
+  <br/>
+  <div>Create DEXpair with shardID</div>
+  <form id="createPairForm" onsubmit="app.createPair(this);return false;">
+    <input type="number" name="pairId" placeholder="pairId" value="0">
+    <input type="text" name="root0" placeholder="address root0" >
+    <input type="text" name="root1" placeholder="address root1" >
+    <button id="buttonCreatePair">Create DEXpair</button>
+  </form>
+  <br/>
+  <div>provideLiquidity</div>
+  <form id="provideLiquidityForm" onsubmit="app.provideLiquidity(this);return false;">
+    <input type="text" name="pairAddr" placeholder="pairAddr">
+    <input type="number" name="qtyA" placeholder="qtyA" value="0">
+    <input type="number" name="qtyB" placeholder="qtyB" value="0">
+    <button id="buttonProvideLiquidity">Provide Liquidity</button>
+  </form>
+  <br/>
+  <div>selectLiquidity</div>
+  <form id="selectLiquidityForm" onsubmit="app.provideLiquidity(this);return false;">
+    <input type="text" name="pairAddr" placeholder="pairAddr">
+    <input type="number" name="percent" placeholder="percentToSelect" value="0">
+    <button id="buttonSelectLiquidity">Select Liquidity</button>
+  </form>
 
 </div>
 <br/>
