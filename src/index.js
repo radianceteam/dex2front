@@ -293,7 +293,38 @@ window.app = {
     }
   },
 
-
+  async swapA() {
+    const button = document.getElementById('buttonConnectDEXpair');
+    button.disabled = true;
+    try {
+      _.checkExtensionAvailability();
+      const provider = _.getProvider();
+      const signer = await provider.getSigner();
+      const pubkey = await signer.getPublicKey();
+      const root = new freeton.Contract(provider, DEXrootContract.abi, Radiance.networks['2'].dexroot);
+      const rootData = await root.methods.checkPubKey.run({pubkey:"0x"+pubkey});
+      if (rootData.status == true) {
+        const contract = new freeton.Contract(signer, DEXclientContract.abi, rootData.dexclient);
+        const contractMessageProcessing = await contract.methods.connectPair.call({pairAddr:form.pairAddr.value});
+        await contractMessageProcessing.wait();
+        console.log(`Called. TxId: ${contractMessageProcessing.txid}`)
+        document.getElementById('result').innerHTML += '</br>' + `Called. TxId: ${contractMessageProcessing.txid}`
+        // const client = new TonClient({network: { server_address: 'net.ton.dev' }});
+        // const balance = (await client.net.query_collection({collection: "accounts",filter: {id: {eq: result.value0,},},result: "balance",})).result;
+        document.getElementById('result').innerHTML += '</br>' + 'createDEXclient: '+ JSON.stringify(contractMessageProcessing)
+        console.log('createDEXclient: '+contractMessageProcessing);
+        // console.log('balance: '+parseInt(balance[0].balance));
+      } else {
+        document.getElementById('result').innerHTML += '</br>' + 'DEXclient status false'
+        console.log('DEXclient status false');
+      }
+    } catch (e) {
+      document.getElementById('result').innerHTML += '</br>' + JSON.stringify(e);
+      console.log(e);
+    } finally {
+      button.disabled = false;
+    }
+  },
 
 
 
