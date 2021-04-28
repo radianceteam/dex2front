@@ -196,6 +196,9 @@ window.app = {
       if (rootData.status == true) {
         const dexclient = new freeton.Contract(provider, DEXclientContract.abi, rootData.dexclient);
         const dexclientData = await dexclient.methods.getAllDataPreparation.run();
+        
+        const dexclientDataAddress = await dexclient.methods.showContractAddress.run();
+
         document.getElementById('result').innerHTML += '</br>' + 'getAllClienRoots: '+ JSON.stringify(dexclientData.rootKeysR)
         console.log('getAllClienRoots: '+dexclientData.rootKeysR);
         for (const item of dexclientData.rootKeysR) {
@@ -245,6 +248,10 @@ window.app = {
           symbolA = hex2ascii(symbolA.value0);
           symbolB = hex2ascii(symbolB.value0);
           console.log('Pair:'+symbolA+' : '+symbolB+' addr: '+item);
+          console.log('balanceReserve-'+symbolA+' : ' + pairData.balanceReserveA)// + ' addr: '+ pairData.addressReserveA);
+          console.log('balanceReserve-'+symbolB+' : ' + pairData.balanceReserveB)// + ' addr: '+ pairData.addressReserveB);
+          document.getElementById('result').innerHTML += '</br>' + 'balanceReserve-'+symbolA+' : ' + pairData.balanceReserveA + ' addr: '+ pairData.addressReserveA
+          document.getElementById('result').innerHTML += '</br>' + 'balanceReserve-'+symbolB+' : ' + pairData.balanceReserveB + ' addr: '+ pairData.addressReserveB
           document.getElementById('result').innerHTML += '</br>' +'Pair: '+JSON.stringify(symbolA)+' : '+JSON.stringify(symbolB)+' addr: '+JSON.stringify(item);
 
         }
@@ -259,7 +266,6 @@ window.app = {
       button.disabled = false;
     }
   },
-
   async connectDEXpair(form) {
     const button = document.getElementById('buttonConnectDEXpair');
     button.disabled = true;
@@ -292,11 +298,6 @@ window.app = {
       button.disabled = false;
     }
   },
-
-
-
-
-
   async runContractMethod() {
     const button = document.getElementById('buttonRunContractMethod');
     button.disabled = true;
@@ -496,4 +497,326 @@ window.app = {
       button.disabled = false;
     }
   },
+  async getAddressBalance (dexClientAddress) {
+    try {
+      const client = new _tonclient_core__WEBPACK_IMPORTED_MODULE_1__["TonClient"]({network: { server_address: 'net.ton.dev' }});
+      const balance = (await client.net.query_collection({collection: "accounts",filter: {id: {eq: dexClientAddress,},},result: "balance",})).result;
+      document.getElementById('result').innerHTML += '</br>' + ' balance: '+ JSON.stringify(parseInt(balance[0].balance))
+      currentBalance = parseInt(balance[0].balance)
+      console.log('balance: '+currentBalance);        
+    } catch (error) {
+      console.log(error)  
+    }  
+  },
+
+  async getBalanceTONgrams() {
+    const button = document.getElementById('buttonGetBalanceTONgrams');
+    button.disabled = true;
+    try {
+      _.checkExtensionAvailability();
+      const provider = _.getProvider();
+      const signer = await provider.getSigner();
+      const pubkey = await signer.getPublicKey();
+      const root = new freeton.Contract(provider, DEXrootContract.abi, Radiance.networks['2'].dexroot);
+      const rootData = await root.methods.checkPubKey.run({pubkey:"0x"+pubkey});
+      if (rootData.status == true) {
+
+        const dexclient = new freeton.Contract(provider, DEXclientContract.abi, rootData.dexclient);
+        const dexclientData = await dexclient.methods.getBalanceTONgrams.run();
+        document.getElementById('clientId').value = dexclient.address;
+        document.getElementById('BalanceTONgrams').value =dexclientData.balanceTONgrams; // JSON.stringify(dexclientData.balanceTONgrams);
+        console.log('getBalanceTONgrams: '+dexclientData.balanceTONgrams);
+        // for (const item of dexclientData.rootKeysR) {
+        //   const tokenRoot = new freeton.Contract(provider, RootTokenContract.abi, item);
+        //   const symbol = await tokenRoot.methods.getSymbol.run();
+        //   const addr = await dexclient.methods.getWalletByRoot.run({rootAddr:item});
+        //   const tokenWallet = new freeton.Contract(provider, TONTokenWalletContract.abi, addr.wallet);
+        //   const balance = await tokenWallet.methods.getBalance.run();
+        //   document.getElementById('result').innerHTML += '</br>' + 'symbol: '+ JSON.stringify(hex2ascii(symbol.value0))+' balance: '+ JSON.stringify(balance.value0)
+        //   console.log('symbol: '+hex2ascii(symbol.value0)+' balance: '+balance.value0);
+        // }
+      } else {
+        document.getElementById('result').innerHTML += '</br>' + 'DEXclient status false'
+        console.log('DEXclient status false');
+      }
+    } catch (e) {
+      document.getElementById('result').innerHTML += '</br>' + JSON.stringify(e);
+      console.log(e);
+    } finally {
+      button.disabled = false;
+    }
+  },
+
+ 
+  async wrapTON() {
+    const button = document.getElementById('buttonGetBalanceTONgrams');
+    button.disabled = true;
+    try {
+      _.checkExtensionAvailability();
+
+      const provider = _.getProvider();
+      const signer = await provider.getSigner();      
+      // const provider = _.getProvider();
+      // const provider = _.getProvider();
+      // const signer = await provider.getSigner();
+      // const signer = await provider.getSigner();
+      const pubkey = await signer.getPublicKey();
+      const root = new freeton.Contract(provider, DEXrootContract.abi, Radiance.networks['2'].dexroot);
+      const rootData = await root.methods.checkPubKey.run({pubkey:"0x"+pubkey});
+      if (rootData.status == true) {
+
+
+        // const signer = await provider.getSigner();
+        // const pubkey = await signer.getPublicKey();
+        // const contract = new freeton.Contract(signer, DEXrootContract.abi, Radiance.networks['2'].dexroot);
+
+        // const signer = await provider.getSigner();
+        // const pubkey = await signer.getPublicKey();
+        // const provider = _.getProvider();
+
+        // const dexclient = new freeton.Contract(provider, DEXclientContract.abi, rootData.dexclient);
+        const dexclient = new freeton.Contract(signer, DEXclientContract.abi, rootData.dexclient ); //rootData.dexclient); signer.wallet.address
+        // const dexclientData = await dexclient.methods.getBalanceTONgrams.run();
+        // const _wrapTON = await dexclient.methods.wrapTON.run({qtyTONgrams:"1000000000"});
+        const qtyTONgrams = document.getElementById('wrapTON');
+        const contractMessageProcessing = await dexclient.methods.wrapTON.call({qtyTONgrams:!qtyTONgrams.value?qtyTONgrams.defaultValue:qtyTONgrams.value});
+        const _wrapTON = await contractMessageProcessing.wait();
+
+
+        // document.getElementById('clientId').value = dexclient.address;
+        // document.getElementById('BalanceTONgrams').value =dexclientData.balanceTONgrams; // JSON.stringify(dexclientData.balanceTONgrams);
+        console.log('txid: '+contractMessageProcessing.txid);
+        // for (const item of dexclientData.rootKeysR) {
+        //   const tokenRoot = new freeton.Contract(provider, RootTokenContract.abi, item);
+        //   const symbol = await tokenRoot.methods.getSymbol.run();
+        //   const addr = await dexclient.methods.getWalletByRoot.run({rootAddr:item});
+        //   const tokenWallet = new freeton.Contract(provider, TONTokenWalletContract.abi, addr.wallet);
+        //   const balance = await tokenWallet.methods.getBalance.run();
+        //   document.getElementById('result').innerHTML += '</br>' + 'symbol: '+ JSON.stringify(hex2ascii(symbol.value0))+' balance: '+ JSON.stringify(balance.value0)
+        //   console.log('symbol: '+hex2ascii(symbol.value0)+' balance: '+balance.value0);
+        // }
+      } else {
+        document.getElementById('result').innerHTML += '</br>' + 'DEXclient status false'
+        console.log('DEXclient status false');
+      }
+    } catch (e) {
+      document.getElementById('result').innerHTML += '</br>' + JSON.stringify(e);
+      console.log(e);
+    } finally {
+      button.disabled = false;
+    }
+  },  
+  
+  async makeABdepositToPair(form) {
+    const button = document.getElementById('buttonGetClientRoots');
+    button.disabled = true;
+    try {
+      _.checkExtensionAvailability();
+      const provider = _.getProvider();
+      const signer = await provider.getSigner();
+      const pubkey = await signer.getPublicKey();
+      const root = new freeton.Contract(provider, DEXrootContract.abi, Radiance.networks['2'].dexroot);
+      const rootData = await root.methods.checkPubKey.run({pubkey:"0x"+pubkey});
+      if (rootData.status == true) {
+        const dexclient = new freeton.Contract(signer, DEXclientContract.abi, rootData.dexclient);
+
+        // (address pairAddr, uint128 qtyA, uint128 qtyB) 
+        const qtyA = document.getElementById('makeABqtyA');
+        const qtyB = document.getElementById('makeABqtyB');
+
+        const dexclientData = await dexclient.methods.makeABdepositToPair.call({pairAddr: form.pairAddr.value, qtyA:!qtyA.value?qtyA.defaultValue:qtyA.value, qtyB:!qtyB.value?qtyB.defaultValue:qtyB.value});
+        const fds=1
+        // document.getElementById('result').innerHTML += '</br>' + 'getAllClienRoots: '+ JSON.stringify(dexclientData.rootKeysR)
+        // console.log('getAllClienRoots: '+dexclientData.rootKeysR);
+        // for (const item of dexclientData.rootKeysR) {
+        //   const tokenRoot = new freeton.Contract(provider, RootTokenContract.abi, item);
+        //   const symbol = await tokenRoot.methods.getSymbol.run();
+        //   const addr = await dexclient.methods.getWalletByRoot.run({rootAddr:item});
+        //   const tokenWallet = new freeton.Contract(provider, TONTokenWalletContract.abi, addr.wallet);
+        //   const balance = await tokenWallet.methods.getBalance.run();
+        //   document.getElementById('result').innerHTML += '</br>' + 'symbol: '+ JSON.stringify(hex2ascii(symbol.value0))+' balance: '+ JSON.stringify(balance.value0)
+        //   console.log('symbol: '+hex2ascii(symbol.value0)+' balance: '+balance.value0);
+        // }
+      } else {
+        document.getElementById('result').innerHTML += '</br>' + 'DEXclient status false'
+        console.log('DEXclient status false');
+      }
+    } catch (e) {
+      document.getElementById('result').innerHTML += '</br>' + JSON.stringify(e);
+      console.log(e);
+    } finally {
+      button.disabled = false;
+    }
+  },
+
+  async makeAdepositToPair(form) {
+    const button = document.getElementById('buttonGetClientRoots');
+    button.disabled = true;
+    try {
+      _.checkExtensionAvailability();
+      const provider = _.getProvider();
+      const signer = await provider.getSigner();
+      const pubkey = await signer.getPublicKey();
+      const root = new freeton.Contract(provider, DEXrootContract.abi, Radiance.networks['2'].dexroot);
+      const rootData = await root.methods.checkPubKey.run({pubkey:"0x"+pubkey});
+      if (rootData.status == true) {
+        const dexclient = new freeton.Contract(signer, DEXclientContract.abi, rootData.dexclient);
+
+        // (address pairAddr, uint128 qtyA, uint128 qtyB) 
+        const qtyA = document.getElementById('makeAqtyA');
+        // const qtyB = document.getElementById('makeAqtyB'); makeAdepositToPair
+
+        const dexclientData = await dexclient.methods.makeAdepositToPair.call({pairAddr: form.pairAddr.value, qtyA:!qtyA.value?qtyA.defaultValue:qtyA.value }) ///, qtyB:!qtyB.value?qtyB.defaultValue:qtyB.value});
+        const fds=1
+        // document.getElementById('result').innerHTML += '</br>' + 'getAllClienRoots: '+ JSON.stringify(dexclientData.rootKeysR)
+        // console.log('getAllClienRoots: '+dexclientData.rootKeysR);
+        // for (const item of dexclientData.rootKeysR) {
+        //   const tokenRoot = new freeton.Contract(provider, RootTokenContract.abi, item);
+        //   const symbol = await tokenRoot.methods.getSymbol.run();
+        //   const addr = await dexclient.methods.getWalletByRoot.run({rootAddr:item});
+        //   const tokenWallet = new freeton.Contract(provider, TONTokenWalletContract.abi, addr.wallet);
+        //   const balance = await tokenWallet.methods.getBalance.run();
+        //   document.getElementById('result').innerHTML += '</br>' + 'symbol: '+ JSON.stringify(hex2ascii(symbol.value0))+' balance: '+ JSON.stringify(balance.value0)
+        //   console.log('symbol: '+hex2ascii(symbol.value0)+' balance: '+balance.value0);
+        // }
+      } else {
+        document.getElementById('result').innerHTML += '</br>' + 'DEXclient status false'
+        console.log('DEXclient status false');
+      }
+    } catch (e) {
+      document.getElementById('result').innerHTML += '</br>' + JSON.stringify(e);
+      console.log(e);
+    } finally {
+      button.disabled = false;
+    }
+  },
+
+  async makeBdepositToPair(form) {
+    const button = document.getElementById('buttonGetClientRoots');
+    button.disabled = true;
+    try {
+      _.checkExtensionAvailability();
+      const provider = _.getProvider();
+      const signer = await provider.getSigner();
+      const pubkey = await signer.getPublicKey();
+      const root = new freeton.Contract(provider, DEXrootContract.abi, Radiance.networks['2'].dexroot);
+      const rootData = await root.methods.checkPubKey.run({pubkey:"0x"+pubkey});
+      if (rootData.status == true) {
+        const dexclient = new freeton.Contract(signer, DEXclientContract.abi, rootData.dexclient);
+
+        // (address pairAddr, uint128 qtyA, uint128 qtyB) 
+        // const qtyA = document.getElementById('makeABqtyA');
+        const qtyB = document.getElementById('makeBqtyB');
+
+        const dexclientData = await dexclient.methods.makeBdepositToPair.call({pairAddr: form.pairAddr.value, qtyB: !qtyB.value?qtyB.defaultValue:qtyB.value});
+        const fds=1
+        // document.getElementById('result').innerHTML += '</br>' + 'getAllClienRoots: '+ JSON.stringify(dexclientData.rootKeysR)
+        // console.log('getAllClienRoots: '+dexclientData.rootKeysR);
+        // for (const item of dexclientData.rootKeysR) {
+        //   const tokenRoot = new freeton.Contract(provider, RootTokenContract.abi, item);
+        //   const symbol = await tokenRoot.methods.getSymbol.run();
+        //   const addr = await dexclient.methods.getWalletByRoot.run({rootAddr:item});
+        //   const tokenWallet = new freeton.Contract(provider, TONTokenWalletContract.abi, addr.wallet);
+        //   const balance = await tokenWallet.methods.getBalance.run();
+        //   document.getElementById('result').innerHTML += '</br>' + 'symbol: '+ JSON.stringify(hex2ascii(symbol.value0))+' balance: '+ JSON.stringify(balance.value0)
+        //   console.log('symbol: '+hex2ascii(symbol.value0)+' balance: '+balance.value0);
+        // }
+      } else {
+        document.getElementById('result').innerHTML += '</br>' + 'DEXclient status false'
+        console.log('DEXclient status false');
+      }
+    } catch (e) {
+      document.getElementById('result').innerHTML += '</br>' + JSON.stringify(e);
+      console.log(e);
+    } finally {
+      button.disabled = false;
+    }
+  },
+
+  async processSwapA(form) {
+    const button = document.getElementById('buttonGetClientRoots');
+    button.disabled = true;
+    try {
+      _.checkExtensionAvailability();
+      const provider = _.getProvider();
+      const signer = await provider.getSigner();
+      const pubkey = await signer.getPublicKey();
+      const root = new freeton.Contract(provider, DEXrootContract.abi, Radiance.networks['2'].dexroot);
+      const rootData = await root.methods.checkPubKey.run({pubkey:"0x"+pubkey});
+      if (rootData.status == true) {
+        const dexclient = new freeton.Contract(signer, DEXclientContract.abi, rootData.dexclient);
+
+        // (address pairAddr, uint128 qtyA, uint128 qtyB) 
+        const qtyA = document.getElementById('makeABqtyA');
+        // const qtyB = document.getElementById('makeABqtyB');
+
+        const dexclientData = await dexclient.methods.processSwapA.call({pairAddr: form.pairAddr.value, qtyA:!qtyA.value?qtyA.defaultValue:qtyA.value});
+        const fds=1
+        // document.getElementById('result').innerHTML += '</br>' + 'getAllClienRoots: '+ JSON.stringify(dexclientData.rootKeysR)
+        // console.log('getAllClienRoots: '+dexclientData.rootKeysR);
+        // for (const item of dexclientData.rootKeysR) {
+        //   const tokenRoot = new freeton.Contract(provider, RootTokenContract.abi, item);
+        //   const symbol = await tokenRoot.methods.getSymbol.run();
+        //   const addr = await dexclient.methods.getWalletByRoot.run({rootAddr:item});
+        //   const tokenWallet = new freeton.Contract(provider, TONTokenWalletContract.abi, addr.wallet);
+        //   const balance = await tokenWallet.methods.getBalance.run();
+        //   document.getElementById('result').innerHTML += '</br>' + 'symbol: '+ JSON.stringify(hex2ascii(symbol.value0))+' balance: '+ JSON.stringify(balance.value0)
+        //   console.log('symbol: '+hex2ascii(symbol.value0)+' balance: '+balance.value0);
+        // }
+      } else {
+        document.getElementById('result').innerHTML += '</br>' + 'DEXclient status false'
+        console.log('DEXclient status false');
+      }
+    } catch (e) {
+      document.getElementById('result').innerHTML += '</br>' + JSON.stringify(e);
+      console.log(e);
+    } finally {
+      button.disabled = false;
+    }
+  },
+  
+  async processSwapB(form) {
+    const button = document.getElementById('buttonGetClientRoots');
+    button.disabled = true;
+    try {
+      _.checkExtensionAvailability();
+      const provider = _.getProvider();
+      const signer = await provider.getSigner();
+      const pubkey = await signer.getPublicKey();
+      const root = new freeton.Contract(provider, DEXrootContract.abi, Radiance.networks['2'].dexroot);
+      const rootData = await root.methods.checkPubKey.run({pubkey:"0x"+pubkey});
+      if (rootData.status == true) {
+        const dexclient = new freeton.Contract(signer, DEXclientContract.abi, rootData.dexclient);
+
+        // (address pairAddr, uint128 qtyA, uint128 qtyB) 
+        // const qtyA = document.getElementById('makeABqtyA');
+        const qtyB = document.getElementById('makeABqtyB');
+
+        const dexclientData = await dexclient.methods.processSwapB.call({pairAddr: form.pairAddr.value, qtyB:!qtyB.value?qtyB.defaultValue:qtyB.value});
+        const fds=1
+        // document.getElementById('result').innerHTML += '</br>' + 'getAllClienRoots: '+ JSON.stringify(dexclientData.rootKeysR)
+        // console.log('getAllClienRoots: '+dexclientData.rootKeysR);
+        // for (const item of dexclientData.rootKeysR) {
+        //   const tokenRoot = new freeton.Contract(provider, RootTokenContract.abi, item);
+        //   const symbol = await tokenRoot.methods.getSymbol.run();
+        //   const addr = await dexclient.methods.getWalletByRoot.run({rootAddr:item});
+        //   const tokenWallet = new freeton.Contract(provider, TONTokenWalletContract.abi, addr.wallet);
+        //   const balance = await tokenWallet.methods.getBalance.run();
+        //   document.getElementById('result').innerHTML += '</br>' + 'symbol: '+ JSON.stringify(hex2ascii(symbol.value0))+' balance: '+ JSON.stringify(balance.value0)
+        //   console.log('symbol: '+hex2ascii(symbol.value0)+' balance: '+balance.value0);
+        // }
+      } else {
+        document.getElementById('result').innerHTML += '</br>' + 'DEXclient status false'
+        console.log('DEXclient status false');
+      }
+    } catch (e) {
+      document.getElementById('result').innerHTML += '</br>' + JSON.stringify(e);
+      console.log(e);
+    } finally {
+      button.disabled = false;
+    }
+  },
+  // getBalance
+
+  // getAddressWTON
 };

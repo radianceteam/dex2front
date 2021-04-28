@@ -4,6 +4,72 @@
   <title>Radiance dex2front</title>
 </head>
 <body>
+
+
+  <div>Get Balance TONgrams</div>
+  <form id="getBalanceTONgramsForm" onsubmit="app.getBalanceTONgrams();return false;">    
+    <button id="buttonGetBalanceTONgrams">Get Balance TON grams</button>
+    <input id="BalanceTONgrams" type="text" name="BalanceTONgrams" placeholder="BalanceTONgrams">
+  </form>
+  <br/>
+  
+  <div>DEXclient</div>
+  <form id="createDEXclientForm2" onsubmit="app.createDEXclient(this);return false;">
+    <input id="clientId" type="text" name="clientId">
+
+  </form>
+
+  <div>Wrap TON</div>
+  <form id="wrapTONform" onsubmit="app.wrapTON();return false;">    
+    <button id="buttonWrapTON">Wrap TON</button>
+    <input id="wrapTON" type="number" name="wrapTON" placeholder="wrapTON" value=1000000000>
+  </form>
+  <br/>
+
+  <div>Make AB deposit To Pair</div>
+  <form id="makeABdepositToPair" onsubmit="app.makeABdepositToPair(this);return false;">    
+    <input type="text" name="pairAddr" placeholder="pairAddr">
+    <input id="makeABqtyA" type="number" name="qtyA" placeholder="qtyA" value=1000000000>
+    <input id="makeABqtyB" type="number" name="qtyB" placeholder="qtyB" value=1000000000>
+    <button id="buttonmakeABdepositToPair">Make AB deposit To Pair</button>
+  </form>
+  <br/>
+
+  <div>Make A deposit To Pair</div>
+  <form id="makeAdepositToPair" onsubmit="app.makeAdepositToPair(this);return false;">    
+    <input type="text" name="pairAddr" placeholder="pairAddr">
+    <input id="makeAqtyA" type="number" name="qtyA" placeholder="qtyA" value=1000000000>
+    <!-- <input id="makeAqtyB" type="number" name="qtyB" placeholder="qtyB" value=1000000000> -->
+    <button id="buttonmakeAdepositToPair">Make A deposit To Pair</button>
+  </form>
+  <br/>
+
+  <div>Make B deposit To Pair</div>
+  <form id="makeBdepositToPair" onsubmit="app.makeBdepositToPair(this);return false;">    
+    <input type="text" name="pairAddr" placeholder="pairAddr">
+    <!-- <input id="makeBqtyA" type="number" name="qtyA" placeholder="qtyA" value=1000000000> -->
+    <input id="makeBqtyB" type="number" name="qtyB" placeholder="qtyB" value=1000000000>
+    <button id="buttonmakeBdepositToPair">Make B deposit To Pair</button>
+  </form>
+  <br/>
+
+  <div>swap A</div>
+  <form id="swapAForm" onsubmit="app.processSwapA(this);return false;">
+    <input type="text" name="pairAddr" placeholder="pairAddr">
+    <input type="number" name="nanoTokens" placeholder="nanoTokens" value=1000000000>
+    <button id="buttonSwapA">Swap A</button>
+  </form>
+  <br/>
+  <div>swap B</div>
+  <form id="swapBForm" onsubmit="app.processSwapB(this);return false;">
+    <input type="text" name="pairAddr" placeholder="pairAddr">
+    <input type="number" name="nanoTokens" placeholder="nanoTokens" value=1000000000>
+    <button id="buttonSwapB">Swap B</button>
+  </form>
+  <br/>
+
+  <!-- makeAdepositToPair -->
+
   <div>
     <h3>Common</h3>
     <button id="buttonRequestVersion" onclick="app.requestVersion()">Get Version</button>
@@ -87,20 +153,8 @@
     <button id="buttonConnectDEXpair">Connect DEXpair</button>
   </form>
   <br/>
-  <div>swapA</div>
-  <form id="swapAForm" onsubmit="app.swapA(this);return false;">
-    <input type="text" name="pairAddr" placeholder="pairAddr">
-    <input type="number" name="nanoTokens" placeholder="nanoTokens" value="0">
-    <button id="buttonSwapA">Swap A</button>
-  </form>
-  <br/>
-  <div>swapB</div>
-  <form id="swapBForm" onsubmit="app.swapB(this);return false;">
-    <input type="text" name="pairAddr" placeholder="pairAddr">
-    <input type="number" name="nanoTokens" placeholder="nanoTokens" value="0">
-    <button id="buttonSwapB">Swap B</button>
-  </form>
-  <br/>
+
+
   <div>Compute DEXpair Addr with shardID</div>
   <form id="computeDEXpairAddrForm" onsubmit="app.computeDEXpairAddr(this);return false;">
     <input type="number" name="pairId" placeholder="pairId" value="0">
@@ -135,5 +189,6 @@
 <div>Look results in console.</div>
 <div id="result"></div>
 <script src="./main.js"></script>
+<script src="../src/utils.js"></script>
 </body>
 </html>
