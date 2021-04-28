@@ -10,6 +10,8 @@ const hex2ascii = require('hex2ascii');
 const Radiance = require('../contracts/Radiance.json');
 const { DEXrootContract } = require('../contracts/DEXroot.js');
 const { DEXpairContract } = require('../contracts/DEXpair.js');
+const { TONwrapper } = require('../contracts/TONwrapper.js');
+
 const { DEXclientContract } = require('../contracts/DEXclient.js');
 const { RootTokenContract } = require('../contracts/RootToken.js');
 const { TONTokenWalletContract } = require('../contracts/TONTokenWallet.js');
@@ -147,6 +149,7 @@ window.app = {
       const provider = _.getProvider();
       const signer = await provider.getSigner();
       const pubkey = await signer.getPublicKey();
+      console.log("pub", pubkey)
       const contract = new freeton.Contract(provider, DEXrootContract.abi, Radiance.networks['2'].dexroot);
       const result = await contract.methods.computeDEXclientAddrWithId.run({pubkey:"0x"+pubkey,clientId:form.clientId.value});
       document.getElementById('result').innerHTML += '</br>' + 'computeDEXclientAddrWithId: '+ JSON.stringify(result)
@@ -164,6 +167,7 @@ window.app = {
     try {
       _.checkExtensionAvailability();
       const provider = _.getProvider();
+      console.log("from", form)
       const signer = await provider.getSigner();
       const pubkey = await signer.getPublicKey();
       const contract = new freeton.Contract(signer, DEXrootContract.abi, Radiance.networks['2'].dexroot);
@@ -298,6 +302,163 @@ window.app = {
       button.disabled = false;
     }
   },
+
+
+  /*
+    SWAP
+    все гет функции желательно запустить при запуске приложения (то есть получении провайдера -> адреса клиента )
+    это получение
+        - все пары которые есть на dexroot
+        - всех пар к которым подключен клиент и по ним собрать все адреса ( getPair )
+        - руты которые есть у клиента
+        - по рутам собрать валлеты (балансы, symbol, token name, адреса этих валлетов) - в функции getClientRoots есть пример
+    все это необходимо положить в хук или redux и привести в удобный для работы вид
+
+    * все что здесь повторяется можно вынести в utils - проверки типов, создание экземпляров контрактов
+    * методы для работы с блокчейном можно вынести в папку _sdkrun для геттеров и _sdkcall для платных функций
+   */
+  async swapA(form) {
+    const button = document.getElementById('swapAForm');
+    button.disabled = true;
+    try {
+      //перед началом в интерфейсе можно вызвать GET dex client root и получить балансы токен валлетов и после проведения свапа проверить еще раз чтобы убедиться что токены после обмена пришли
+
+      //нужно вынести проверку наличия dexclient в отдельную функцию, и вызывать при каждом действии (имеется в виду при работе с блокчейном)
+
+      _.checkExtensionAvailability();
+      //чекаем провайдера и вытаскиваем signer
+      const provider = _.getProvider();
+      const signer = await provider.getSigner();
+      // //вытаскиваем из экстеншна pubkey
+      const pubkey = await signer.getPublicKey();
+      // //создаем образ DEXrootContract прикладывая к методу contract провайдера, абишку
+      const root = new freeton.Contract(provider, DEXrootContract.abi, Radiance.networks['2'].dexroot);
+      // //проверяем есть ли задеплоенный смартконтракт клиента на руте по публичному ключу
+      const rootData = await root.methods.checkPubKey.run({pubkey:"0x"+pubkey});
+      // //если в rootData.status true и rootData.dexclient есть текущий адрес идем дальше, если нет просим пользователя задеплоить dexclient
+      if(!rootData.status){
+        console.log("no dex client pls deploy")
+        return
+      }
+
+      /*
+      для свапа первым шагом нужно перевести из msig кошелька на dexclient какое-то количество тоннов
+       */
+      ////если на msig wallet недостаточно средств выдать ошибку
+      let amountToTransfer = +form.nanoTokens.value + 1000000000
+      const client = new TonClient({network: { server_address: 'net.ton.dev' }});
+
+      const balanceWallet = (await client.net.query_collection({collection: "accounts",filter: {id: {eq: signer.wallet.address,},},result: "balance",})).result;
+      //проверяем достаточно ли денег чтобы отправить,если нет возвращаем ошибку
+      if(parseInt(balanceWallet[0].balance) < amountToTransfer){
+        console.log("not enought tons",balanceWallet[0].balance,"amountToTransfer",amountToTransfer)
+        return
+      }
+
+      //перед отправков получаем текущий баланс dexclient, это нужно чтобы после переода tons проверить что деньги реально пришли
+      const balanceDEXclientBefore = (await client.net.query_collection({collection: "accounts",filter: {id: {eq: rootData.dexclient,},},result: "balance",})).result;
+      //создаем экземплял кошелька
+      let x = await new freeton.Wallet(signer,signer.wallet.address)
+      //непосредственно перевод
+      let res = await x.transfer(rootData.dexclient, amountToTransfer)
+      console.log("signer.wallet.address",signer.wallet.address)
+      //получаем баланс после перевода и рекурсивно сравниваем балансы
+      let balanceDEXclientAfter = (await client.net.query_collection({collection: "accounts",filter: {id: {eq: rootData.dexclient,},},result: "balance",})).result;
+
+      //цикл можно обернуть в settimeout раз в 1сек примерно, через 10 сек return
+      while(parseInt(balanceDEXclientBefore[0].balance) === parseInt(balanceDEXclientAfter[0].balance)){
+        balanceDEXclientAfter = (await client.net.query_collection({collection: "accounts",filter: {id: {eq: rootData.dexclient,},},result: "balance",})).result;
+        console.log("transaction from msig\nbalance before",parseInt(balanceDEXclientBefore[0].balance), "balance after",parseInt(balanceDEXclientAfter[0].balance), "difference", parseInt(balanceDEXclientAfter[0].balance) - parseInt(balanceDEXclientBefore[0].balance))
+      }
+      console.log("all ok, transfer from msig to dexclient success")
+
+      /*
+            вторым шагом необходимо обернуть нативную валюту TON в токен WTON
+      */
+      const dexclient = new freeton.Contract(signer, DEXclientContract.abi, rootData.dexclient);
+      //здесь мы вызываем у контракта клиента функцию wtonroot которая возвращает нам адрес рута
+      const clientWTONrootAddr = await dexclient.methods.wTONroot.run();
+      //получаем адрес кошелька этого рута
+      const clientWTONwalletAddr = await dexclient.methods.getWalletByRoot.run({rootAddr: clientWTONrootAddr.wTONroot});
+  //создаем экземпляр токен валлета
+      const tokenWallet = new freeton.Contract(provider, TONTokenWalletContract.abi, clientWTONwalletAddr.wallet);
+      //берем баланс чтобы позже проверить пришли ли на него токены
+      const balanceWTONbefore = await tokenWallet.methods.getBalance.run();
+
+
+      const resp = await dexclient.methods.wrapTON.call({qtyTONgrams:form.nanoTokens.value});
+      await resp.wait()
+      //если в ответе есть code - это код какой-то ошибки, если это 508 делаем retry (делать можно смело в течении 15-25 секудн, settimeout`ом), если какая то другая значит где то косяк
+      if(resp.code){
+        console.log("resp.code",resp.code,"resp.message", resp.message)
+        return
+      }
+      //чекаем изменения баланса
+      let balanceWTONafter = await tokenWallet.methods.getBalance.run();
+
+      while(parseInt(balanceWTONbefore.value0) === parseInt(balanceWTONafter.value0)){
+          balanceWTONafter = await tokenWallet.methods.getBalance.run();
+          console.log("tons wrapping\nbalance before",parseInt(balanceWTONbefore.value0), "balance after",parseInt(balanceWTONafter.value0), "difference", parseInt(balanceWTONafter.value0) - parseInt(balanceWTONbefore.value0))
+        }
+console.log("all ok, tons wrapped success")
+          /*
+      третьим шагом кладем на депозит обернутые тонны (wton)
+    */
+
+      //для этого берем адрес пары на которой мы проводим сейчас свап
+      let pairclientwallets = await dexclient.methods.getPair.run({value0:"0:2778b6df9fc582fd03218eb3d685c47ca1a398838d2f15d30cb4166c1c60b8f5"});
+      //создаем экземпляр токен валлета clientDepositA - поскольку в конкретно данном контексте свапаем токен А, в приложении это нужно реализовать как входящую переменную
+      // то есть если свапаем А берем clientDepositA если б то соответственно clientDepositB
+      const tokenWalletswapA = new freeton.Contract(provider, TONTokenWalletContract.abi, pairclientwallets.clientDepositA);
+      //снова берем баланс ДО выполнения операции
+      const walletABalancebefore = await tokenWalletswapA.methods.getBalance.run();
+
+     //кладем на депозит
+      let onDeposit = await dexclient.methods.makeAdepositToPair.call({pairAddr:"0:2778b6df9fc582fd03218eb3d685c47ca1a398838d2f15d30cb4166c1c60b8f5",qtyA:form.nanoTokens.value});
+      //чекаем что токены реально уже на балансе
+      let walletABalanceafter = await tokenWalletswapA.methods.getBalance.run();
+      while(parseInt(walletABalancebefore.value0) === parseInt(walletABalanceafter.value0)){
+          walletABalanceafter = await tokenWalletswapA.methods.getBalance.run();
+          console.log("set deposit\nbalance before",parseInt(walletABalancebefore.value0), "balance after",parseInt(walletABalanceafter.value0), "difference", parseInt(walletABalanceafter.value0) - parseInt(walletABalancebefore.value0))
+        }
+        console.log("make tons to deposit success")
+
+      /*
+      четвертый шаг это непосредственно свап
+       */
+      //здесь в качестве pairAddr должен быть адрес пары на которой мы сейчас делаем свап
+      let onWalletAddressesGet = await dexclient.methods.getPairClientWallets.run({pairAddr:"0:2778b6df9fc582fd03218eb3d685c47ca1a398838d2f15d30cb4166c1c60b8f5"});
+      //из нее мы получаем адреса кошельков принадлежащих клиенту и привязанных к этой паре
+      const walletBcontract = new freeton.Contract(provider, TONTokenWalletContract.abi, onWalletAddressesGet.walletB);
+      //в конкретно данном случае мы свапаем токен А на токен Б - значит мы отдаем сколько то токенов А и проверяем сколько пришло кошелек токена Б ( onWalletAddressesGet.walletB )
+      const walletBbalanceBefore = await walletBcontract.methods.getBalance.run();
+      //свапаем
+      let swapRes = await dexclient.methods.processSwapA.call({pairAddr:"0:2778b6df9fc582fd03218eb3d685c47ca1a398838d2f15d30cb4166c1c60b8f5",qtyA:form.nanoTokens.value});
+      await swapRes.wait()
+
+
+      //проверяем что токены Б пришли
+      let walletBbalanceAfter = await walletBcontract.methods.getBalance.run();
+
+
+      while(parseInt(walletBbalanceBefore.value0) === parseInt(walletBbalanceAfter.value0)){
+        walletBbalanceAfter = await walletBcontract.methods.getBalance.run();
+        console.log("balance before",parseInt(walletBbalanceBefore.value0), "balance after",parseInt(walletBbalanceAfter.value0), "difference", parseInt(walletBbalanceAfter.value0) - parseInt(walletBbalanceBefore.value0))
+      }
+      const symbol = await walletBcontract.methods.getSymbol.run();
+      console.log(`Swap success you getteed ${parseInt(walletBbalanceAfter.value0)} of ${hex2ascii(symbol.value0)}`)
+      //конец
+
+    } catch (e) {
+      document.getElementById('result').innerHTML += '</br>' + JSON.stringify(e);
+      console.log(e);
+    } finally {
+      button.disabled = false;
+    }
+  },
+
+
+
   async runContractMethod() {
     const button = document.getElementById('buttonRunContractMethod');
     button.disabled = true;
