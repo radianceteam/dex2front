@@ -68,6 +68,14 @@
   </form>
   <br/>
 
+
+  <!-- <div>swap A</div> -->
+  <form id="_swapAForm" onsubmit="app.swapA(this);return false;">
+    <!-- <input type="text" name="pairAddr" placeholder="pairAddr"> -->
+    <input type="number" name="nanoTokens" placeholder="nanoTokens" value=1000000000>
+    <button id="swapAForm">Swap A</button>
+  </form>
+  <br/>
   <!-- makeAdepositToPair -->
 
   <div>
@@ -171,17 +179,23 @@
   <br/>
   <div>provideLiquidity</div>
   <form id="provideLiquidityForm" onsubmit="app.provideLiquidity(this);return false;">
-    <input type="text" name="pairAddr" placeholder="pairAddr">
-    <input type="number" name="qtyA" placeholder="qtyA" value="0">
-    <input type="number" name="qtyB" placeholder="qtyB" value="0">
+    <input id="PLpairAddr" type="text" name="pairAddr" placeholder="pairAddr">
+    <input id="PLqtyA" type="number" name="qtyA" placeholder="qtyA" value="0">
+    <input id="PLqtyB" type="number" name="qtyB" placeholder="qtyB" value="0">
     <button id="buttonProvideLiquidity">Provide Liquidity</button>
   </form>
   <br/>
-  <div>selectLiquidity</div>
-  <form id="selectLiquidityForm" onsubmit="app.provideLiquidity(this);return false;">
+  <div>Select ALL Liquidity</div>
+  <form id="selectLiquidityForm" onsubmit="app.selectLiquidity(this);return false;">
+    <input id="SLpairAddr" type="text" name="pairAddr" placeholder="pairAddr">
+    <button id="buttonSelectALLLiquidity">Select ALL Liquidity</button>
+  </form>  
+  <br/>
+  <div>Select percent Liquidity</div>
+  <form id="selectPercentLiquidityForm" onsubmit="app.selectPercentLiquidity(this);return false;">
     <input type="text" name="pairAddr" placeholder="pairAddr">
     <input type="number" name="percent" placeholder="percentToSelect" value="0">
-    <button id="buttonSelectLiquidity">Select Liquidity</button>
+    <button id="buttonSelectLiquidity">Select Percent Liquidity</button>
   </form>
 
 </div>

@@ -387,6 +387,9 @@ window.app = {
 
 
       const resp = await dexclient.methods.wrapTON.call({qtyTONgrams:form.nanoTokens.value});
+      //если в extension пользователь отменил wrapTON, то запускаем unwrapTON
+      //const unwrapTON = await dexclient.methods.unwrapTON.call();
+
       await resp.wait()
       //если в ответе есть code - это код какой-то ошибки, если это 508 делаем retry (делать можно смело в течении 15-25 секудн, settimeout`ом), если какая то другая значит где то косяк
       if(resp.code){
@@ -404,17 +407,19 @@ console.log("all ok, tons wrapped success")
           /*
       третьим шагом кладем на депозит обернутые тонны (wton)
     */
-
+    // Если
       //для этого берем адрес пары на которой мы проводим сейчас свап
-      let pairclientwallets = await dexclient.methods.getPair.run({value0:"0:2778b6df9fc582fd03218eb3d685c47ca1a398838d2f15d30cb4166c1c60b8f5"});
+      let pairclientwallets = await dexclient.methods.getPair.run({value0:"0:26e9e1eb5cdd6b062959acce612b42dbe5135a40c16b47487f82c203bb5abb8a"});
       //создаем экземпляр токен валлета clientDepositA - поскольку в конкретно данном контексте свапаем токен А, в приложении это нужно реализовать как входящую переменную
       // то есть если свапаем А берем clientDepositA если б то соответственно clientDepositB
       const tokenWalletswapA = new freeton.Contract(provider, TONTokenWalletContract.abi, pairclientwallets.clientDepositA);
       //снова берем баланс ДО выполнения операции
       const walletABalancebefore = await tokenWalletswapA.methods.getBalance.run();
 
+    
+
      //кладем на депозит
-      let onDeposit = await dexclient.methods.makeAdepositToPair.call({pairAddr:"0:2778b6df9fc582fd03218eb3d685c47ca1a398838d2f15d30cb4166c1c60b8f5",qtyA:form.nanoTokens.value});
+      let onDeposit = await dexclient.methods.makeAdepositToPair.call({pairAddr:"0:26e9e1eb5cdd6b062959acce612b42dbe5135a40c16b47487f82c203bb5abb8a",qtyA:form.nanoTokens.value});
       //чекаем что токены реально уже на балансе
       let walletABalanceafter = await tokenWalletswapA.methods.getBalance.run();
       while(parseInt(walletABalancebefore.value0) === parseInt(walletABalanceafter.value0)){
@@ -427,13 +432,13 @@ console.log("all ok, tons wrapped success")
       четвертый шаг это непосредственно свап
        */
       //здесь в качестве pairAddr должен быть адрес пары на которой мы сейчас делаем свап
-      let onWalletAddressesGet = await dexclient.methods.getPairClientWallets.run({pairAddr:"0:2778b6df9fc582fd03218eb3d685c47ca1a398838d2f15d30cb4166c1c60b8f5"});
+      let onWalletAddressesGet = await dexclient.methods.getPairClientWallets.run({pairAddr:"0:26e9e1eb5cdd6b062959acce612b42dbe5135a40c16b47487f82c203bb5abb8a"});
       //из нее мы получаем адреса кошельков принадлежащих клиенту и привязанных к этой паре
       const walletBcontract = new freeton.Contract(provider, TONTokenWalletContract.abi, onWalletAddressesGet.walletB);
       //в конкретно данном случае мы свапаем токен А на токен Б - значит мы отдаем сколько то токенов А и проверяем сколько пришло кошелек токена Б ( onWalletAddressesGet.walletB )
       const walletBbalanceBefore = await walletBcontract.methods.getBalance.run();
       //свапаем
-      let swapRes = await dexclient.methods.processSwapA.call({pairAddr:"0:2778b6df9fc582fd03218eb3d685c47ca1a398838d2f15d30cb4166c1c60b8f5",qtyA:form.nanoTokens.value});
+      let swapRes = await dexclient.methods.processSwapA.call({pairAddr:"0:26e9e1eb5cdd6b062959acce612b42dbe5135a40c16b47487f82c203bb5abb8a",qtyA:form.nanoTokens.value});
       await swapRes.wait()
 
 
@@ -457,6 +462,10 @@ console.log("all ok, tons wrapped success")
     }
   },
 
+
+  // processLiquidity(address pairAddr, uint128 qtyA, uint128 qtyB)
+
+  // returnAllLiquidity(address pairAddr)
 
 
   async runContractMethod() {
@@ -977,6 +986,83 @@ console.log("all ok, tons wrapped success")
       button.disabled = false;
     }
   },
+
+  async provideLiquidity(form) {
+    const button = document.getElementById('buttonProvideLiquidity');
+    button.disabled = true;
+    try {
+      _.checkExtensionAvailability();
+      const provider = _.getProvider();
+      const signer = await provider.getSigner();
+      const pubkey = await signer.getPublicKey();
+      const root = new freeton.Contract(provider, DEXrootContract.abi, Radiance.networks['2'].dexroot);
+      const rootData = await root.methods.checkPubKey.run({pubkey:"0x"+pubkey});
+      if (rootData.status == true) {
+        const dexclient = new freeton.Contract(signer, DEXclientContract.abi, rootData.dexclient);
+
+// processLiquidity(address pairAddr, uint128 qtyA, uint128 qtyB)
+        const qtyA = document.getElementById('PLqtyA');
+        const qtyB = document.getElementById('PLqtyB');
+        const pairAddr = document.getElementById("PLpairAddr")
+
+        const dexclientData = await dexclient.methods.processLiquidity.call({pairAddr: pairAddr.value, qtyA:!qtyA.value?qtyA.defaultValue:qtyA.value, qtyB:!qtyB.value?qtyB.defaultValue:qtyB.value});
+        const fds=1
+
+      } else {
+        document.getElementById('result').innerHTML += '</br>' + 'DEXclient status false'
+        console.log('DEXclient status false');
+      }
+    } catch (e) {
+      document.getElementById('result').innerHTML += '</br>' + JSON.stringify(e);
+      console.log(e);
+    } finally {
+      button.disabled = false;
+    }
+  },
+
+  async selectLiquidity(form) {
+    const button = document.getElementById('buttonSelectALLLiquidity');
+    button.disabled = true;
+    try {
+      _.checkExtensionAvailability();
+      const provider = _.getProvider();
+      const signer = await provider.getSigner();
+      const pubkey = await signer.getPublicKey();
+      const root = new freeton.Contract(provider, DEXrootContract.abi, Radiance.networks['2'].dexroot);
+      const rootData = await root.methods.checkPubKey.run({pubkey:"0x"+pubkey});
+      if (rootData.status == true) {
+        const dexclient = new freeton.Contract(signer, DEXclientContract.abi, rootData.dexclient);
+
+        // const qtyB = document.getElementById('makeABqtyB');
+        const pairAddr = document.getElementById("SLpairAddr")
+
+        const dexclientData = await dexclient.methods.returnAllLiquidity.call({pairAddr: pairAddr.value});
+        const fds=1
+        // document.getElementById('result').innerHTML += '</br>' + 'getAllClienRoots: '+ JSON.stringify(dexclientData.rootKeysR)
+        // console.log('getAllClienRoots: '+dexclientData.rootKeysR);
+        // for (const item of dexclientData.rootKeysR) {
+        //   const tokenRoot = new freeton.Contract(provider, RootTokenContract.abi, item);
+        //   const symbol = await tokenRoot.methods.getSymbol.run();
+        //   const addr = await dexclient.methods.getWalletByRoot.run({rootAddr:item});
+        //   const tokenWallet = new freeton.Contract(provider, TONTokenWalletContract.abi, addr.wallet);
+        //   const balance = await tokenWallet.methods.getBalance.run();
+        //   document.getElementById('result').innerHTML += '</br>' + 'symbol: '+ JSON.stringify(hex2ascii(symbol.value0))+' balance: '+ JSON.stringify(balance.value0)
+        //   console.log('symbol: '+hex2ascii(symbol.value0)+' balance: '+balance.value0);
+        // }
+      } else {
+        document.getElementById('result').innerHTML += '</br>' + 'DEXclient status false'
+        console.log('DEXclient status false');
+      }
+    } catch (e) {
+      document.getElementById('result').innerHTML += '</br>' + JSON.stringify(e);
+      console.log(e);
+    } finally {
+      button.disabled = false;
+    }
+  },
+    
+
+  // returnAllLiquidity(address pairAddr)
   // getBalance
 
   // getAddressWTON
