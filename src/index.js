@@ -31,6 +31,7 @@ const _ = {
   }
 };
 
+
 window.app = {
   async requestVersion() {
     const button = document.getElementById('buttonRequestVersion');
@@ -987,8 +988,8 @@ console.log("all ok, tons wrapped success")
     }
   },
 
-  async provideLiquidity(form) {
-    const button = document.getElementById('buttonProvideLiquidity');
+  async OnlyProvideLiquidity(form) {
+    const button = document.getElementById('buttonOnlyProvideLiquidity');
     button.disabled = true;
     try {
       _.checkExtensionAvailability();
@@ -1001,12 +1002,147 @@ console.log("all ok, tons wrapped success")
         const dexclient = new freeton.Contract(signer, DEXclientContract.abi, rootData.dexclient);
 
 // processLiquidity(address pairAddr, uint128 qtyA, uint128 qtyB)
-        const qtyA = document.getElementById('PLqtyA');
-        const qtyB = document.getElementById('PLqtyB');
-        const pairAddr = document.getElementById("PLpairAddr")
+        const qtyA = document.getElementById('OPLqtyA');
+        const qtyB = document.getElementById('OPLqtyB');
+        const pairAddr = document.getElementById("OPLpairAddr")
 
         const dexclientData = await dexclient.methods.processLiquidity.call({pairAddr: pairAddr.value, qtyA:!qtyA.value?qtyA.defaultValue:qtyA.value, qtyB:!qtyB.value?qtyB.defaultValue:qtyB.value});
         const fds=1
+
+      } else {
+        document.getElementById('result').innerHTML += '</br>' + 'DEXclient status false'
+        console.log('DEXclient status false');
+      }
+    } catch (e) {
+      document.getElementById('result').innerHTML += '</br>' + JSON.stringify(e);
+      console.log(e);
+    } finally {
+      button.disabled = false;
+    }
+  },
+
+
+
+
+  async provideLiquidity(form) {
+    const button = document.getElementById('buttonProvideLiquidity');
+    button.disabled = true;
+    try {
+      _.checkExtensionAvailability();
+
+      const provider = _.getProvider();
+      const signer = await provider.getSigner();
+      const pubkey = await signer.getPublicKey();
+      const root = new freeton.Contract(provider, DEXrootContract.abi, Radiance.networks['2'].dexroot);
+      const rootData = await root.methods.checkPubKey.run({pubkey:"0x"+pubkey});
+      if (rootData.status == true) {
+        const dexclient = new freeton.Contract(signer, DEXclientContract.abi, rootData.dexclient);
+
+        // (address pairAddr, uint128 qtyA, uint128 qtyB) 
+        const qtyA = document.getElementById('PLqtyA');
+        const qtyB = document.getElementById('PLqtyB');
+
+
+        let pairclientwallets = await dexclient.methods.getPair.run({value0:form.pairAddr.value});
+
+        const tokenWalletA = new freeton.Contract(provider, TONTokenWalletContract.abi, pairclientwallets.clientDepositA);
+
+        const tokenWalletB = new freeton.Contract(provider, TONTokenWalletContract.abi, pairclientwallets.clientDepositB);
+
+        const walletABalanceBefore = await tokenWalletA.methods.getBalance.run();
+        const walletBBalanceBefore = await tokenWalletB.methods.getBalance.run();
+  
+        const makeABdeposit = await dexclient.methods.makeABdepositToPair.call({pairAddr: form.pairAddr.value, qtyA:!qtyA.value?qtyA.defaultValue:qtyA.value, qtyB:!qtyB.value?qtyB.defaultValue:qtyB.value});
+
+        let walletABalanceAfter = await tokenWalletA.methods.getBalance.run();
+        let walletBBalanceAfter = await tokenWalletB.methods.getBalance.run();        
+
+
+        // let i = 1;
+        // setTimeout(function run() {
+
+        //   setTimeout(run, 100);
+        // }, 2000);
+
+        while(((parseInt(walletABalanceBefore.value0) === parseInt(walletABalanceAfter.value0))||(parseInt(walletBBalanceBefore.value0) === parseInt(walletBBalanceAfter.value0)))){
+          walletABalanceAfter = await tokenWalletA.methods.getBalance.run()
+          walletBBalanceAfter = await tokenWalletB.methods.getBalance.run()
+          
+          console.log("set deposit A\nbalance before",parseInt(walletABalanceBefore.value0), "balance after",parseInt(walletABalanceAfter.value0), "difference", parseInt(walletABalanceAfter.value0) - parseInt(walletABalanceBefore.value0),"\n set deposit B\nbalance before",parseInt(walletBBalanceBefore.value0), "balance after",parseInt(walletBBalanceAfter.value0), "difference", parseInt(walletBBalanceAfter.value0) - parseInt(walletBBalanceBefore.value0))
+        }
+          console.log("Make AB token`s to deposit success.")
+
+          const processLiquidity = await dexclient.methods.processLiquidity.call({pairAddr: form.pairAddr.value, qtyA:!qtyA.value?qtyA.defaultValue:qtyA.value, qtyB:!qtyB.value?qtyB.defaultValue:qtyB.value});
+
+//       const provider = _.getProvider();
+//       const signer = await provider.getSigner();
+//       const pubkey = await signer.getPublicKey();
+//       const root = new freeton.Contract(provider, DEXrootContract.abi, Radiance.networks['2'].dexroot);
+//       const rootData = await root.methods.checkPubKey.run({pubkey:"0x"+pubkey});
+//       if (rootData.status == true) {
+//         const dexclient = new freeton.Contract(signer, DEXclientContract.abi, rootData.dexclient);
+
+// // processLiquidity(address pairAddr, uint128 qtyA, uint128 qtyB)
+//         const qtyA = document.getElementById('PLqtyA');
+//         const qtyB = document.getElementById('PLqtyB');
+//         const pairAddr = document.getElementById("PLpairAddr")
+
+//         const dexclientData = await dexclient.methods.processLiquidity.call({pairAddr: pairAddr.value, qtyA:!qtyA.value?qtyA.defaultValue:qtyA.value, qtyB:!qtyB.value?qtyB.defaultValue:qtyB.value});
+//         const fds=1
+
+      } else {
+        document.getElementById('result').innerHTML += '</br>' + 'DEXclient status false'
+        console.log('DEXclient status false');
+      }
+    } catch (e) {
+      document.getElementById('result').innerHTML += '</br>' + JSON.stringify(e);
+      console.log(e);
+    } finally {
+      button.disabled = false;
+    }
+  },
+
+  async balanceTONandTokens(form) {
+    const button = document.getElementById('buttonProvideLiquidity');
+    button.disabled = true;
+    try {
+      _.checkExtensionAvailability();
+
+      // const getAddressBalance_ (dexClientAddress) = {
+      //   try {
+       
+      //   } catch (error) {
+      //     console.log(error)  
+      //   }  
+      // }
+
+      const provider = _.getProvider();
+      const signer = await provider.getSigner();
+      const pubkey = await signer.getPublicKey();
+      const root = new freeton.Contract(provider, DEXrootContract.abi, Radiance.networks['2'].dexroot);
+      const rootData = await root.methods.checkPubKey.run({pubkey:"0x"+pubkey});
+      if (rootData.status == true) {
+        const dexclient = new freeton.Contract(signer, DEXclientContract.abi, rootData.dexclient);
+
+        let pairclientwallets = await dexclient.methods.getPair.run({value0:form.pairAddr.value});
+
+        const tokenWalletA = new freeton.Contract(provider, TONTokenWalletContract.abi, pairclientwallets.clientDepositA);
+
+        const tokenWalletB = new freeton.Contract(provider, TONTokenWalletContract.abi, pairclientwallets.clientDepositB);
+
+        const walletABalance = await tokenWalletA.methods.getBalance.run()
+        console.log("Balance walletA:" + walletABalance.value0)
+        // const walletABalanceTokens = await getAddressBalance(pairclientwallets.clientDepositA)
+
+        const client = new _tonclient_core__WEBPACK_IMPORTED_MODULE_1__["TonClient"]({network: { server_address: 'net.ton.dev' }});
+        const balance = (await client.net.query_collection({collection: "accounts",filter: {id: {eq: pairclientwallets.clientDepositA,},},result: "balance",})).result;
+        document.getElementById('result').innerHTML += '</br>' + ' balance: '+ JSON.stringify(parseInt(balance[0].balance))
+        currentBalance = parseInt(balance[0].balance)
+        console.log('balance: '+currentBalance); 
+
+        const walletBBalance = await tokenWalletB.methods.getBalance.run();
+        console.log("Balance walletB:" + walletBBalance.value0)
+        // const walletBBalanceTokens = await getAddressBalance(pairclientwallets.clientDepositB)
 
       } else {
         document.getElementById('result').innerHTML += '</br>' + 'DEXclient status false'

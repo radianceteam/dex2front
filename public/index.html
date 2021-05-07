@@ -19,6 +19,12 @@
 
   </form>
 
+  <p>
+    <button id="buttonGetClientRoots" onclick="app.getClientRoots()">Get DEXclient Roots</button>
+    <button id="buttonGetClientPairs" onclick="app.getClientPairs()">Get DEXclient Pairs</button>
+    <button id="buttonCallContractR2Method" onclick="app.runContractR2Method()">Get All DEXpairs2</button>
+  </p>
+
   <div>Wrap TON</div>
   <form id="wrapTONform" onsubmit="app.wrapTON();return false;">    
     <button id="buttonWrapTON">Wrap TON</button>
@@ -77,6 +83,44 @@
   </form>
   <br/>
   <!-- makeAdepositToPair -->
+
+  <div>Balance TON and Tokens</div>
+  <form id="balanceTONandTokens" onsubmit="app.balanceTONandTokens(this);return false;">
+    <input id="balacePairAddr" type="text" name="pairAddr" placeholder="pairAddr">
+    <button id="buttonBalanceTONandTokens">Balance TON and Tokens</button>
+  </form>  
+  <br/>
+
+  <div>Only provide Liquidity</div>
+  <form id="OnlyProvideLiquidityForm" onsubmit="app.OnlyProvideLiquidity(this);return false;">
+    <input id="OPLpairAddr" type="text" name="pairAddr" placeholder="pairAddr">
+    <input id="OPLqtyA" type="number" name="qtyA" placeholder="qtyA" value="0">
+    <input id="OPLqtyB" type="number" name="qtyB" placeholder="qtyB" value="0">
+    <button id="buttonOnlyProvideLiquidity">Provide Liquidity</button>
+  </form>
+
+  <div>FULL Provide Liquidity</div>
+  <form id="provideLiquidityForm" onsubmit="app.provideLiquidity(this);return false;">
+    <input id="PLpairAddr" type="text" name="pairAddr" placeholder="pairAddr">
+    <input id="PLqtyA" type="number" name="qtyA" placeholder="qtyA" value="0">
+    <input id="PLqtyB" type="number" name="qtyB" placeholder="qtyB" value="0">
+    <button id="buttonProvideLiquidity">Provide Liquidity</button>
+  </form>
+  <br/>
+
+  <div>Select ALL Liquidity</div>
+  <form id="selectLiquidityForm" onsubmit="app.selectLiquidity(this);return false;">
+    <input id="SLpairAddr" type="text" name="pairAddr" placeholder="pairAddr">
+    <button id="buttonSelectALLLiquidity">Select ALL Liquidity</button>
+  </form>  
+  <br/>
+  <div>Select percent Liquidity</div>
+  <form id="selectPercentLiquidityForm" onsubmit="app.selectPercentLiquidity(this);return false;">
+    <input type="text" name="pairAddr" placeholder="pairAddr">
+    <input type="number" name="percent" placeholder="percentToSelect" value="0">
+    <button id="buttonSelectLiquidity">Select Percent Liquidity</button>
+  </form>
+
 
   <div>
     <h3>Common</h3>
@@ -177,26 +221,7 @@
     <button id="buttonCreatePair">Create DEXpair</button>
   </form>
   <br/>
-  <div>provideLiquidity</div>
-  <form id="provideLiquidityForm" onsubmit="app.provideLiquidity(this);return false;">
-    <input id="PLpairAddr" type="text" name="pairAddr" placeholder="pairAddr">
-    <input id="PLqtyA" type="number" name="qtyA" placeholder="qtyA" value="0">
-    <input id="PLqtyB" type="number" name="qtyB" placeholder="qtyB" value="0">
-    <button id="buttonProvideLiquidity">Provide Liquidity</button>
-  </form>
-  <br/>
-  <div>Select ALL Liquidity</div>
-  <form id="selectLiquidityForm" onsubmit="app.selectLiquidity(this);return false;">
-    <input id="SLpairAddr" type="text" name="pairAddr" placeholder="pairAddr">
-    <button id="buttonSelectALLLiquidity">Select ALL Liquidity</button>
-  </form>  
-  <br/>
-  <div>Select percent Liquidity</div>
-  <form id="selectPercentLiquidityForm" onsubmit="app.selectPercentLiquidity(this);return false;">
-    <input type="text" name="pairAddr" placeholder="pairAddr">
-    <input type="number" name="percent" placeholder="percentToSelect" value="0">
-    <button id="buttonSelectLiquidity">Select Percent Liquidity</button>
-  </form>
+
 
 </div>
 <br/>
