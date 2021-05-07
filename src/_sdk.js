@@ -17,20 +17,20 @@ const KingtonOrder = require('../contracts/KingtonOrder.json');
 const SetcodeMultisigWallet = require('../contracts/SetcodeMultisigWallet.json');
 
 
-// const _ = {
-//     checkExtensionAvailability() {
-//         if (window.freeton === undefined) {
-//             throw 'Extension not available.';
-//         }
-//     },
-//     getProvider() {
-//         return new freeton.providers.ExtensionProvider(window.freeton);
-//     }
-// };
-// window.app = {
-//     test () {
-//         console.log(_.checkExtensionAvailability())
-//     }
-//
-// }
+const _ = {
+    checkExtensionAvailability() {
+        if (window.freeton === undefined) {
+            throw 'Extension not available.';
+        }
+    },
+    getProvider() {
+        return new freeton.providers.ExtensionProvider(window.freeton);
+    }
+};
+window.app = {
+    test () {
+        console.log(_.checkExtensionAvailability())
+    }
+
+}
 console.log(freeton)
