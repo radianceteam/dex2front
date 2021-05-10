@@ -28,8 +28,24 @@ const _ = {
   },
   getProvider() {
     return new freeton.providers.ExtensionProvider(window.freeton);
+  },
+  async _getBalanceTONgrams(clientAddr) {
+    // const button = document.getElementById('buttonGetBalanceTONgrams');
+    // button.disabled = true;
+    try {
+      // 
+      // document.getElementById('result').innerHTML += '</br>' + 'wallet: '+ JSON.stringify(signer.wallet.address);
+      // console.log('wallet: '+ clientAddr);
+      const client = new TonClient({network: { server_address: 'net.ton.dev' }});
+      const result = (await client.net.query_collection({collection: "accounts",filter: {id: {eq: clientAddr,},},result: "balance",})).result;
+      // document.getElementById('result').innerHTML += '</br>' + 'balance: '+ JSON.stringify(parseInt(result[0].balance));
+      console.log('balance TON: '+parseInt(result[0].balance));
+    } catch (e) {
+      // document.getElementById('result').innerHTML += '</br>' + JSON.stringify(e);
+      console.log(e);
+    }              
   }
-};
+}
 
 
 window.app = {
@@ -213,7 +229,13 @@ window.app = {
           const tokenWallet = new freeton.Contract(provider, TONTokenWalletContract.abi, addr.wallet);
           const balance = await tokenWallet.methods.getBalance.run();
           document.getElementById('result').innerHTML += '</br>' + 'symbol: '+ JSON.stringify(hex2ascii(symbol.value0))+' balance: '+ JSON.stringify(balance.value0)
-          console.log('symbol: '+hex2ascii(symbol.value0)+' balance: '+balance.value0);
+          console.log('Root address: ' + item);
+          const balanceRoot = await _._getBalanceTONgrams(item); 
+          console.log('Client Wallet: ' + addr.wallet); 
+          const balanceClientWallet = await _._getBalanceTONgrams(addr.wallet); 
+          console.log('============================================')
+          console.log('symbol: '+hex2ascii(symbol.value0)+' balance: '+balance.value0);  
+          console.log('============================================')        
         }
       } else {
         document.getElementById('result').innerHTML += '</br>' + 'DEXclient status false'
@@ -252,6 +274,7 @@ window.app = {
           let symbolB = await rootTokenB.methods.getSymbol.run();
           symbolA = hex2ascii(symbolA.value0);
           symbolB = hex2ascii(symbolB.value0);
+          console.log('============================================')
           console.log('Pair:'+symbolA+' : '+symbolB+' addr: '+item);
           console.log('balanceReserve-'+symbolA+' : ' + pairData.balanceReserveA)// + ' addr: '+ pairData.addressReserveA);
           console.log('balanceReserve-'+symbolB+' : ' + pairData.balanceReserveB)// + ' addr: '+ pairData.addressReserveB);
@@ -692,10 +715,12 @@ console.log("all ok, tons wrapped success")
       const rootData = await root.methods.checkPubKey.run({pubkey:"0x"+pubkey});
       if (rootData.status == true) {
 
+        document.getElementById('BalanceTONgrams').value
+
         const dexclient = new freeton.Contract(provider, DEXclientContract.abi, rootData.dexclient);
         const dexclientData = await dexclient.methods.getBalanceTONgrams.run();
         document.getElementById('clientId').value = dexclient.address;
-        document.getElementById('BalanceTONgrams').value =dexclientData.balanceTONgrams; // JSON.stringify(dexclientData.balanceTONgrams);
+        // document.getElementById('BalanceTONgrams').value =dexclientData.balanceTONgrams; // JSON.stringify(dexclientData.balanceTONgrams);
         console.log('getBalanceTONgrams: '+dexclientData.balanceTONgrams);
         // for (const item of dexclientData.rootKeysR) {
         //   const tokenRoot = new freeton.Contract(provider, RootTokenContract.abi, item);
@@ -718,7 +743,6 @@ console.log("all ok, tons wrapped success")
     }
   },
 
- 
   async wrapTON() {
     const button = document.getElementById('buttonGetBalanceTONgrams');
     button.disabled = true;
@@ -797,6 +821,10 @@ console.log("all ok, tons wrapped success")
 
         const dexclientData = await dexclient.methods.makeABdepositToPair.call({pairAddr: form.pairAddr.value, qtyA:!qtyA.value?qtyA.defaultValue:qtyA.value, qtyB:!qtyB.value?qtyB.defaultValue:qtyB.value});
         const fds=1
+
+        // const dexclientData1 = await dexclient.methods.getPairClientWallets.call({pairAddr: form.pairAddr.value})
+
+        // let fd=1
         // document.getElementById('result').innerHTML += '</br>' + 'getAllClienRoots: '+ JSON.stringify(dexclientData.rootKeysR)
         // console.log('getAllClienRoots: '+dexclientData.rootKeysR);
         // for (const item of dexclientData.rootKeysR) {
@@ -1021,9 +1049,6 @@ console.log("all ok, tons wrapped success")
     }
   },
 
-
-
-
   async provideLiquidity(form) {
     const button = document.getElementById('buttonProvideLiquidity');
     button.disabled = true;
@@ -1129,20 +1154,49 @@ console.log("all ok, tons wrapped success")
         const tokenWalletA = new freeton.Contract(provider, TONTokenWalletContract.abi, pairclientwallets.clientDepositA);
 
         const tokenWalletB = new freeton.Contract(provider, TONTokenWalletContract.abi, pairclientwallets.clientDepositB);
+        
+        console.log('============================================')
+        console.log('DepositA:' + pairclientwallets.clientDepositA)
+        const balanceClientWalletA = await _._getBalanceTONgrams(pairclientwallets.clientDepositA); 
 
         const walletABalance = await tokenWalletA.methods.getBalance.run()
-        console.log("Balance walletA:" + walletABalance.value0)
+        console.log("Balance DepositA:" + walletABalance.value0)
         // const walletABalanceTokens = await getAddressBalance(pairclientwallets.clientDepositA)
 
-        const client = new _tonclient_core__WEBPACK_IMPORTED_MODULE_1__["TonClient"]({network: { server_address: 'net.ton.dev' }});
-        const balance = (await client.net.query_collection({collection: "accounts",filter: {id: {eq: pairclientwallets.clientDepositA,},},result: "balance",})).result;
-        document.getElementById('result').innerHTML += '</br>' + ' balance: '+ JSON.stringify(parseInt(balance[0].balance))
-        currentBalance = parseInt(balance[0].balance)
-        console.log('balance: '+currentBalance); 
+        // const client = new _tonclient_core__WEBPACK_IMPORTED_MODULE_1__["TonClient"]({network: { server_address: 'net.ton.dev' }});
+        // const balance = (await client.net.query_collection({collection: "accounts",filter: {id: {eq: pairclientwallets.clientDepositA,},},result: "balance",})).result;
+        // document.getElementById('result').innerHTML += '</br>' + ' balance: '+ JSON.stringify(parseInt(balance[0].balance))
+        // const currentBalance = parseInt(balance[0].balance)
+        // console.log('balance TON: '+currentBalance); 
+
+        console.log('============================================')
+        console.log('DepositB:' + pairclientwallets.clientDepositB)
+        const balanceClientWalletB = await _._getBalanceTONgrams(pairclientwallets.clientDepositB); 
 
         const walletBBalance = await tokenWalletB.methods.getBalance.run();
-        console.log("Balance walletB:" + walletBBalance.value0)
+        console.log("Balance DepositB:" + walletBBalance.value0)
         // const walletBBalanceTokens = await getAddressBalance(pairclientwallets.clientDepositB)
+
+        console.log('============================================')
+        console.log('curPair:' + pairclientwallets.curPair)
+        const balancecurPair = await _._getBalanceTONgrams(pairclientwallets.curPair); 
+
+        console.log('============================================')
+        console.log('pairReserveA:' + pairclientwallets.pairReserveA)
+        const balancepairReserveA = await _._getBalanceTONgrams(pairclientwallets.pairReserveA); 
+
+        console.log('============================================')
+        console.log('pairReserveB:' + pairclientwallets.pairReserveB)
+        const balancepairReserveB = await _._getBalanceTONgrams(pairclientwallets.pairReserveB); 
+
+        console.log('============================================')
+        console.log('pairRootA:' + pairclientwallets.pairRootA)
+        const balancepairRootA = await _._getBalanceTONgrams(pairclientwallets.pairRootA); 
+
+        console.log('============================================')
+        console.log('pairRootB:' + pairclientwallets.pairRootB)
+        const balancepairRootB = await _._getBalanceTONgrams(pairclientwallets.pairRootB); 
+
 
       } else {
         document.getElementById('result').innerHTML += '</br>' + 'DEXclient status false'
