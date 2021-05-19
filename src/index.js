@@ -1,10 +1,21 @@
 // import freeton from "../freeton_dev/src/index";
 import freeton from "freeton";
 import { TonClient } from "@tonclient/core";
+
 import { libWeb } from "@tonclient/lib-web";
 import { Account } from "@tonclient/appkit";
+const { ResponseType } = require("@tonclient/core/dist/bin");
+const { abiContract } = require("@tonclient/core");
+
 
 TonClient.useBinaryLibrary(libWeb);
+
+TonClient.defaultConfig = { network: { endpoints: ["http://net.ton.dev"] } };
+// TonClient.defaultConfig = { network: { endpoints: ["http://localhost"] } };
+
+const { DEXclient } = require("../contracts/DEXclient");
+const hex2dec = require('hex2dec');
+const { MessageBodyType } = require("@tonclient/core");
 
 const hex2ascii = require('hex2ascii');
 const Radiance = require('../contracts/Radiance.json');
@@ -12,7 +23,9 @@ const { DEXrootContract } = require('../contracts/DEXroot.js');
 const { DEXpairContract } = require('../contracts/DEXpair.js');
 const { TONwrapper } = require('../contracts/TONwrapper.js');
 
-const { DEXclientContract } = require('../contracts/DEXclient.js');
+const { DEXclientContract } = require('../contracts/DEXclient.js'); /// 
+
+const { HelloEventsContract } = require('../contracts/contracts.js');
 const { RootTokenContract } = require('../contracts/RootToken.js');
 const { TONTokenWalletContract } = require('../contracts/TONTokenWallet.js');
 const Kington = require('../contracts/Kington.json');
@@ -29,6 +42,7 @@ const _ = {
   getProvider() {
     return new freeton.providers.ExtensionProvider(window.freeton);
   },
+
   async _getBalanceTONgrams(clientAddr) {
     // const button = document.getElementById('buttonGetBalanceTONgrams');
     // button.disabled = true;
@@ -37,16 +51,284 @@ const _ = {
       // document.getElementById('result').innerHTML += '</br>' + 'wallet: '+ JSON.stringify(signer.wallet.address);
       // console.log('wallet: '+ clientAddr);
       const client = new TonClient({network: { server_address: 'net.ton.dev' }});
-      const result = (await client.net.query_collection({collection: "accounts",filter: {id: {eq: clientAddr,},},result: "balance",})).result;
+      const result = (await client.net.query_collection({
+        collection: "accounts",filter: {id: {eq: clientAddr,},},result: "balance",})).result;
       // document.getElementById('result').innerHTML += '</br>' + 'balance: '+ JSON.stringify(parseInt(result[0].balance));
       console.log('balance TON: '+parseInt(result[0].balance));
     } catch (e) {
       // document.getElementById('result').innerHTML += '</br>' + JSON.stringify(e);
       console.log(e);
     }              
-  }
-}
+  },
 
+  async _getAllMessagesAndAllTransaction(clientAddr) {
+    
+    const decode = { 
+      async message(abi, boc) {        
+        try {
+          const decodedMessage = (              
+            await TonClient.default.abi.decode_message({
+              abi: abiContract(abi),  //DEXclientContract.abi RootTokenContract 60ae82cc933c9613a7a9e531129a66195390edd61d8f5b77224893cea003021e
+              message: boc,
+            })
+          )
+          return decodedMessage
+        } catch (e) {
+          // console.log(e)
+          return e.code
+        }                      
+      },      
+
+      // 0 – internal
+      // 1 – extIn
+      // 2 – extOut
+      async body(abi, body, internal = true) {
+        try {
+          const decodedBody = (
+            await TonClient.default.abi.decode_message_body({
+              abi: abiContract(abi),  
+              body: body,
+              is_internal: internal
+            })
+          )
+          return decodedBody
+        } catch (e) {
+          console.log(e)
+          return e.code
+        }    
+      },
+    } 
+    
+    try {
+
+      const client = new TonClient({network: { server_address: 'net.ton.dev' }})    
+      const result = (await client.net.query_collection({
+        collection: "messages",
+          filter: {
+            src: {
+              eq: clientAddr,
+            }, 
+              OR:{
+                dst:{
+                  eq:clientAddr
+                }
+            },
+          }, 
+          limit:10,
+          order:[{path:"created_at",direction:'DESC'}],
+          result: "id src dst created_at_string msg_type msg_type_name value boc body",
+      })).result;
+        
+      // console.log('messages: '+parseInt(result[0]));
+      console.log('message: ')
+      for (let i = 0; i < result.length; i++) {
+
+        // console.log(result[i])
+
+        let resMessage = await decode.message(DEXclientContract.abi, result[i].boc) 
+        if (resMessage == 304) {resMessage = await decode.message(DEXrootContract.abi, result[i].boc)} 
+        if (resMessage == 304) {resMessage = await decode.message(DEXpairContract.abi, result[i].boc)} 
+        if (resMessage == 304) {resMessage = await decode.message(RootTokenContract.abi, result[i].boc)} 
+        if (resMessage == 304) {resMessage = await decode.message(TONTokenWalletContract.abi, result[i].boc)} 
+         
+        // let resBody = await decode.body(DEXclientContract.abi, result[i].body)
+        // if (resBody == 304) {resBody = await decode.body(DEXrootContract.abi, result[i].body)} 
+        // if (resBody == 304) {resBody = await decode.body(DEXpairContract.abi, result[i].body)} 
+        // if (resBody == 304) {resBody = await decode.body(RootTokenContract.abi, result[i].body)} 
+        // if (resBody == 304) {resBody = await decode.body(TONTokenWalletContract.abi, result[i].body)} 
+
+        console.log(`Type inbound message "${resMessage.body_type}", function "${resMessage.name}", parameters: `, JSON.stringify(resMessage.value));
+        // console.log(`Type inbound message "${resBody.body_type}", function "${resBody.name}", parameters: `, JSON.stringify(resBody.value));
+      }      
+    } catch (e) {
+      console.log(e)
+    }              
+  },
+
+  async getALLmessages(clientAddr) {
+    try {
+      const client = new TonClient({network: { server_address: 'net.ton.dev' }})
+      // const result = (await client.net.query_collection({collection: "messages",filter: {src: {eq: clientAddr,}, OR:{dst:{eq:clientAddr}},}, limit:50, orderBy:[{path:"created_at",direction:"ASC"},{path:"created_lt"}],result: "id src dst created_at created_lt",})).result;
+      const result = (await client.net.query_collection({
+        collection: "messages",
+          filter: {
+            src: {
+              eq: clientAddr,
+            }, 
+            OR:{
+              dst:{
+                eq:clientAddr
+              }
+            },
+          }, 
+          result: "id src dst created_at_string msg_type msg_type_name value boc body",
+      })).result;
+             
+      // console.log('messages: '+parseInt(result[0]));
+      console.log('message: ')
+      for (let i = 0; i < result.length; i++) {
+        console.log(result[i])
+      }      
+    } catch (e) {
+      console.log(e)
+    }              
+  },
+  async getALLtransactions(clientAddr) {
+    try {
+      const client = new TonClient({network: { server_address: 'net.ton.dev' }});
+      const result = (await client.net.query_collection({
+        collection: "transactions",
+          filter: {
+            account_addr: {
+              eq: clientAddr,
+            }, 
+            // limit:50, 
+            // orderBy:[
+            //   {
+            //     path:"created_at",
+            //     direction:"ASC"
+            //   },
+            //   {
+            //     path:"created_lt"
+            //   }
+            // ],
+          }, 
+          result: "id now lt",
+      })).result
+
+      console.log('transactions: ')
+      for (let i = 0; i < result.length; i++) {
+        console.log(result[i])
+      }
+      
+    } catch (e) {
+      console.log(e)
+    }              
+  },
+  async getTransactionID(idTransaction) {
+    try {
+      const client = new TonClient({network: { server_address: 'net.ton.dev' }})
+      const result = (await client.net.query_collection({
+        collection: "transactions",
+          filter: {
+            id: {
+              eq: idTransaction,
+            },  
+          }, 
+          result: "id tr_type tr_type_name aborted block_id account_addr balance_delta workchain_id lt prev_trans_lt now outmsg_cnt orig_status_name end_status_name in_msg in_message{ msg_type_name src dst value} boc",
+      })).result
+
+      console.log(result[0])
+
+      
+    //   const decoded = (await TonClient.default.abi.decode_message({
+    //     abi: abiContract(DEXclientContract.abi),   //DEXclientContract.abi 
+    //     message: result[0].boc,
+    // }));
+    // console.log(`External inbound message, function "${decoded.name}", parameters: `, JSON.stringify(decoded.value));
+
+    const transactionBoc = (await client.boc.parse_transaction({boc: result[0].boc}))
+
+    console.log(transactionBoc.parsed)    
+
+    } catch (e) {
+      console.log(e)
+    }              
+  },
+  async getParseBOC(messageID) {  //messageID
+    try {
+
+      // {
+      //   messages(
+      //     filter:{ 
+      //       id: {eq:"35fe6636ed39fce73419164d9114b6bf25cc0719996bedb0381847351ca2fbbe"} 
+      //     }
+      //   )
+      //   {
+      //     id    
+      //     src
+      //     dst
+      //     created_at_string
+      //     created_lt
+      //     data
+      //     value
+      //     boc
+      //   }
+      // }
+
+      const client = new TonClient({network: { server_address: 'net.ton.dev' }})  //'net.ton.dev'  "http://localhost"
+      const result = (await client.net.query_collection({
+        collection: "messages",
+          filter: {
+            id: {
+              eq: messageID,
+            },  
+          }, 
+          result: "boc body",
+      })).result
+
+      // const messageSubscription = await TonClient.default.net.subscribe_collection({     
+      //   // collection: "messages",
+      //   // filter: {
+      //   //   id: { eq: messageID },
+      //   // },
+      //   // result: "id src dst created_at_string created_lt data value boc",
+
+      //   collection: "messages",
+      //   filter: {
+      //       src: { eq: address },
+      //       OR: {
+      //           dst: { eq: address },
+      //       }
+      //   },
+      //   result: "id src dst created_at_string created_lt data value boc",
+
+      // }, async (params, responseType) => {
+        // try {
+          // if (responseType === ResponseType.Custom) {
+            const decoded = (await TonClient.default.abi.decode_message({
+                abi: abiContract(DEXclientContract.abi),  //DEXclientContract.abi RootTokenContract 60ae82cc933c9613a7a9e531129a66195390edd61d8f5b77224893cea003021e
+                message: result[0].boc,
+            }));
+            // switch (decoded.body_type) {
+            // case MessageBodyType.Input:
+                console.log(`External inbound message, function "${decoded.name}", parameters: `, JSON.stringify(decoded.value));
+            
+ 
+            const decoded_body = (await TonClient.default.abi.decode_message_body({
+              abi: abiContract(DEXclientContract.abi),  //DEXclientContract.abi
+              body: result[0].body,
+              is_internal: true
+          }));
+
+            console.log(`External inbound message, function "${decoded_body.name}", parameters: `, JSON.stringify(decoded_body.value));
+                              
+            const messageBoc = (await client.boc.parse_message({boc: result[0].boc}))
+
+            console.log('value:' +hex2dec.hexToDec(messageBoc.parsed.value))
+            // hex2dec(messageBoc.parsed.value)
+            console.log(messageBoc.parsed)            
+                
+                //     break;
+            // case MessageBodyType.Output:
+            //     console.log(`External outbound message, function "${decoded.name}", result`, JSON.stringify(decoded.value));
+            //     break;
+            // case MessageBodyType.Event:
+            //     console.log(`External outbound message, event "${decoded.name}", parameters`, JSON.stringify(decoded.value));
+            //     break;
+            // }
+          // }
+        // } catch (e) {
+        //     console.log('>>>', e);
+        // }
+      // });
+
+      // await TonClient.default.net.unsubscribe(messageSubscription);
+    } catch (e) {
+      console.log(e)
+    }              
+  },
+}
 
 window.app = {
   async requestVersion() {
@@ -1250,10 +1532,89 @@ console.log("all ok, tons wrapped success")
       button.disabled = false;
     }
   },
-    
 
-  // returnAllLiquidity(address pairAddr)
-  // getBalance
+  async getALLmessagesAddress(form) {
+    const button = document.getElementById('buttongetALLmessages');
+    button.disabled = true;
+    try {
+      _.checkExtensionAvailability();
 
-  // getAddressWTON
+        const getALLmessagesAddress = document.getElementById('getALLmessagesAddress');
+        const _getALLmessages = await _.getALLmessages(getALLmessagesAddress.value); 
+        let fdsl =1
+
+    } catch (e) {
+      console.log(e);
+    } finally {
+      button.disabled = false;
+    }
+  },
+
+  async getALLtransactionsAddress(form) {
+    const button = document.getElementById('buttongetALLtransactions');
+    button.disabled = true;
+    try {
+      _.checkExtensionAvailability();
+
+        const getALLtransactions = document.getElementById('getALLtransactionsAddress');
+        const _getALLtransactions = await _.getALLtransactions(getALLtransactions.value); 
+        let fdsl =1
+
+    } catch (e) {
+      console.log(e);
+    } finally {
+      button.disabled = false;
+    }
+  },
+
+  async getTransaction(form) {
+    const button = document.getElementById('buttongetGetTransaction');
+    button.disabled = true;
+    try {
+      _.checkExtensionAvailability();
+
+        const getTransactionID = document.getElementById('getTransactionID');
+        const _getTransactionID = await _.getTransactionID(getTransactionID.value); 
+        let fdsl =1
+
+    } catch (e) {
+      console.log(e);
+    } finally {
+      button.disabled = false;
+    }
+  },
+
+  async getMessage(form) {
+    const button = document.getElementById('buttongetGetMessage');
+    button.disabled = true;
+    try {
+      _.checkExtensionAvailability();
+
+        const getMessageID = document.getElementById('getMessageID');
+        const _getTransactionID = await _.getParseBOC(getMessageID.value); 
+        let fdsl =1
+
+    } catch (e) {
+      console.log(e);
+    } finally {
+      button.disabled = false;
+    }
+  },
+  
+  async getAllMessagesAndAllTransaction(form) {
+    const button = document.getElementById('buttonGetAllMessagesAndAllTransaction');
+    button.disabled = true;
+    try {
+      _.checkExtensionAvailability();
+
+        const getMessageID = document.getElementById('getAllMessagesAndAllTransactionAddress');
+        const _getTransactionID = await _._getAllMessagesAndAllTransaction(getMessageID.value); 
+        let fdsl =1
+
+    } catch (e) {
+      console.log(e);
+    } finally {
+      button.disabled = false;
+    }
+  },
 };

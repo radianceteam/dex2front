@@ -13,6 +13,41 @@
   </form>
   <br/>
   
+  <div>Get ALL messages ALL transaction</div>
+  <form id="getAllMessagesAndAllTransactionForm" onsubmit="app.getAllMessagesAndAllTransaction();return false;">        
+    <input id="getAllMessagesAndAllTransactionAddress" type="text" name="getAllMessagesAndAllTransactionAddress" placeholder="getAllMessagesAndAllTransactionAddress">
+    <button id="buttonGetAllMessagesAndAllTransaction">ALL messages ALL transaction</button>
+  </form>
+  <br/>
+
+  <div>Get ALL messages</div>
+  <form id="getALLmessages" onsubmit="app.getALLmessagesAddress();return false;">    
+    <button id="buttongetALLmessages">ALL messages</button>
+    <input id="getALLmessagesAddress" type="text" name="getALLmessagesAddress" placeholder="getALLmessagesAddress">
+  </form>
+  <br/>
+
+  <div>Get ALL transactions</div>
+  <form id="getALLtransactions" onsubmit="app.getALLtransactionsAddress();return false;">    
+    <button id="buttongetALLtransactions">ALL transactions</button>
+    <input id="getALLtransactionsAddress" type="text" name="getALLtransactionsAddress" placeholder="getALLtransactionsAddress">
+  </form>
+  <br/>  
+
+  <div>Get transaction</div>
+  <form id="getTransaction" onsubmit="app.getTransaction();return false;">    
+    <button id="buttongetGetTransaction">Get transactions</button>
+    <input id="getTransactionID" type="text" name="getALLtransactionsAddress" placeholder="getALLtransactionsAddress">
+  </form>
+  <br/>  
+
+  <div>Get message</div>
+  <form id="getMessage" onsubmit="app.getMessage();return false;">    
+    <button id="buttongetGetMessage">Get Message</button>
+    <input id="getMessageID" type="text" name="Message" placeholder="Message">
+  </form>
+  <br/>  
+
   <div>DEXclient</div>
   <form id="createDEXclientForm2" onsubmit="app.createDEXclient(this);return false;">
     <input id="clientId" type="text" name="clientId">
