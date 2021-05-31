@@ -962,6 +962,11 @@
   "resolved" "https://registry.npmjs.org/@tonclient/core/-/core-1.12.0.tgz"
   "version" "1.12.0"
 
+"@tonclient/lib-node@^1.15.0":
+  "integrity" "sha512-e6GYa7v/TaqfbHWkuayUSWWLM4Qm87YvsK1dnba1+tJbUq8WHKO0jvzXIWgcfn1vNiZx7h7I4DKe+NlqbVprTw=="
+  "resolved" "https://registry.npmjs.org/@tonclient/lib-node/-/lib-node-1.15.0.tgz"
+  "version" "1.15.0"
+
 "@tonclient/lib-web@^1.12.0":
   "integrity" "sha512-TyFOiAkfexsNgYc0ygb9//f9qp4kdRZ9m3bdqNQXzRPEuaxR3j42P52AuHdoZCmhHLA6lauyTeWHOoqTOyKK/Q=="
   "resolved" "https://registry.npmjs.org/@tonclient/lib-web/-/lib-web-1.12.0.tgz"

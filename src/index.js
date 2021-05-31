@@ -19,15 +19,20 @@ const { MessageBodyType } = require("@tonclient/core");
 
 const hex2ascii = require('hex2ascii');
 const Radiance = require('../contracts/Radiance.json');
-const { DEXrootContract } = require('../contracts/DEXroot.js');
-const { DEXpairContract } = require('../contracts/DEXpair.js');
+
+
 const { TONwrapper } = require('../contracts/TONwrapper.js');
 
+const { DEXrootContract } = require('../contracts/DEXroot.js');
+const { DEXpairContract } = require('../contracts/DEXpair.js');
 const { DEXclientContract } = require('../contracts/DEXclient.js'); /// 
-
-const { HelloEventsContract } = require('../contracts/contracts.js');
+const { SafeMultisigContract } = require('../contracts/SafeMultisigContract.js');
+const { SafeMultisigWalletContract } = require('../contracts/SafeMultisigWalletContract.js');
+const { _SetcodeMultisigWallet } = require('../contracts/SetcodeMultisigWallet.js');
+const { _SetcodeMultisigWallet2 } = require('../contracts/SetcodeMultisigWallet2.js');
 const { RootTokenContract } = require('../contracts/RootToken.js');
 const { TONTokenWalletContract } = require('../contracts/TONTokenWallet.js');
+
 const Kington = require('../contracts/Kington.json');
 const KingtonOrder = require('../contracts/KingtonOrder.json');
 const SetcodeMultisigWallet = require('../contracts/SetcodeMultisigWallet.json');
@@ -130,14 +135,18 @@ const _ = {
         if (resMessage == 304) {resMessage = await decode.message(DEXpairContract.abi, result[i].boc)} 
         if (resMessage == 304) {resMessage = await decode.message(RootTokenContract.abi, result[i].boc)} 
         if (resMessage == 304) {resMessage = await decode.message(TONTokenWalletContract.abi, result[i].boc)} 
-         
+        if (resMessage == 304) {resMessage = await decode.message(SafeMultisigContract.abi, result[i].boc)}  
+        if (resMessage == 304) {resMessage = await decode.message(SafeMultisigWalletContract.abi, result[i].boc)}
+        if (resMessage == 304) {resMessage = await decode.message(_SetcodeMultisigWallet.abi, result[i].boc)}
+        if (resMessage == 304) {resMessage = await decode.message(_SetcodeMultisigWallet2.abi, result[i].boc)}
+        
         // let resBody = await decode.body(DEXclientContract.abi, result[i].body)
         // if (resBody == 304) {resBody = await decode.body(DEXrootContract.abi, result[i].body)} 
         // if (resBody == 304) {resBody = await decode.body(DEXpairContract.abi, result[i].body)} 
         // if (resBody == 304) {resBody = await decode.body(RootTokenContract.abi, result[i].body)} 
         // if (resBody == 304) {resBody = await decode.body(TONTokenWalletContract.abi, result[i].body)} 
 
-        console.log(`Type inbound message "${resMessage.body_type}", function "${resMessage.name}", parameters: `, JSON.stringify(resMessage.value));
+        console.log(`Type inbound message "${resMessage.body_type}", date: "${result[i].created_at_string}" function "${resMessage.name}", parameters: `, JSON.stringify(resMessage.value));
         // console.log(`Type inbound message "${resBody.body_type}", function "${resBody.name}", parameters: `, JSON.stringify(resBody.value));
       }      
     } catch (e) {
