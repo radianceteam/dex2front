@@ -12,7 +12,7 @@ import BigNumber from "bignumber.js";
 import {HelloContract} from "./HelloContract";
 import { useState } from "react"
 import { checkExtensions, test,getCurrentExtension } from "./extensions/checkExtensions"
-import { checkPubKey, getPairClientWallets,getAllDataPreparation,showContractAddress,pairKeys,getDexClientData,x,getRootData,getClientData,createDEXclient,connectToPair,onSharding,getGiverAddress} from "./sdk/run"
+import { getWalletData,getPairReserves,checkPubKey, getPairClientWallets,getAllDataPreparation,showContractAddress,pairKeys,getDexClientData,x,getRootData,getClientData,createDEXclient,connectToPair,onSharding,getGiverAddress} from "./sdk/run"
 
 // async function checkExtension() {
 //
@@ -171,6 +171,13 @@ function App() {
     async function clickMe7() {
         let y = getGiverAddress()
     }
+    async function clickMe8() {
+        let y = getPairReserves()
+    }
+    async function clickMe9() {
+        let y = getWalletData()
+    }
+
   return (
       <div className="App">
         <button
@@ -231,7 +238,22 @@ function App() {
               onClick={()=>clickMe7()}>
               getGiverAddress
           </button>
-
+          <button
+              style={{
+                  "width": "500px",
+                  "height": "200px",
+              }}
+              onClick={()=>clickMe8()}>
+              getPairReserves
+          </button>
+          <button
+              style={{
+                  "width": "500px",
+                  "height": "200px",
+              }}
+              onClick={()=>clickMe9()}>
+              getWalletData
+          </button>
       </div>
   );
 }

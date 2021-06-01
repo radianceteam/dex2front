@@ -8,7 +8,7 @@ TonClient.useBinaryLibrary(libWeb);
 
 import {DEXrootContract} from "../contracts/DEXRoot.js";
 import {DEXclientContract} from "../contracts/DEXClient.js";
-
+import {TONTokenWalletContract} from "../contracts/TONTokenWallet.js";
 const Radiance = require('../Radiance.json');
 
 /*
@@ -37,6 +37,8 @@ export async function onSharding() {
         let status = false;
         let n = 0;
         while (!status) {
+
+
             let response = await runMethod("getClientAddress", {_answer_id:0,clientPubKey:'0x'+pubkey,clientSoArg:n}, rootContract)
             console.log("response",response)
             let clientAddr;
@@ -182,7 +184,14 @@ export async function getClientData() {
     }
 }
 
-export async function getPairData() {
+
+let pairDa = {
+    pairAddress: "0:3e96b50974d234e41c8b9ed34e31d582a4c09f5de2e150e292698e837fdc8f5a",
+    walletA: "0:3f4e1ba21792fb570eba3d24f46faa585abc921bfa09b53c0c373e0d44e66aa3",
+    walletB: "0:30423414c343e45f854dba29b5b70510df9db82163c499641adfb2e32d63dc4a"
+}
+
+export async function getPairReserves(pairDa) {
     let curExt = {};
     await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
     const {name, address, pubkey, contract, runMethod, callMethod} = curExt._extLib
@@ -190,17 +199,19 @@ export async function getPairData() {
     try {
         let resp = {};
         //todo check address
-        const clientContract = await contract(DEXclientContract.abi, "0:3faf8b711558183290d3ad0a1a9860423e2432a049086075fe432eed2bf1f9d0");
-        let soUINT = await runMethod("soUINT", {}, clientContract)
-        let rootConnector = await runMethod("rootConnector", {}, clientContract)
-        let rootDEX = await runMethod("rootDEX", {}, clientContract)
-        let pairs = await runMethod("pairs", {}, clientContract)
-        let rootWallet = await runMethod("rootWallet", {}, clientContract)
-        let getAllDataPreparation = await runMethod("getAllDataPreparation", {}, clientContract)
-        let counterCallback = await runMethod("counterCallback", {}, clientContract)
 
-        console.log( {...soUINT,...rootConnector,...rootDEX,...pairs,...rootWallet,...getAllDataPreparation,...counterCallback})
-        return {...soUINT,...rootConnector,...rootDEX,...pairs,...rootWallet,...getAllDataPreparation,...counterCallback}
+
+        const walletA = await contract(TONTokenWalletContract.abi, pairDa.walletA);
+        const walletB = await contract(TONTokenWalletContract.abi, pairDa.walletB);
+
+        let balanceA = await runMethod("balance", {_answer_id:0}, walletA)
+        let balanceB = await runMethod("balance", {_answer_id:0}, walletB)
+
+        let detailsA = await runMethod("getDetails", {_answer_id:0}, walletA)
+        let detailsB = await runMethod("getDetails", {_answer_id:0}, walletB)
+
+
+        return {...balanceA,...balanceB,...detailsA,...detailsB}
     } catch (e) {
         console.log("catch E", e);
     }
