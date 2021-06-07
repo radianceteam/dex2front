@@ -150,7 +150,7 @@ function SwapConfirmPopup(props) {
               <span className="confirm-value"><img className="confirm-icon" src={iconGenerator(toToken.symbol)} alt={toToken.symbol}/>{toValue.toFixed(4)}</span>
             </div>
             <p className="confirm-text">
-              Output is estimated. You will receive at least <span>{toValue.toFixed(4)} {toToken.symbol}</span> or the transaction will revert
+              Outpoot is estimated. You will receive at least <span>{toValue.toFixed(4)} {toToken.symbol}</span> or the transaction will revert
             </p>
             <button className="btn popup-btn" onClick={() => handleSwap()}>Confirm Swap</button>
           </>
