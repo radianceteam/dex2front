@@ -8,7 +8,7 @@ import { _ } from '../../freeton';
 import Select from '../Select/Select'
 import './Input.scss';
 import { iconGenerator } from '../../iconGenerator';
-import { getPairReserves } from '../../extensions/sdk/run';
+// import { getPairReserves } from '../../extensions/sdk/run3';
 
 function Input(props) {
   const dispatch = useDispatch();
@@ -25,7 +25,7 @@ function Input(props) {
 
   const swapFromToken = useSelector(state => state.swapReducer.fromToken);
   const swapToToken = useSelector(state => state.swapReducer.toToken);
-  
+
   const poolFromToken = useSelector(state => state.poolReducer.fromToken);
   const poolToToken = useSelector(state => state.poolReducer.toToken);
 
@@ -56,9 +56,9 @@ function Input(props) {
       })
     }
   }, [swapFromToken, swapToToken, poolFromToken, poolToToken, pairsList])
-  
+
   useEffect(() => {
-    changeValue();    
+    changeValue();
   }, [value, swapRate, poolRate])
 
 
@@ -121,7 +121,7 @@ function Input(props) {
             min="0"
             placeholder="0"
           />
-          
+
           { !props.token.symbol ? (
             <button className="btn input-btn" onClick={() => handleClick()}>
               Select a token

@@ -27,12 +27,12 @@ function App() {
     let curExt = {};
     await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
     dispatch(setCurExt(curExt));
-    
+
     let pairs = await getAllPairsWoithoutProvider();
     dispatch(setPairsList(pairs))
 
   }, []);
-  
+
 
   useEffect(() => {
     window.addEventListener('beforeunload', function(e) {

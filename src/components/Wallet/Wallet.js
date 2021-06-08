@@ -1,13 +1,13 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { connectWallet, showAccount } from '../../store/actions/app';
-import './Wallet.scss' 
+import './Wallet.scss'
 
 function Wallet() {
   const dispatch = useDispatch();
   const walletIsConnected = useSelector(state => state.appReducer.walletIsConnected);
   const wallet = useSelector(state => state.walletReducer.wallet);
-
+console.log("wallet",wallet)
   return (
     <div className="wallet">
       {!walletIsConnected ?

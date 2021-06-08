@@ -1,7 +1,7 @@
 import React from 'react';
 import {useSelector, useDispatch} from 'react-redux';
 import {useLocation} from 'react-router-dom';
-import { getPairReserves } from '../../extensions/sdk/run';
+// import { getPairReserves } from '../../extensions/sdk/run3';
 import { iconGenerator } from '../../iconGenerator';
 import {hidePoolFromSelect, hidePoolToSelect, setPoolFromToken, setPoolPairId, setPoolToInputValue, setPoolToToken} from '../../store/actions/pool';
 import {hideSwapFromSelect, hideSwapToSelect, setSwapFromToken, setSwapPairId, setSwapRate, setSwapToInputValue, setSwapToToken} from '../../store/actions/swap';
@@ -54,7 +54,7 @@ function SelectItem(props) {
         dispatch(hidePoolFromSelect());
       }
     }
-    if(props.type === 'to') {      
+    if(props.type === 'to') {
       const payload = {
         walletAddress: '',
         symbol: props.symbol,

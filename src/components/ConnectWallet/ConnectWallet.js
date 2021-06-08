@@ -2,15 +2,14 @@ import React, {useState, useEffect} from 'react';
 import {useSelector, useDispatch} from 'react-redux';
 import {closeConnecting, setWalletIsConnected, showPopup} from '../../store/actions/app';
 import {setPairsList, setPubKey, setTokenList, setWallet} from '../../store/actions/wallet';
-import {checkPubKey, computeDEXclientAddr, createDEXclient, getClientRoots, getWallet,} from '../../freeton';
+import { computeDEXclientAddr, createDEXclient, getClientRoots, getWallet,} from '../../freeton';
 import MainBlock from '../MainBlock/MainBlock';
 import CloseBtn from '../CloseBtn/CloseBtn';
 import Loader from '../Loader/Loader';
 import './ConnectWallet.scss';
 import { setSwapFromToken, setSwapToToken } from '../../store/actions/swap';
 import { setPoolFromToken, setPoolToToken } from '../../store/actions/pool';
-import { getRootData, getAllPairs, getWalletBalance, getAllClientWallets } from '../../extensions/sdk/run';
-import { getClientBalance } from '../../extensions/webhook/script';
+import { getAllClientWallets,getClientBalance,checkPubKey,subscribe } from '../../extensions/webhook/script.js';
 
 function ConnectWallet() {
   const dispatch = useDispatch();
@@ -21,7 +20,7 @@ function ConnectWallet() {
 
   let swapFromToken = useSelector(state => state.swapReducer.fromToken);
   let swapToToken = useSelector(state => state.swapReducer.toToken);
-  
+
   let poolFromToken = useSelector(state => state.poolReducer.fromToken);
   let poolToToken = useSelector(state => state.poolReducer.toToken);
 
@@ -36,15 +35,19 @@ function ConnectWallet() {
         // dispatch(setWalletIsConnected(true));
         // dispatch(closeConnecting());
         const walletAddress = curExt._extLib.address;
-        const clientBalance = await getClientBalance(walletAddress);
-        let tokenList = await getAllClientWallets(curExt);
+
+        let chechedClient = await checkPubKey(curExt._extLib.pubkey)
+        const clientBalance = await getClientBalance(chechedClient.dexclient);
+        let tokenList = await getAllClientWallets(chechedClient.dexclient);
+        tokenList.map(item=>subscribe(item.walletAddress))
+        console.log("tokenList",tokenList)
         tokenList = tokenList.filter(i => !i.symbol.includes('/')).map(i => (
           {
             ...i,
             symbol: i.symbol === 'WTON' ? 'TON' : i.symbol
           })
         );
-        
+
         dispatch(setTokenList(tokenList));
         dispatch(setWallet({id: walletAddress, balance: clientBalance}));
 
@@ -77,17 +80,17 @@ function ConnectWallet() {
       }
       // try {
       //   let pubKey = await checkPubKey();
-        
+
       //   if(!pubKey.status) {
       //     await computeDEXclientAddr(0);
       //     await createDEXclient(0);
       //   }
-        
+
       //   while(!pubKey.status) {
       //     pubKey = await checkPubKey();
       //     console.log('Creating DEXclient...');
       //   }
-        
+
       //   let wallet = await getWallet();
       //   dispatch(setWallet(wallet));
       //   dispatch(setPubKey(pubKey));
@@ -107,7 +110,7 @@ function ConnectWallet() {
 
       //   dispatch(setTokenList(tokenList));
       //   dispatch(setWalletIsConnected(true));
-      
+
       //   tokenList.forEach(i => {
       //     if(swapFromToken.id === i.id) {
       //       swapFromToken.balance = i.balance;
@@ -131,14 +134,14 @@ function ConnectWallet() {
       //     case 'Extension not available.':
       //       setExtIsAvailable(false);
       //       setIsLoading(false);
-      //       break;       
+      //       break;
       //     case 'Cannot read property \'balance\' of undefined':
       //       dispatch(closeConnecting());
       //       dispatch(showPopup({type: 'error', message: 'Your balance is 0. Please, replenish it first.'}));
       //       break;
       //     case 'Canceled by user.':
       //       dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
-      //       break;  
+      //       break;
       //     default:
       //       dispatch(closeConnecting());
       //       dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));

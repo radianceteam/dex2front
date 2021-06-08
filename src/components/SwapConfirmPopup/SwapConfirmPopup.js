@@ -52,7 +52,7 @@ function SwapConfirmPopup(props) {
     //               dispatch(setTokenList(payload));
     //               check = false;
     //             }
-    //           })            
+    //           })
     //         }
     //       })
     //     }
@@ -125,7 +125,7 @@ function SwapConfirmPopup(props) {
         content={
           <>
             <p className="confirm-subtitle">Confirm Swap</p>
-            <div className="confirm-block swap-confirm-block">              
+            <div className="confirm-block swap-confirm-block">
               <span className="confirm-token"><img className="confirm-icon" src={iconGenerator(fromToken.symbol)} alt={fromToken.symbol}/>{fromValue}</span>
               { appTheme === 'light' ?
                 <svg width="68" height="19" viewBox="0 0 68 19" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -145,7 +145,7 @@ function SwapConfirmPopup(props) {
                       <stop offset="1" stop-color="white" stopOpacity="0"/>
                     </linearGradient>
                   </defs>
-                </svg>              
+                </svg>
               }
               <span className="confirm-value"><img className="confirm-icon" src={iconGenerator(toToken.symbol)} alt={toToken.symbol}/>{toValue.toFixed(4)}</span>
             </div>
