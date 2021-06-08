@@ -16,30 +16,44 @@ function checkExtensionAvailability() {
 export async function checkExtensions() {
     return [
         {
+            current: true,
             name: "extraton",
             available: await checkExtensionAvailability(),
             link: "https://chrome.google.com/webstore/detail/extraton/hhimbkmlnofjdajamcojlcmgialocllm",
+            logo: "./extratonIcon.png",
         },
         {
+            current: false,
             name: "broxus",
             available: await hasTonProvider(),
             link: "https://chrome.google.com/webstore/detail/ton-crystal-wallet/cgeeodpfagjceefieflmdfphplkenlfk",
+            logo: "./broxusIcon.png",
         }
     ]
 }
 
-export async function getCurrentExtension(extension) {
-    let curExtension = {};
-    if (extension === "extraton") {
-        curExtension._extLib = await extraton()
+export async function getCurrentExtension(extensionsArry) {
+    let curExtension = extensionsArry.filter(item => {
+            return item.current === true
+        }
+    );
+    // if(curExtension.length === 0){
+    //     console.log("0000000>>>>>>no extension",curExtension)
+    //     extensionsArry[0]._extLib = await extraton()
+    //     extensionsArry[0].name = "testing extraton"
+    //     return extensionsArry[0]
+    // }
+    if (curExtension[0].name === "extraton") {
+        curExtension[0]._extLib = await extraton()
     } else {
-        curExtension._extLib = await broxus()
+        curExtension[0]._extLib = await broxus()
     }
 
-    // if (curExtension.length > 1) {
-    //     return curExtension[0]
-    // }
-    return curExtension;
+    if (curExtension.length > 1) {
+        return curExtension[0]
+    }
+    console.log("no provided extension")
+    return curExtension[0]
 }
 
 

@@ -148,48 +148,6 @@ export async function createDEXclient(shardData) {
  * @return   {object} processSwapA
  */
 
-export async function checkPubKey() {
-    let curExt = {};
-    await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
-    const {name, address, pubkey, contract, runMethod, callMethod} = curExt._extLib
-    console.log("typof pub", typeof pubkey)
-    try {
-        const rootContract = await contract(DEXrootContract.abi, Radiance.networks['2'].dexroot);
-        let checkPubKey = await runMethod("checkPubKey", {pubkey:"0x"+pubkey}, rootContract)
-        console.log("checkPubKey",checkPubKey)
-        return checkPubKey
-    } catch (e) {
-        console.log("catch E", e);
-        return e
-    }
-}
-
-
-
-export async function swapA(pairAddr, qtyA) {
-    let curExt = {};
-    await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
-    const {name, address, pubkey, contract, runMethod, callMethod} = curExt._extLib
-    let getClientAddressFromRoot = await checkPubKey()
-
-// export async function checkPubKey() {
-//     let curExt = {};
-//     await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
-//     const {name, address, pubkey, contract, runMethod, callMethod} = curExt._extLib
-//     console.log("typof pub", typeof pubkey)
-//     try {
-//         const rootContract = await contract(DEXrootContract.abi, Radiance.networks['2'].dexroot);
-//         let checkPubKey = await runMethod("checkPubKey", {pubkey:"0x"+pubkey}, rootContract)
-//         console.log("checkPubKey",checkPubKey)
-//         return checkPubKey
-//     } catch (e) {
-//         console.log("catch E", e);
-//         return e
-//     }
-// }
-
-
-
 export async function swapA(curExt,pairAddr, qtyA) {
     const {pubkey, contract, callMethod} = curExt._extLib
     let getClientAddressFromRoot = await checkPubKey(pubkey)
@@ -256,12 +214,6 @@ export async function returnLiquidity(curExt,pairAddr, tokens) {
         return e
     }
 }
-
-export async function processLiquidity(pairAddr, qtyA, qtyB) {
-    let curExt = {};
-    await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
-    const {name, address, pubkey, contract, runMethod, callMethod} = curExt._extLib
-    let getClientAddressFromRoot = await checkPubKey()
 
 /**
  * Function to process liquid
@@ -348,14 +300,17 @@ export async function connectToPairStep2DeployWallets(connectionData) {
     if(newArr.length===0){
         return new UserException("y already have all pair wallets")
     }
-    try{
-        await newArr.map(async (item,i)=>{
-        let soUint = await getShardConnectPairQUERY(clientAdr,targetShard,item)
-        await callMethod("connectRoot", {root: item, souint:soUint,gramsToConnector:500000000,gramsToRoot:1500000000}, clientContract).then(respt=>{
-        })
-        })
-    }catch (e) {
-        console.log("this",e)
-        return e
-    }
+try{
+    await newArr.map(async (item,i)=>{
+       let soUint = await getShardConnectPairQUERY(clientAdr,targetShard,item)
+       await callMethod("connectRoot", {root: item, souint:soUint,gramsToConnector:500000000,gramsToRoot:1500000000}, clientContract).then(respt=>{
+       })
+    })
+}catch (e) {
+    console.log("this",e)
+    return e
 }
+
+}
+
+
