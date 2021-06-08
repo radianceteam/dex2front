@@ -1,12 +1,8 @@
 import React from 'react';
 import {useSelector, useDispatch} from 'react-redux';
 import {useLocation} from 'react-router-dom';
-<<<<<<< HEAD
-import { getPairReserves } from '../../extensions/sdk/run';
-=======
 // import { getPairReserves } from '../../extensions/sdk/run3';
 import { iconGenerator } from '../../iconGenerator';
->>>>>>> 611e2bb617370667b682fbd8a44506d984ec360b
 import {hidePoolFromSelect, hidePoolToSelect, setPoolFromToken, setPoolPairId, setPoolToInputValue, setPoolToToken} from '../../store/actions/pool';
 import {hideSwapFromSelect, hideSwapToSelect, setSwapFromToken, setSwapPairId, setSwapRate, setSwapToInputValue, setSwapToToken} from '../../store/actions/swap';
 import { iconGenerator } from '../../iconGenerator';

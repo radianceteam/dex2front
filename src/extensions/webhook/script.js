@@ -18,18 +18,12 @@ import {SafeMultisigWallet} from "../msig/SafeMultisigWallet.js";
 import {DEXPairContract} from "../contracts/DEXPairContract.js";
 
 import {abiContract} from "@tonclient/core";
-<<<<<<< HEAD
-import {getWalletBalance} from "../sdk/run";
-import {checkExtensions, getCurrentExtension} from "../extensions/checkExtensions";
-
-=======
 // import {getWalletBalance} from "../sdk/run";
 import {checkExtensions, getCurrentExtension} from "../extensions/checkExtensions";
 
 const RootContract = new Account(DEXrootContract, {address:Radiance.networks['2'].dexroot, client});
 
 
->>>>>>> 611e2bb617370667b682fbd8a44506d984ec360b
 function hex2a(hex) {
     let str = '';
     for (let i = 0; i < hex.length; i += 2) {
@@ -84,11 +78,6 @@ export async function getShardConnectPairQUERY(clientAddress,targetShard,rootAdd
 
 export async function getRootCreators() {
     try {
-<<<<<<< HEAD
-        const RootContract = new Account(DEXrootContract, {address:Radiance.networks['2'].dexroot, client});
-=======
-
->>>>>>> 611e2bb617370667b682fbd8a44506d984ec360b
         let RootCreators = await RootContract.runLocal("creators", {}).catch(e=>console.log(e))
         console.log("curWalletBalance",RootCreators.decoded.output.creators)
         return RootCreators.decoded.output
@@ -99,11 +88,6 @@ export async function getRootCreators() {
 }
 export async function getRootBalanceOF() {
     try {
-<<<<<<< HEAD
-        const RootContract = new Account(DEXrootContract, {address:Radiance.networks['2'].dexroot, client});
-=======
-
->>>>>>> 611e2bb617370667b682fbd8a44506d984ec360b
         let RootbalanceOf = await RootContract.runLocal("balanceOf", {})
         console.log("balanceOf",RootbalanceOf.decoded.output.balanceOf)
         return RootbalanceOf.decoded.output
@@ -133,8 +117,6 @@ export async function getWalletBalanceQUERY(walletAddress) {
     }
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 export async function getAllClientRootsQUERY() {
 
     const acc = new Account(DEXclientContract, {address: "0:7618a254b78bae580d7097e14ac6a9b84c51e48f78da47732475478a9fbfcdb9", client});
@@ -142,8 +124,7 @@ export async function getAllClientRootsQUERY() {
         const response = await acc.runLocal("getAllDataPreparation", {});
         console.log("response2",response2.decoded.output)
         return response.decoded.output
-=======
-=======
+
 /**
  * Function to check connected pair or not
  * @author   max_akkerman
@@ -151,7 +132,6 @@ export async function getAllClientRootsQUERY() {
  * @return   {bool}
  */
 
->>>>>>> 467b8d2f2ca1abc60684d5da876a1ab0cb95ee02
 export async function checkClientPairExists(clientAddress,pairAddress) {
     const acc = new Account(DEXclientContract, {address: clientAddress, client});
     try{
@@ -161,12 +141,10 @@ export async function checkClientPairExists(clientAddress,pairAddress) {
         let newArr = clientPairs.filter(item => item === pairAddress
         );
         return newArr.length !== 0;
->>>>>>> 611e2bb617370667b682fbd8a44506d984ec360b
     } catch (e) {
         console.log("catch E", e);
         return e
     }
-<<<<<<< HEAD
 
 
 }
@@ -176,7 +154,7 @@ export async function getAllClientWalletsQUERY(clientAddress) {
 
     const acc = new Account(DEXclientContract, {address: clientAddress, client});
     const response = await acc.runLocal("rootWallet", {});
-=======
+
 }
 
 /**
@@ -190,12 +168,10 @@ export async function getAllClientWalletsQUERY(clientAddress) {
 export async function getAllClientWallets(clientAddress) {
     const acc = new Account(DEXclientContract, {address: clientAddress, client});
     const response = await acc.runLocal("rootWallet", {});
-<<<<<<< HEAD
-    console.log("response",response)
->>>>>>> 611e2bb617370667b682fbd8a44506d984ec360b
-=======
 
->>>>>>> 467b8d2f2ca1abc60684d5da876a1ab0cb95ee02
+    console.log("response",response)
+
+
     let normlizeWallets = []
 try {
     for (const item of Object.entries(response.decoded.output.rootWallet)) {
@@ -208,13 +184,8 @@ try {
         let itemData = {};
 
         itemData.walletAddress = item[1];
-<<<<<<< HEAD
-        itemData.name = hex2a(curRootData.decoded.output.value0.name);
-        itemData.balance = curWalletData.decoded.output.value0.balance;
-=======
         itemData.symbol = hex2a(curRootData.decoded.output.value0.symbol);
         itemData.balance = +curWalletData.decoded.output.value0.balance / 1000000000;
->>>>>>> 611e2bb617370667b682fbd8a44506d984ec360b
 
         normlizeWallets.push(itemData)
     }
@@ -225,12 +196,8 @@ try {
     return e
 }
 }
-<<<<<<< HEAD
-<<<<<<< HEAD
 
 
-
-=======
 // export async function getAllClientWalletsQUERY(clientAddress) {
 //
 //     const acc = new Account(DEXclientContract, {address: "0:7e6b052ad3301cfdefe07df46d77ef05c3c47dc84c9246135ab36b4cecbffa1f", client});
@@ -260,15 +227,12 @@ try {
 //         return e
 //     }
 // }
-=======
-
 /**
  * Function to check existing of dexclient at root
  * @author   max_akkerman
  * @param   {number} clientPubkey
  * @return   [{walletAddress:string,symbol:string,balance:number}]
  */
->>>>>>> 467b8d2f2ca1abc60684d5da876a1ab0cb95ee02
 
 export async function checkPubKey(clientPubkey) {
     console.log("typeof chec pubkey", typeof clientPubkey)
@@ -282,7 +246,6 @@ export async function checkPubKey(clientPubkey) {
     }
 }
 
-<<<<<<< HEAD
 
 // export async function getAllPairsWoithoutProvider() {
 //     const acc = new Account(DEXrootContract, {address: "0:74a70fecf38874f6b6e131df9aa1099d8ed3046312f233cb36aba5f6fb2513ff", client});
@@ -320,31 +283,22 @@ export async function checkPubKey(clientPubkey) {
 //     return normlizeWallets
 //
 // }
->>>>>>> 611e2bb617370667b682fbd8a44506d984ec360b
-=======
 /**
  * Function to get all pairs on dex root
  * @author   max_akkerman
  * @param
  * @return   [{pairAddress:string,symbolA:string,reserveA:number,symbolB:string,reserveB:number,rateAB:nubmer,rateBA:number}]
  */
->>>>>>> 467b8d2f2ca1abc60684d5da876a1ab0cb95ee02
+
 
 export async function getAllPairsWoithoutProvider() {
     const acc = new Account(DEXrootContract, {address: "0:74a70fecf38874f6b6e131df9aa1099d8ed3046312f233cb36aba5f6fb2513ff", client});
     const response = await acc.runLocal("pairs", {});
 
     let normlizeWallets = []
-<<<<<<< HEAD
-    console.log("response",response.decoded.output)
-
-    for (const item of Object.entries(response.decoded.output.pairs)) {
-        // console.log("item",item)
-=======
 
     for (const item of Object.entries(response.decoded.output.pairs)) {
 
->>>>>>> 611e2bb617370667b682fbd8a44506d984ec360b
         const curRootTokenA = new Account(RootTokenContract, {address: item[1].root0, client});
         const curRootTokenB = new Account(RootTokenContract, {address: item[1].root1, client});
         const curRootTokenAB = new Account(RootTokenContract, {address: item[1].rootLP, client});
@@ -358,16 +312,6 @@ export async function getAllPairsWoithoutProvider() {
 
         let itemData = {};
         itemData.pairAddress = item[0];
-<<<<<<< HEAD
-        // console.log("curRootDataAB",curRootDataAB)
-        itemData.pairname = hex2a(curRootDataAB.decoded.output.value0.name)
-        itemData.nameWalletA = hex2a(curRootDataA.decoded.output.value0.name)
-        itemData.balanceWalletA = bal.decoded.output.balanceReserve[item[1].root0]
-
-        itemData.nameWalletB = hex2a(curRootDataB.decoded.output.value0.name)
-        itemData.balanceWalletB = bal.decoded.output.balanceReserve[item[1].root1]
-
-=======
 
         // itemData.pairname = hex2a(curRootDataAB.decoded.output.value0.name)
         itemData.symbolA = hex2a(curRootDataA.decoded.output.value0.symbol) === 'WTON' ? 'TON' : hex2a(curRootDataA.decoded.output.value0.symbol)
@@ -378,7 +322,6 @@ export async function getAllPairsWoithoutProvider() {
 
         itemData.rateAB = +bal.decoded.output.balanceReserve[item[1].root1] / +bal.decoded.output.balanceReserve[item[1].root0]
         itemData.rateBA = +bal.decoded.output.balanceReserve[item[1].root0] / +bal.decoded.output.balanceReserve[item[1].root1]
->>>>>>> 611e2bb617370667b682fbd8a44506d984ec360b
         normlizeWallets.push(itemData)
     }
     console.log("{normlizeWallets}",normlizeWallets)
@@ -386,19 +329,12 @@ export async function getAllPairsWoithoutProvider() {
 
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
 /**
  * Function to get native balance of address in tons
  * @author   max_akkerman
  * @param {string} clientAddress
  * @return   {number}
  */
->>>>>>> 467b8d2f2ca1abc60684d5da876a1ab0cb95ee02
-
->>>>>>> 611e2bb617370667b682fbd8a44506d984ec360b
 export async function getClientBalance(clientAddress) {
 
     let address = clientAddress
@@ -414,10 +350,7 @@ export async function getClientBalance(clientAddress) {
         });
 
         console.log("clientBalance",+clientBalance.result[0].balance)
-<<<<<<< HEAD
-=======
         return +clientBalance.result[0].balance / 1000000000
->>>>>>> 611e2bb617370667b682fbd8a44506d984ec360b
     } catch (e) {
         console.log("catch E", e);
         return e

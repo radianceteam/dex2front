@@ -6,11 +6,7 @@ import {DEXrootContract} from "../contracts/DEXRoot.js";
 import {DEXclientContract} from "../contracts/DEXClient.js";
 import {RootTokenContract} from "../contracts/RootTokenContract.js";
 import {SafeMultisigWallet} from "../msig/SafeMultisigWallet.js";
-<<<<<<< HEAD
-import {getRootCreators, getShardConnectPairQUERY} from "../webhook/script"
-=======
 import {getRootCreators, getShardConnectPairQUERY, checkPubKey} from "../webhook/script"
->>>>>>> 611e2bb617370667b682fbd8a44506d984ec360b
 
 TonClient.useBinaryLibrary(libWeb);
 
@@ -36,11 +32,7 @@ export async function setCreator() {
     await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
     const {name, address, pubkey, contract, runMethod, callMethod, internal} = curExt._extLib
 
-<<<<<<< HEAD
-    let checkClientExists = await checkPubKey()
-=======
     let checkClientExists = await checkPubKey(pubkey)
->>>>>>> 611e2bb617370667b682fbd8a44506d984ec360b
 
     if(checkClientExists.status){
         console.log(UserException("y already have dex client"))
@@ -48,19 +40,9 @@ export async function setCreator() {
     }else {
         try {
 
-<<<<<<< HEAD
-            console.log("setCreator", address)
-            const rootContract = await contract(DEXrootContract.abi, Radiance.networks['2'].dexroot);
-            let deployresp = await callMethod("setCreator", {giverAddr: address}, rootContract)
-            console.log("deployresp",deployresp)
-            let checkClientExists = await getRootCreators().catch(e=>console.log(e))
-
-            console.log("checkClientExists",checkClientExists)
-=======
             const rootContract = await contract(DEXrootContract.abi, Radiance.networks['2'].dexroot);
             let deployresp = await callMethod("setCreator", {giverAddr: address}, rootContract)
             let checkClientExists = await getRootCreators().catch(e=>console.log(e))
->>>>>>> 611e2bb617370667b682fbd8a44506d984ec360b
             let n = 0
             while (!checkClientExists.creators["0x"+pubkey]){
                 checkClientExists = await getRootCreators()
@@ -70,10 +52,6 @@ export async function setCreator() {
                     return new UserException("yps, something goes wrong, try again")
                 }
             }
-<<<<<<< HEAD
-            console.log("deployresp", deployresp)
-=======
->>>>>>> 611e2bb617370667b682fbd8a44506d984ec360b
             await onSharding()
 
 
@@ -102,10 +80,7 @@ export async function onSharding() {
         // console.log("pubkeypubkey",pubkey)
         let status = false;
         let n = 0;
-<<<<<<< HEAD
-=======
 let clientAddress
->>>>>>> 611e2bb617370667b682fbd8a44506d984ec360b
         while (!status) {
             let response = await runMethod("getClientAddress", {_answer_id:0,clientPubKey:'0x'+pubkey,clientSoArg:n}, rootContract)
             // console.log("response",response)
@@ -173,8 +148,6 @@ export async function createDEXclient(shardData) {
  * @return   {object} processSwapA
  */
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 export async function checkPubKey() {
     let curExt = {};
     await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
@@ -198,7 +171,7 @@ export async function swapA(pairAddr, qtyA) {
     await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
     const {name, address, pubkey, contract, runMethod, callMethod} = curExt._extLib
     let getClientAddressFromRoot = await checkPubKey()
-=======
+
 // export async function checkPubKey() {
 //     let curExt = {};
 //     await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
@@ -217,20 +190,13 @@ export async function swapA(pairAddr, qtyA) {
 
 
 
-=======
->>>>>>> 467b8d2f2ca1abc60684d5da876a1ab0cb95ee02
 export async function swapA(curExt,pairAddr, qtyA) {
     const {pubkey, contract, callMethod} = curExt._extLib
     let getClientAddressFromRoot = await checkPubKey(pubkey)
->>>>>>> 611e2bb617370667b682fbd8a44506d984ec360b
     if(getClientAddressFromRoot.status === false){
         return getClientAddressFromRoot
     }
     try {
-<<<<<<< HEAD
-        // let resp = {};
-=======
->>>>>>> 611e2bb617370667b682fbd8a44506d984ec360b
         const clientContract = await contract(DEXclientContract.abi, getClientAddressFromRoot.dexclient);
         const processSwapA = await callMethod("processSwapA", {pairAddr:pairAddr, qtyA:qtyA}, clientContract)
         console.log("processSwapA",processSwapA)
@@ -248,35 +214,19 @@ export async function swapA(curExt,pairAddr, qtyA) {
  * @return   {object} processSwapB
  */
 
-<<<<<<< HEAD
-export async function swapB(pairAddr, qtyB) {
-    let curExt = {};
-    await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
-    const {name, address, pubkey, contract, runMethod, callMethod} = curExt._extLib
-    let getClientAddressFromRoot = await checkPubKey()
-=======
 export async function swapB(curExt,pairAddr, qtyB) {
     const {pubkey, contract, callMethod} = curExt._extLib
     let getClientAddressFromRoot = await checkPubKey(pubkey)
->>>>>>> 611e2bb617370667b682fbd8a44506d984ec360b
     if(getClientAddressFromRoot.status === false){
         return getClientAddressFromRoot
     }
     try {
-<<<<<<< HEAD
-        let resp = {};
-=======
->>>>>>> 611e2bb617370667b682fbd8a44506d984ec360b
         const clientContract = await contract(DEXclientContract.abi, getClientAddressFromRoot.dexclient);
         const processSwapA = await callMethod("processSwapB", {pairAddr:pairAddr, qtyB:qtyB}, clientContract)
         console.log("processSwapA",processSwapA)
         return processSwapA
     } catch (e) {
-<<<<<<< HEAD
-        console.log("catch E processSwapA", e);
-=======
         console.log("catch E processSwapB", e);
->>>>>>> 611e2bb617370667b682fbd8a44506d984ec360b
         return e
     }
 }
@@ -289,19 +239,11 @@ export async function swapB(curExt,pairAddr, qtyB) {
  */
 
 
-<<<<<<< HEAD
-export async function returnLiquidity(pairAddr, tokens) {
-    let curExt = {};
-    await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
-    const {name, address, pubkey, contract, runMethod, callMethod} = curExt._extLib
-    let getClientAddressFromRoot = await checkPubKey()
-=======
 export async function returnLiquidity(curExt,pairAddr, tokens) {
     // let curExt = {};
     // await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
     const {name, address, pubkey, contract, runMethod, callMethod} = curExt._extLib
     let getClientAddressFromRoot = await checkPubKey(pubkey)
->>>>>>> 611e2bb617370667b682fbd8a44506d984ec360b
     if(getClientAddressFromRoot.status === false){
         return getClientAddressFromRoot
     }
@@ -315,15 +257,12 @@ export async function returnLiquidity(curExt,pairAddr, tokens) {
     }
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 export async function processLiquidity(pairAddr, qtyA, qtyB) {
     let curExt = {};
     await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
     const {name, address, pubkey, contract, runMethod, callMethod} = curExt._extLib
     let getClientAddressFromRoot = await checkPubKey()
-=======
-=======
+
 /**
  * Function to process liquid
  * @author   max_akkerman
@@ -331,13 +270,11 @@ export async function processLiquidity(pairAddr, qtyA, qtyB) {
  * @return   {object} processLiquidity
  */
 
->>>>>>> 467b8d2f2ca1abc60684d5da876a1ab0cb95ee02
 export async function processLiquidity(curExt,pairAddr, qtyA, qtyB) {
     // let curExt = {};
     // await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
     const {name, address, pubkey, contract, runMethod, callMethod} = curExt._extLib
     let getClientAddressFromRoot = await checkPubKey(pubkey)
->>>>>>> 611e2bb617370667b682fbd8a44506d984ec360b
     if(getClientAddressFromRoot.status === false){
         return getClientAddressFromRoot
     }
@@ -358,15 +295,6 @@ export async function processLiquidity(curExt,pairAddr, qtyA, qtyB) {
  * @return   {object} processLiquidity
  */
 
-<<<<<<< HEAD
-export async function connectToPair(pairAddr) {
-
-    // let pairAddr = "0:7e97c915eeb2cad1e0977225b6a9d96ed79902f01c46c60e3362a1e2a5da1912"
-    let curExt = {};
-    await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
-    const {contract,callMethod,runMethod} = curExt._extLib
-    let getClientAddressFromRoot = await checkPubKey()
-=======
 export async function connectToPair(curExt,pairAddr) {
 
     // let pairAddr = "0:7e97c915eeb2cad1e0977225b6a9d96ed79902f01c46c60e3362a1e2a5da1912"
@@ -374,7 +302,6 @@ export async function connectToPair(curExt,pairAddr) {
     // await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
     const {contract,callMethod,runMethod,pubkey} = curExt._extLib
     let getClientAddressFromRoot = await checkPubKey(pubkey)
->>>>>>> 611e2bb617370667b682fbd8a44506d984ec360b
     if(getClientAddressFromRoot.status === false){
         return getClientAddressFromRoot
     }
@@ -411,11 +338,7 @@ export async function getClientForConnect(data) {
 
 
 export async function connectToPairStep2DeployWallets(connectionData) {
-<<<<<<< HEAD
-    let { soUINT,curPair,clientAdr,callMethod, clientContract,contract,clientRoots} = connectionData;
-=======
     let { curPair,clientAdr,callMethod, clientContract,clientRoots} = connectionData;
->>>>>>> 611e2bb617370667b682fbd8a44506d984ec360b
 
     let targetShard = getShard(clientAdr);
     let cureClientRoots = [curPair.rootA,curPair.rootB,curPair.rootAB]
@@ -425,17 +348,14 @@ export async function connectToPairStep2DeployWallets(connectionData) {
     if(newArr.length===0){
         return new UserException("y already have all pair wallets")
     }
-try{
-    await newArr.map(async (item,i)=>{
-       let soUint = await getShardConnectPairQUERY(clientAdr,targetShard,item)
-       await callMethod("connectRoot", {root: item, souint:soUint,gramsToConnector:500000000,gramsToRoot:1500000000}, clientContract).then(respt=>{
-       })
-    })
-}catch (e) {
-    console.log("this",e)
-    return e
+    try{
+        await newArr.map(async (item,i)=>{
+        let soUint = await getShardConnectPairQUERY(clientAdr,targetShard,item)
+        await callMethod("connectRoot", {root: item, souint:soUint,gramsToConnector:500000000,gramsToRoot:1500000000}, clientContract).then(respt=>{
+        })
+        })
+    }catch (e) {
+        console.log("this",e)
+        return e
+    }
 }
-
-}
-
-
