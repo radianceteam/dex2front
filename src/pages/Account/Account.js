@@ -8,11 +8,14 @@ import MainBlock from '../../components/MainBlock/MainBlock';
 import CloseBtn from '../../components/CloseBtn/CloseBtn';
 import ConnectWallet from '../../components/ConnectWallet/ConnectWallet';
 import './Account.scss';
+import ExtensionsList from '../../components/ExtensionsList/ExtensionsList';
 
 function Account() {
   const history = useHistory();
   const dispatch = useDispatch();
 
+  const extensionIsSelected = useSelector(state => state.appReducer.extensionIsSelected);
+  const connectingWallet = useSelector(state => state.appReducer.connectingWallet);
   const wallet = useSelector(state => state.walletReducer.wallet);
   const pubKey = useSelector(state => state.walletReducer.pubKey);
   const transactionsList = useSelector(state => state.walletReducer.transactionsList);
@@ -21,9 +24,6 @@ function Account() {
   //   const payload = await getAllMessagesAndAllTransaction(pubKey.address);
   //   dispatch(setTransactionsList(payload));
   // }, [])
-
-
-  const connectingWallet = useSelector(state => state.appReducer.connectingWallet);
 
   function disconnectHandler() {
     dispatch(hideAccount());
@@ -34,8 +34,9 @@ function Account() {
   }
 
   return (
-    <div className="container">      
-      {connectingWallet ? <ConnectWallet /> :
+    <div className="container">
+      {!extensionIsSelected && <ExtensionsList />}
+      {(extensionIsSelected && connectingWallet) ? <ConnectWallet /> :
         <MainBlock
           class="account"
           smallTitle={true}

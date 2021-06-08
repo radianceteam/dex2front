@@ -2,9 +2,9 @@ import React from 'react';
 import {useSelector, useDispatch} from 'react-redux';
 import {useLocation} from 'react-router-dom';
 import { getPairReserves } from '../../extensions/sdk/run';
-import { iconGenerator } from '../../iconGenerator';
 import {hidePoolFromSelect, hidePoolToSelect, setPoolFromToken, setPoolPairId, setPoolToInputValue, setPoolToToken} from '../../store/actions/pool';
 import {hideSwapFromSelect, hideSwapToSelect, setSwapFromToken, setSwapPairId, setSwapRate, setSwapToInputValue, setSwapToToken} from '../../store/actions/swap';
+import { iconGenerator } from '../../iconGenerator';
 import './SelectItem.scss';
 
 function SelectItem(props) {

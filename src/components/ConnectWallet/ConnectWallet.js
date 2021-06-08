@@ -1,11 +1,11 @@
 import React, {useState, useEffect} from 'react';
 import { useHistory } from 'react-router-dom';
-import {useSelector, useDispatch} from 'react-redux';
-import {closeConnecting, setWalletIsConnected, showPopup} from '../../store/actions/app';
-import {setTokenList, setWallet} from '../../store/actions/wallet';
+import { useSelector, useDispatch } from 'react-redux';
+import { closeConnecting, setWalletIsConnected, showPopup } from '../../store/actions/app';
+import { setTokenList, setWallet } from '../../store/actions/wallet';
 import { setSwapFromToken, setSwapToToken } from '../../store/actions/swap';
 import { setPoolFromToken, setPoolToToken } from '../../store/actions/pool';
-import { getAllClientWallets } from '../../extensions/sdk/run';
+import { checkPubKey, getAllClientWallets, setCreator } from '../../extensions/sdk/run';
 import { getClientBalance } from '../../extensions/webhook/script';
 import MainBlock from '../MainBlock/MainBlock';
 import Loader from '../Loader/Loader';
@@ -27,47 +27,58 @@ function ConnectWallet() {
 
   useEffect(() => {
     (async function() {
-      try {
-        const walletAddress = curExt._extLib.address;
-        const clientBalance = await getClientBalance(walletAddress);
-        let tokenList = await getAllClientWallets(curExt);
-        tokenList = tokenList.filter(i => !i.symbol.includes('/')).map(i => (
-          {
-            ...i,
-            symbol: i.symbol === 'WTON' ? 'TON' : i.symbol
-          })
-        );
+      let pubkey = await checkPubKey();
+
+      if(!pubkey.status) {
+        try {
+          await setCreator();
+        } catch (err) {
+          console.log(err);
+          dispatch(closeConnecting());
+          dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
+        }
+      }
+      // try {
+      //   const walletAddress = curExt._extLib.address;
+      //   const clientBalance = await getClientBalance(walletAddress);
+      //   let tokenList = await getAllClientWallets(curExt);
+      //   tokenList = tokenList.filter(i => !i.symbol.includes('/')).map(i => (
+      //     {
+      //       ...i,
+      //       symbol: i.symbol === 'WTON' ? 'TON' : i.symbol
+      //     })
+      //   );
         
-        dispatch(setTokenList(tokenList));
-        dispatch(setWallet({id: walletAddress, balance: clientBalance}));
+      //   dispatch(setTokenList(tokenList));
+      //   dispatch(setWallet({id: walletAddress, balance: clientBalance}));
 
-        tokenList.forEach(i => {
-          if(swapFromToken.symbol === i.symbol) {
-            swapFromToken.balance = i.balance;
-            swapFromToken.walletAddress = i.walletAddress;
-            dispatch(setSwapFromToken(swapFromToken));
-          } else if(swapToToken.symbol === i.symbol) {
-            swapToToken.balance = i.balance;
-            swapToToken.walletAddress = i.walletAddress;
-            dispatch(setSwapToToken(swapToToken));
-          } else if(poolFromToken.symbol === i.symbol) {
-            poolFromToken.balance = i.balance;
-            poolFromToken.walletAddress = i.walletAddress;
-            dispatch(setPoolFromToken(poolFromToken));
-          } else if(poolToToken.symbol === i.symbol) {
-            poolToToken.balance = i.balance;
-            poolToToken.walletAddress = i.walletAddress;
-            dispatch(setPoolToToken(poolToToken));
-          }
-        })
+      //   tokenList.forEach(i => {
+      //     if(swapFromToken.symbol === i.symbol) {
+      //       swapFromToken.balance = i.balance;
+      //       swapFromToken.walletAddress = i.walletAddress;
+      //       dispatch(setSwapFromToken(swapFromToken));
+      //     } else if(swapToToken.symbol === i.symbol) {
+      //       swapToToken.balance = i.balance;
+      //       swapToToken.walletAddress = i.walletAddress;
+      //       dispatch(setSwapToToken(swapToToken));
+      //     } else if(poolFromToken.symbol === i.symbol) {
+      //       poolFromToken.balance = i.balance;
+      //       poolFromToken.walletAddress = i.walletAddress;
+      //       dispatch(setPoolFromToken(poolFromToken));
+      //     } else if(poolToToken.symbol === i.symbol) {
+      //       poolToToken.balance = i.balance;
+      //       poolToToken.walletAddress = i.walletAddress;
+      //       dispatch(setPoolToToken(poolToToken));
+      //     }
+      //   })
 
-        dispatch(setWalletIsConnected(true));
-        dispatch(closeConnecting());
-      } catch (err) {
-        console.log(err);
-        dispatch(closeConnecting());
-        dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
-      }      
+      //   dispatch(setWalletIsConnected(true));
+      //   dispatch(closeConnecting());
+      // } catch (err) {
+      //   console.log(err);
+      //   dispatch(closeConnecting());
+      //   dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
+      // }      
     })()
   }, []);
 

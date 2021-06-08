@@ -12,6 +12,7 @@ import {
 
 const initialState = {
   appTheme: null,
+  extensionIsSelected: false,
   curExt: {},
   walletIsConnected: false,
   connectingWallet: false,
@@ -29,7 +30,8 @@ const appReducer = (state = initialState, { type, payload }) => {
     case SET_CUR_EXT: 
       return {
         ...state,
-        curExt: payload
+        curExt: payload,
+        extensionIsSelected: true
       }
     case CONNECT_WALLET: 
       return {

@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import { useHistory } from 'react-router-dom'
 import {useSelector, useDispatch} from 'react-redux';
 import {connectWallet, showPopup} from '../../store/actions/app';
 import MainBlock from './../../components/MainBlock/MainBlock';
@@ -9,7 +10,10 @@ import WaitingPopup from '../../components/WaitingPopup/WaitingPopup';
 import './Swap.scss';
 
 function Swap () {
+  const history = useHistory();
   const dispatch = useDispatch();
+
+  let curExt = useSelector(state => state.appReducer.curExt);
 
   const connectingWallet = useSelector(state => state.appReducer.connectingWallet);
   const walletIsConnected = useSelector(state => state.appReducer.walletIsConnected);
@@ -28,6 +32,11 @@ function Swap () {
   const [swapConfirmPopupIsVisible, setSwapConfirmPopupIsVisible] = useState(false);
 
   const rate = useSelector(state => state.swapReducer.rate);
+
+  const handleClick = () => {
+    dispatch(connectWallet());
+    history.push('/account');
+  }
 
   function handleConfirm() {
     if(fromToken.symbol && toToken.symbol && fromValue) {
@@ -74,7 +83,7 @@ function Swap () {
             />
             { walletIsConnected ?
               <button className={(fromToken.symbol && toToken.symbol && fromValue && toValue) ? "btn mainblock-btn" : "btn mainblock-btn btn--disabled"} onClick={() => handleConfirm()}>Swap</button> :
-              <button className="btn mainblock-btn" onClick={() => dispatch(connectWallet())}>Connect wallet</button>
+              <button className="btn mainblock-btn" disabled={!curExt} onClick={handleClick}>Connect wallet</button>
             }
             { (fromToken.symbol && toToken.symbol) && <p className="swap-rate">Price <span>{rate} {toToken.symbol}</span> per <span>{fromToken.symbol}</span></p> }
             
@@ -84,7 +93,7 @@ function Swap () {
 
         { swapConfirmPopupIsVisible && <SwapConfirmPopup hideConfirmPopup={setSwapConfirmPopupIsVisible.bind(this, false)} /> }
 
-        { (!accountIsVisible && swapAsyncIsWaiting) && <WaitingPopup text={`Swapping ${fromValue} ${fromToken.symbol} for ${toValue} ${toToken.symbol}`} /> }
+        { swapAsyncIsWaiting && <WaitingPopup text={`Swapping ${fromValue} ${fromToken.symbol} for ${toValue} ${toToken.symbol}`} /> }
     </div>
   )
 }
