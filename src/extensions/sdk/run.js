@@ -165,13 +165,15 @@ export async function createDEXclient(shardData) {
     }
 }
 
+
 /**
- * Function to send to check exists of dex client by pubkey
+ * Function to swap A
  * @author   max_akkerman
- * @param   {string} user public key
- * @return   {object} {status: true, dexclient: "0:7d0f794a34e1645ab920f5737d19435415dd07331f02eb02b7bc41727448da43"}
+ * @param   {curExt:object, pairAddr:string, qtyA:number}
+ * @return   {object} processSwapA
  */
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 export async function checkPubKey() {
     let curExt = {};
@@ -215,6 +217,8 @@ export async function swapA(pairAddr, qtyA) {
 
 
 
+=======
+>>>>>>> 467b8d2f2ca1abc60684d5da876a1ab0cb95ee02
 export async function swapA(curExt,pairAddr, qtyA) {
     const {pubkey, contract, callMethod} = curExt._extLib
     let getClientAddressFromRoot = await checkPubKey(pubkey)
@@ -237,6 +241,12 @@ export async function swapA(curExt,pairAddr, qtyA) {
     }
 }
 
+/**
+ * Function to swap B
+ * @author   max_akkerman
+ * @param   {curExt:object, pairAddr:string, qtyB:number}
+ * @return   {object} processSwapB
+ */
 
 <<<<<<< HEAD
 export async function swapB(pairAddr, qtyB) {
@@ -271,6 +281,13 @@ export async function swapB(curExt,pairAddr, qtyB) {
     }
 }
 
+/**
+ * Function to return liquid from pair, tokens - are the liquidityProvider tokens type
+ * @author   max_akkerman
+ * @param   {curExt:object, pairAddr:string, tokens:number}
+ * @return   {object} returnLiquidity
+ */
+
 
 <<<<<<< HEAD
 export async function returnLiquidity(pairAddr, tokens) {
@@ -299,12 +316,22 @@ export async function returnLiquidity(curExt,pairAddr, tokens) {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 export async function processLiquidity(pairAddr, qtyA, qtyB) {
     let curExt = {};
     await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
     const {name, address, pubkey, contract, runMethod, callMethod} = curExt._extLib
     let getClientAddressFromRoot = await checkPubKey()
 =======
+=======
+/**
+ * Function to process liquid
+ * @author   max_akkerman
+ * @param   {curExt:object, pairAddr:string, qtyA:number,qtyB:number}
+ * @return   {object} processLiquidity
+ */
+
+>>>>>>> 467b8d2f2ca1abc60684d5da876a1ab0cb95ee02
 export async function processLiquidity(curExt,pairAddr, qtyA, qtyB) {
     // let curExt = {};
     // await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
@@ -324,7 +351,12 @@ export async function processLiquidity(curExt,pairAddr, qtyA, qtyB) {
     }
 }
 
-
+/**
+ * Function to connect To Pair
+ * @author   max_akkerman
+ * @param   {curExt:object, pairAddr:string}
+ * @return   {object} processLiquidity
+ */
 
 <<<<<<< HEAD
 export async function connectToPair(pairAddr) {

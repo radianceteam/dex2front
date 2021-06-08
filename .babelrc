@@ -1,13 +1,17 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 >>>>>>> 611e2bb617370667b682fbd8a44506d984ec360b
+=======
+>>>>>>> 467b8d2f2ca1abc60684d5da876a1ab0cb95ee02
 {
     "presets": [
         "@babel/preset-env",
         ["@babel/preset-react"]
     ]
 }
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 =======
@@ -19,3 +23,6 @@
 }
 >>>>>>> e264f917294839c459eb499012b973c1248d06ea
 >>>>>>> 611e2bb617370667b682fbd8a44506d984ec360b
+=======
+
+>>>>>>> 467b8d2f2ca1abc60684d5da876a1ab0cb95ee02
