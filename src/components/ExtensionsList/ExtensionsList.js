@@ -4,7 +4,7 @@ import  extratonIcon from '../../extensions/extratonIcon.png'
 import  broxusIcon from '../../extensions/broxusIcon.png'
 import './ExtensionsList.scss';
 
-const extensions = await checkExtensions();
+let extensions = await checkExtensions();
 
 function extensionIcon(name) {
   switch (name) {

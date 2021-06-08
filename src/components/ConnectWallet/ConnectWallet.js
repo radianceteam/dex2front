@@ -1,19 +1,10 @@
 import React, {useState, useEffect} from 'react';
-<<<<<<< HEAD
 import { useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { closeConnecting, setWalletIsConnected, showPopup } from '../../store/actions/app';
-import { setTokenList, setWallet } from '../../store/actions/wallet';
-import { setSwapFromToken, setSwapToToken } from '../../store/actions/swap';
-import { setPoolFromToken, setPoolToToken } from '../../store/actions/pool';
 import { checkPubKey, getAllClientWallets, setCreator } from '../../extensions/sdk/run';
 import { getClientBalance } from '../../extensions/webhook/script';
-=======
-import {useSelector, useDispatch} from 'react-redux';
 import {closeConnecting, setWalletIsConnected, showPopup} from '../../store/actions/app';
 import {setPairsList, setPubKey, setTokenList, setWallet} from '../../store/actions/wallet';
-import { computeDEXclientAddr, createDEXclient, getClientRoots, getWallet,} from '../../freeton';
->>>>>>> 611e2bb617370667b682fbd8a44506d984ec360b
 import MainBlock from '../MainBlock/MainBlock';
 import CloseBtn from '../CloseBtn/CloseBtn';
 import Loader from '../Loader/Loader';
@@ -37,7 +28,6 @@ function ConnectWallet() {
 
   useEffect(() => {
     (async function() {
-<<<<<<< HEAD
       let pubkey = await checkPubKey();
 
       if(!pubkey.status) {
@@ -62,7 +52,6 @@ function ConnectWallet() {
         
       //   dispatch(setTokenList(tokenList));
       //   dispatch(setWallet({id: walletAddress, balance: clientBalance}));
-=======
       try {
         // const clientData = await getClientData();
         // const walletId = clientData.address;
@@ -87,7 +76,6 @@ function ConnectWallet() {
 
         dispatch(setTokenList(tokenList));
         dispatch(setWallet({id: walletAddress, balance: clientBalance}));
->>>>>>> 611e2bb617370667b682fbd8a44506d984ec360b
 
       //   tokenList.forEach(i => {
       //     if(swapFromToken.symbol === i.symbol) {
@@ -109,15 +97,6 @@ function ConnectWallet() {
       //     }
       //   })
 
-<<<<<<< HEAD
-      //   dispatch(setWalletIsConnected(true));
-      //   dispatch(closeConnecting());
-      // } catch (err) {
-      //   console.log(err);
-      //   dispatch(closeConnecting());
-      //   dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
-      // }      
-=======
         dispatch(setWalletIsConnected(true));
         dispatch(closeConnecting());
       } catch (err) {
@@ -195,7 +174,6 @@ function ConnectWallet() {
       //       break;
       //   }
       // }
->>>>>>> 611e2bb617370667b682fbd8a44506d984ec360b
     })()
   }, []);
 
