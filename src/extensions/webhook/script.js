@@ -112,14 +112,15 @@ export async function getWalletBalanceQUERY(walletAddress) {
     }
 }
 
-export async function checkClientPairExists(pairAddress) {
-
-    const acc = new Account(DEXclientContract, {address: "0:7618a254b78bae580d7097e14ac6a9b84c51e48f78da47732475478a9fbfcdb9", client});
+export async function checkClientPairExists(clientAddress,pairAddress) {
+    const acc = new Account(DEXclientContract, {address: clientAddress, client});
     try{
         const response = await acc.runLocal("getAllDataPreparation", {});
+        let clientPairs = response.decoded.output.pairKeysR
 
-        console.log("response",response.decoded.output)
-        return response.decoded.output
+        let newArr = clientPairs.filter(item => item === pairAddress
+        );
+        return newArr.length !== 0;
     } catch (e) {
         console.log("catch E", e);
         return e
