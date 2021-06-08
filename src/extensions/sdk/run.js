@@ -27,17 +27,15 @@ function getShard(string) {
  * @author   max_akkerman
  * @return   callback         onSharding()
  */
-export async function setCreator() {
-    let curExt = {};
-    await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
+export async function setCreator(curExt) {
     const {name, address, pubkey, contract, runMethod, callMethod, internal} = curExt._extLib
 
-    let checkClientExists = await checkPubKey(pubkey)
+    // let checkClientExists = await checkPubKey(pubkey)
 
-    if(checkClientExists.status){
-        console.log(UserException("y already have dex client"))
-        return new UserException("y already have dex client")
-    }else {
+    // if(checkClientExists.status){
+    //     console.log(UserException("y already have dex client"))
+    //     return new UserException("y already have dex client")
+    // }else {
         try {
 
             const rootContract = await contract(DEXrootContract.abi, Radiance.networks['2'].dexroot);
@@ -52,7 +50,7 @@ export async function setCreator() {
                     return new UserException("yps, something goes wrong, try again")
                 }
             }
-            await onSharding()
+            await onSharding(curExt)
 
 
             // return resp
@@ -61,7 +59,7 @@ export async function setCreator() {
             console.log("catch E", e);
             return e
         }
-    }
+    // }
 }
 /**
  * Function to get shard id to deploy dex client
@@ -69,10 +67,7 @@ export async function setCreator() {
  * @return   callback         createDEXclient()
  */
 
-export async function onSharding() {
-
-    let curExt = {};
-    await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
+export async function onSharding(curExt) {
     const {name, address, pubkey, contract, runMethod, callMethod} = curExt._extLib
     try {
         const rootContract = await contract(DEXrootContract.abi, Radiance.networks['2'].dexroot);
@@ -80,7 +75,7 @@ export async function onSharding() {
         // console.log("pubkeypubkey",pubkey)
         let status = false;
         let n = 0;
-let clientAddress
+        let clientAddress
         while (!status) {
             let response = await runMethod("getClientAddress", {_answer_id:0,clientPubKey:'0x'+pubkey,clientSoArg:n}, rootContract)
             // console.log("response",response)
@@ -96,7 +91,7 @@ let clientAddress
                 status = true;
                 clientAddress = clientAddr;
                 // console.log({address: clientAddr, keys: pubkey, clientSoArg: n})
-                await createDEXclient({address: clientAddr, keys: '0x'+pubkey, clientSoArg: n}).catch(e=>console.log(e))
+                await createDEXclient(curExt, {address: clientAddr, keys: '0x'+pubkey, clientSoArg: n}).catch(e=>console.log(e))
                 // return {address: clientAddr, keys: pubkey, clientSoArg: n}
             } else {console.log(n);}
             n++;
@@ -114,9 +109,7 @@ let clientAddress
  * @return   {object} {deployedAddress:address,statusCreate:bool}
  */
 
-export async function createDEXclient(shardData) {
-    let curExt = {};
-    await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
+export async function createDEXclient(curExt, shardData) {
     const {name, address, pubkey, contract, runMethod, callMethod, internal} = curExt._extLib
 
     try {

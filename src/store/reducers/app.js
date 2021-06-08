@@ -1,5 +1,6 @@
 import {
   CHANGE_THEME,
+  SET_EXTENSIONS_LIST,
   SET_CUR_EXT,
   CONNECT_WALLET,
   SET_WALLET_IS_CONNECTED,
@@ -12,11 +13,13 @@ import {
 
 const initialState = {
   appTheme: null,
+  extensionsList: [],
+  extensionIsSelected: false,
   curExt: {},
   walletIsConnected: false,
   connectingWallet: false,
   accountIsVisible: false,
-  popup: {isVisible: false, type: '', message: ''},
+  popup: {isVisible: false, type: '', message: '', link: ''},
 };
 
 const appReducer = (state = initialState, { type, payload }) => {
@@ -26,10 +29,16 @@ const appReducer = (state = initialState, { type, payload }) => {
         ...state,
         appTheme: payload
       }
+    case SET_EXTENSIONS_LIST: 
+      return {
+        ...state,
+        extensionsList: payload
+      }
     case SET_CUR_EXT: 
       return {
         ...state,
-        curExt: payload
+        curExt: payload,
+        extensionIsSelected: true
       }
     case CONNECT_WALLET: 
       return {
@@ -59,12 +68,12 @@ const appReducer = (state = initialState, { type, payload }) => {
     case SHOW_POPUP: 
       return {
         ...state,
-        popup: {isVisible: true, type: payload.type, message: payload.message}
+        popup: {isVisible: true, type: payload.type, message: payload.message, link: payload.link}
       }
     case HIDE_POPUP: 
       return {
         ...state,
-        popup: {isVisible: false, type: '', message: ''}
+        popup: {isVisible: false, type: '', message: '', link: ''}
       }
     default:
       return state;

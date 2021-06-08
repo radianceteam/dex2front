@@ -1,17 +1,17 @@
 import React, {useEffect} from 'react';
 import {useSelector, useDispatch} from 'react-redux';
-import {Switch, Route, Redirect, useLocation, Prompt} from 'react-router-dom';
-import {changeTheme, setCurExt, showPopup} from './store/actions/app';
+import {Switch, Route, Redirect, useLocation} from 'react-router-dom';
+import {changeTheme, setExtensionsList} from './store/actions/app';
 import {setPairsList} from './store/actions/wallet';
-import {runContractR1Method} from './freeton';
+import { getAllPairsWoithoutProvider } from './extensions/webhook/script';
+import { checkExtensions } from './extensions/extensions/checkExtensions';
+import Account from './pages/Account/Account';
 import Swap from './pages/Swap/Swap';
 import Pool from './pages/Pool/Pool';
 import Popup from './components/Popup/Popup';
 import Header from './components/Header/Header'
 import Manage from './pages/Manage/Manage';
-import AddLiquidity from './components/AddLiquidity/AddLiquidity';
-import { getAllPairsWoithoutProvider } from './extensions/webhook/script';
-import { checkExtensions, getCurrentExtension } from './extensions/extensions/checkExtensions';
+import AddLiquidity from './pages/AddLiquidity/AddLiquidity';
 
 function App() {
   const dispatch = useDispatch();
@@ -24,11 +24,10 @@ function App() {
     const theme = localStorage.getItem('appTheme') === null ? 'light' : localStorage.getItem('appTheme');
     dispatch(changeTheme(theme));
 
-    let curExt = {};
-    await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
-    dispatch(setCurExt(curExt));
+    const extensionsList = await checkExtensions();
+    dispatch(setExtensionsList(extensionsList));
 
-    let pairs = await getAllPairsWoithoutProvider();
+    const pairs = await getAllPairsWoithoutProvider();
     dispatch(setPairsList(pairs))
 
   }, []);
@@ -44,6 +43,7 @@ function App() {
     <>
       <Header />
       <Switch location={location}>
+        <Route path="/account" component={Account} />
         <Route path="/swap" component={Swap} />
         <Route path="/pool"  component={Pool} />
         <Route path="/add-liquidity" component={AddLiquidity} />
@@ -51,7 +51,7 @@ function App() {
         <Redirect from="" to="/swap" />
       </Switch>
 
-      {popup.isVisible && <Popup type={popup.type} message={popup.message} />}
+      {popup.isVisible && <Popup type={popup.type} message={popup.message} link={popup.link} />}
     </>
   );
 }

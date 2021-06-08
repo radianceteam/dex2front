@@ -186,7 +186,6 @@ try {
  */
 
 export async function checkPubKey(clientPubkey) {
-    console.log("typeof chec pubkey", typeof clientPubkey)
     try {
         let response = await RootContract.runLocal("checkPubKey", {pubkey:"0x"+clientPubkey})
         let checkedData = response.decoded.output;

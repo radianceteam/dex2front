@@ -1,16 +1,16 @@
 import React, {useState} from 'react';
+import { useHistory } from 'react-router-dom';
 import {useSelector, useDispatch} from 'react-redux';
-import {connectWallet, showPopup} from '../../store/actions/app';
+import {showPopup} from '../../store/actions/app';
 import MainBlock from './../../components/MainBlock/MainBlock';
 import Input from './../../components/Input/Input';
-import ConnectWallet from '../../components/ConnectWallet/ConnectWallet';
-import Account from '../../components/Account/Account';
 import SwapBtn from '../../components/SwapBtn/SwapBtn';
 import SwapConfirmPopup from '../../components/SwapConfirmPopup/SwapConfirmPopup';
 import WaitingPopup from '../../components/WaitingPopup/WaitingPopup';
 import './Swap.scss';
 
 function Swap () {
+  const history = useHistory();
   const dispatch = useDispatch();
 
   const connectingWallet = useSelector(state => state.appReducer.connectingWallet);
@@ -41,13 +41,11 @@ function Swap () {
     } else {
       dispatch(showPopup({type: 'error', message: 'Fields should not be empty'}));
     }
-  }  
+  }
 
   return (
     <div className="container">
-      { (connectingWallet && !accountIsVisible) && <ConnectWallet /> }
-
-      { (!connectingWallet && !accountIsVisible && !swapAsyncIsWaiting) && (
+      { !swapAsyncIsWaiting && (
         <MainBlock
           smallTitle={false}
           title={'Swap'}
@@ -79,7 +77,7 @@ function Swap () {
               />
               { walletIsConnected ?
                 <button className={(fromToken.symbol && toToken.symbol && fromValue && toValue) ? "btn mainblock-btn" : "btn mainblock-btn btn--disabled"} onClick={() => handleConfirm()}>Swap</button> :
-                <button className="btn mainblock-btn" onClick={() => dispatch(connectWallet())}>Connect wallet</button>
+                <button className="btn mainblock-btn" onClick={() => history.push('/account')}>Connect wallet</button>
               }
               { (fromToken.symbol && toToken.symbol) && <p className="swap-rate">Price <span>{rate} {toToken.symbol}</span> per <span>{fromToken.symbol}</span></p> }
               
@@ -91,8 +89,6 @@ function Swap () {
         { swapConfirmPopupIsVisible && <SwapConfirmPopup hideConfirmPopup={setSwapConfirmPopupIsVisible.bind(this, false)} /> }
 
         { (!accountIsVisible && swapAsyncIsWaiting) && <WaitingPopup text={`Swapping ${fromValue} ${fromToken.symbol} for ${toValue} ${toToken.symbol}`} /> }
-
-        { accountIsVisible && <Account /> }
     </div>
   )
 }

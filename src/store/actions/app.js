@@ -1,5 +1,6 @@
 import {
   CHANGE_THEME,
+  SET_EXTENSIONS_LIST,
   SET_CUR_EXT,
   CONNECT_WALLET,
   CLOSE_CONNECTING,
@@ -15,6 +16,10 @@ export function changeTheme(payload) {
   localStorage.setItem('appTheme', payload);
   return { type: CHANGE_THEME, payload };
 };
+
+export function setExtensionsList(payload) {
+  return { type: SET_EXTENSIONS_LIST, payload }
+}
 
 export function setCurExt(payload) {
   return { type: SET_CUR_EXT, payload }
