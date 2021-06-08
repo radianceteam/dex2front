@@ -6,11 +6,10 @@ import {setPairsList} from './store/actions/wallet';
 import {runContractR1Method} from './freeton';
 import Swap from './pages/Swap/Swap';
 import Pool from './pages/Pool/Pool';
-import Account from './pages/Account/Account';
-import Manage from './pages/Manage/Manage';
 import Popup from './components/Popup/Popup';
 import Header from './components/Header/Header'
-import AddLiquidity from './pages/AddLiquidity/AddLiquidity';
+import Manage from './pages/Manage/Manage';
+import AddLiquidity from './components/AddLiquidity/AddLiquidity';
 import { getAllPairsWoithoutProvider } from './extensions/webhook/script';
 import { checkExtensions, getCurrentExtension } from './extensions/extensions/checkExtensions';
 
@@ -28,12 +27,12 @@ function App() {
     let curExt = {};
     await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
     dispatch(setCurExt(curExt));
-    
+
     let pairs = await getAllPairsWoithoutProvider();
     dispatch(setPairsList(pairs))
 
   }, []);
-  
+
 
   useEffect(() => {
     window.addEventListener('beforeunload', function(e) {
@@ -45,7 +44,6 @@ function App() {
     <>
       <Header />
       <Switch location={location}>
-        <Route path="/account" component={Account} />
         <Route path="/swap" component={Swap} />
         <Route path="/pool"  component={Pool} />
         <Route path="/add-liquidity" component={AddLiquidity} />
