@@ -90,11 +90,17 @@ function Input(props) {
       if(props.type === 'from') {
         dispatch(setSwapFromInputValue(value));
         dispatch(setSwapToInputValue(value * swapRate));
+      } else if(props.type === 'to') {
+        dispatch(setSwapToInputValue(value));
+        dispatch(setSwapFromInputValue(value / swapRate));
       }
     } else if(location.pathname.includes('add-liquidity')) {
       if(props.type === 'from') {
         dispatch(setPoolFromInputValue(value));
         dispatch(setPoolToInputValue(value * poolRate));
+      } else if(props.type === 'to') {
+        dispatch(setPoolToInputValue(value));
+        dispatch(setPoolFromInputValue(value / poolRate));
       }
     }
   }
@@ -114,10 +120,10 @@ function Input(props) {
           <input
             type="number"
             className="input-field"
-            value={props.value > 0 ? props.value : ''}
+            value={props.value > 0 ? props.value.toFixed(4) : ''}
             onChange={event => setValue(parseFloat(event.target.value))}
             onKeyPress={event => handleKeyPress(event)}
-            readOnly={props.type === 'to'}
+            // readOnly={props.type === 'to'}
             min="0"
             placeholder="0"
           />

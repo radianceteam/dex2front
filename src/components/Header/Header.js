@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 import {useSelector, useDispatch} from 'react-redux';
 import {changeTheme} from '../../store/actions/app'
 import {NavLink} from 'react-router-dom';
@@ -8,13 +9,22 @@ import './Header.scss';
 
 function Header() {
   const dispatch = useDispatch();
+  const location = useLocation();
   const theme = useSelector(state => state.appReducer.appTheme);
+
+  const linkIsActive = () => {
+    if(location.pathname.includes('pool') ||
+      location.pathname.includes('add-liquidity') ||
+      location.pathname.includes('manage')) {
+        return true;
+      }
+  }
 
   return (
     <header className="header">
       <div className="header-wrap">
         <NavLink to="/swap" className="header-link" activeClassName="header-link--active">Swap</NavLink>
-        <NavLink to="/pool" className="header-link" activeClassName="header-link--active">Provide Liquidity</NavLink>
+        <NavLink to="/pool" className={linkIsActive() ?"header-link header-link--active" : "header-link"}>Provide Liquidity</NavLink>
       </div>
       <div className="header-wrap">
         <Wallet />

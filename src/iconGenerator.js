@@ -3,6 +3,7 @@ import fBTC from './images/tokens/wBTC.svg';
 import fETH from './images/tokens/wETH.svg';
 import USDT from './images/tokens/wUSDT.svg';
 import USDC from './images/tokens/USDC.svg';
+import DAI from './images/tokens/DAI.svg';
 
 export function iconGenerator(icon) {
   switch (icon) {
@@ -16,6 +17,8 @@ export function iconGenerator(icon) {
       return USDT;
     case 'USDC':
       return USDC;
+    case 'DAI':
+      return DAI;
     default:
       break;
   }

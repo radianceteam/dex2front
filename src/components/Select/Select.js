@@ -65,17 +65,18 @@ function Select(props) {
 
     let toArr = [];
     if(props.type === 'to') {
-      const arr = pairsList.filter(i => i.symbolA === fromToken.symbol || i.symbol === fromToken.symbol);
+      const arr = pairsList.filter(i => i.symbolA === fromToken.symbol || i.symbolB === fromToken.symbol);
+      console.log(arr);
 
       arr.forEach(i => {
-        if(fromToken.id === i.symbol) {
+        if(fromToken.symbol === i.symbolA) {
           toArr.push({              
             pairId: i.pairAddress,
             walletAddress: '',
             symbol: i.symbolB,
             balance: 0
           });
-        } else if(fromToken.id === i.symbol) {
+        } else if(fromToken.symbol === i.symbolB) {
           toArr.push({              
             pairId: i.pairAddress,
             walletAddress: '',

@@ -36,6 +36,7 @@ function SelectItem(props) {
           }
           dispatch(setSwapToToken(payload));
           dispatch(setSwapToInputValue(0));
+          dispatch(setSwapRate(0));
           dispatch(setSwapPairId(''));
         }
         dispatch(hideSwapFromSelect());

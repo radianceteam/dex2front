@@ -73,7 +73,7 @@ function Swap () {
                 type={'to'}
                 text={toValue > 0 ? <>To <span>(estimated)</span></> : 'To'}
                 token={toToken}
-                value={toValue.toFixed(4)}
+                value={toValue}
               />
               { walletIsConnected ?
                 <button className={(fromToken.symbol && toToken.symbol && fromValue && toValue) ? "btn mainblock-btn" : "btn mainblock-btn btn--disabled"} onClick={() => handleConfirm()}>Swap</button> :
