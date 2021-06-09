@@ -338,6 +338,12 @@ export async function subscribe(address) {
             console.log("resBody",resBody);
 
             let payload = await body(TONTokenWalletContract.abi,resBody.value.payload)
+            if (payload === 304) {payload = await body(DEXclientContract.abi, resBody.value.payload)}
+            if (payload === 304) {payload = await body(DEXPairContract.abi, resBody.value.payload)}
+            if (payload === 304) {payload = await body(SafeMultisigWallet.abi, resBody.value.payload)}
+            if (payload === 304) {payload = await body(RootTokenContract.abi, resBody.value.payload)}
+            if (payload === 304) {payload = await body(DEXrootContract.abi, resBody.value.payload)}
+            console.log("payload",payload);
 
             console.log("payload",payload);
 
