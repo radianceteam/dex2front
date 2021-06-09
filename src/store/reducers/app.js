@@ -5,8 +5,6 @@ import {
   CONNECT_WALLET,
   SET_WALLET_IS_CONNECTED,
   CLOSE_CONNECTING,
-  SHOW_ACCOUNT,
-  HIDE_ACCOUNT,
   SHOW_POPUP,
   HIDE_POPUP,
 } from '../actions/types';
@@ -38,7 +36,7 @@ const appReducer = (state = initialState, { type, payload }) => {
       return {
         ...state,
         curExt: payload,
-        extensionIsSelected: true
+        extensionIsSelected: payload._extLib ? true : false
       }
     case CONNECT_WALLET: 
       return {
@@ -54,16 +52,6 @@ const appReducer = (state = initialState, { type, payload }) => {
       return {
         ...state,
         walletIsConnected: payload
-      }
-    case SHOW_ACCOUNT: 
-      return {
-        ...state,
-        accountIsVisible: true
-      }
-    case HIDE_ACCOUNT: 
-      return {
-        ...state,
-        accountIsVisible: false
       }
     case SHOW_POPUP: 
       return {

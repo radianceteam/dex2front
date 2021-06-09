@@ -153,29 +153,29 @@ export async function getAllClientWallets(clientAddress) {
     const acc = new Account(DEXclientContract, {address: clientAddress, client});
     const response = await acc.runLocal("rootWallet", {});
 
-    let normlizeWallets = []
-try {
-    for (const item of Object.entries(response.decoded.output.rootWallet)) {
+    let normalizeWallets = []
+    try {
+        for (const item of Object.entries(response.decoded.output.rootWallet)) {
 
-        const curWalletContract = new Account(TONTokenWalletContract, {address: item[1], client});
-        const curRootContract = new Account(RootTokenContract, {address: item[0], client});
+            const curWalletContract = new Account(TONTokenWalletContract, {address: item[1], client});
+            const curRootContract = new Account(RootTokenContract, {address: item[0], client});
 
-        let curWalletData = await curWalletContract.runLocal("getDetails", {_answer_id: 0})
-        let curRootData = await curRootContract.runLocal("getDetails", {_answer_id: 0})
-        let itemData = {};
+            let curWalletData = await curWalletContract.runLocal("getDetails", {_answer_id: 0})
+            let curRootData = await curRootContract.runLocal("getDetails", {_answer_id: 0})
+            let itemData = {};
 
-        itemData.walletAddress = item[1];
-        itemData.symbol = hex2a(curRootData.decoded.output.value0.symbol);
-        itemData.balance = +curWalletData.decoded.output.value0.balance / 1000000000;
+            itemData.walletAddress = item[1];
+            itemData.symbol = hex2a(curRootData.decoded.output.value0.symbol);
+            itemData.balance = +curWalletData.decoded.output.value0.balance / 1000000000;
 
-        normlizeWallets.push(itemData)
+            normalizeWallets.push(itemData)
+        }
+        console.log(normalizeWallets);
+        return normalizeWallets
+    } catch (e) {
+        console.log("catch E", e);
+        return e
     }
-
-    return normlizeWallets
-} catch (e) {
-    console.log("catch E", e);
-    return e
-}
 }
 
 /**

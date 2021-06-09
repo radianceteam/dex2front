@@ -32,7 +32,7 @@ const walletReducer = (state = initialState, { type, payload }) => {
         ...state,
         pubKey: {
           status: payload.status,
-          address: payload.address
+          address: payload.dexclient
         }
       };
     case SET_TOKEN_LIST:

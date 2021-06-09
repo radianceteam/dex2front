@@ -1,8 +1,8 @@
 import React, {useEffect} from 'react';
 import {useSelector, useDispatch} from 'react-redux';
 import {Switch, Route, Redirect, useLocation} from 'react-router-dom';
-import {changeTheme, setExtensionsList} from './store/actions/app';
-import {setPairsList} from './store/actions/wallet';
+import {changeTheme, setCurExt, setExtensionsList, setWalletIsConnected} from './store/actions/app';
+import {setPairsList, setPubKey, setTokenList, setTransactionsList, setWallet} from './store/actions/wallet';
 import { getAllPairsWoithoutProvider } from './extensions/webhook/script';
 import { checkExtensions } from './extensions/extensions/checkExtensions';
 import Account from './pages/Account/Account';
@@ -17,19 +17,37 @@ function App() {
   const dispatch = useDispatch();
   const location = useLocation();
   const popup = useSelector(state => state.appReducer.popup);
+  const appTheme = useSelector(state => state.appReducer.appTheme);
   const walletIsConnected = useSelector(state => state.appReducer.walletIsConnected);
   const swapAsyncIsWaiting = useSelector(state => state.swapReducer.swapAsyncIsWaiting);
 
   useEffect(async () => {
     const theme = localStorage.getItem('appTheme') === null ? 'light' : localStorage.getItem('appTheme');
-    dispatch(changeTheme(theme));
+    if(appTheme !== theme) dispatch(changeTheme(theme));
 
+    const wallet = localStorage.getItem('wallet') === null ? {} : JSON.parse(localStorage.getItem('wallet'));
+    if(wallet.id) {
+      dispatch(setWallet(wallet));
+      dispatch(setWalletIsConnected(true));
+    }
+
+    const curExt = localStorage.getItem('curExt') === null ? {} : JSON.parse(localStorage.getItem('curExt'));
+    if(curExt._extLib) dispatch(setCurExt(curExt));
+
+    const pubKey = localStorage.getItem('pubKey') === null ? {} : JSON.parse(localStorage.getItem('pubKey'));
+    if(pubKey.status) dispatch(setPubKey(pubKey));
+
+    const tokenList = localStorage.getItem('tokenList') === null ? [] : JSON.parse(localStorage.getItem('tokenList'));
+    if(tokenList.length) dispatch(setTokenList(tokenList));
+
+    const transactionsList = localStorage.getItem('transactionsList') === null ? [] : JSON.parse(localStorage.getItem('transactionsList'));
+    if(transactionsList.length) dispatch(setTransactionsList(transactionsList));
+    
     const extensionsList = await checkExtensions();
     dispatch(setExtensionsList(extensionsList));
 
     const pairs = await getAllPairsWoithoutProvider();
     dispatch(setPairsList(pairs))
-
   }, []);
 
 

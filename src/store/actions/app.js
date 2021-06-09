@@ -22,6 +22,7 @@ export function setExtensionsList(payload) {
 }
 
 export function setCurExt(payload) {
+  localStorage.setItem('curExt', JSON.stringify(payload));
   return { type: SET_CUR_EXT, payload }
 }
 
@@ -35,14 +36,6 @@ export function closeConnecting() {
 
 export function setWalletIsConnected(payload) {
   return { type: SET_WALLET_IS_CONNECTED, payload }
-}
-
-export function showAccount() {
-  return { type: SHOW_ACCOUNT }
-}
-
-export function hideAccount() {
-  return { type: HIDE_ACCOUNT }
 }
 
 export function showPopup(payload) {

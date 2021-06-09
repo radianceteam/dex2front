@@ -7,9 +7,19 @@
   }
 
   &-title {
+    &::first-letter {
+      text-transform: uppercase;
+    }
+  }
+
+  &-body-title {
     font-size: 20px;
     color: var(--popup-title-color);
     margin: 0;
+
+    &::first-letter {
+      text-transform: uppercase;
+    }
   }
 
   &-wallet-key {
