@@ -3,8 +3,8 @@ import {useSelector, useDispatch} from 'react-redux';
 import {Switch, Route, Redirect, useLocation} from 'react-router-dom';
 import {changeTheme, setCurExt, setExtensionsList, setWalletIsConnected} from './store/actions/app';
 import {setPairsList, setPubKey, setTokenList, setTransactionsList, setWallet} from './store/actions/wallet';
-import { getAllPairsWoithoutProvider } from './extensions/webhook/script';
-import { checkExtensions } from './extensions/extensions/checkExtensions';
+import { getAllPairsWoithoutProvider, subscribe } from './extensions/webhook/script';
+import { checkExtensions, getCurrentExtension } from './extensions/extensions/checkExtensions';
 import Account from './pages/Account/Account';
 import Swap from './pages/Swap/Swap';
 import Pool from './pages/Pool/Pool';
@@ -31,14 +31,21 @@ function App() {
       dispatch(setWalletIsConnected(true));
     }
 
-    const curExt = localStorage.getItem('curExt') === null ? {} : JSON.parse(localStorage.getItem('curExt'));
-    if(curExt._extLib) dispatch(setCurExt(curExt));
+    const extName = localStorage.getItem('extName');
+    if(extName) {
+      let curExt = await getCurrentExtension(extName);
+      console.log(curExt);
+      dispatch(setCurExt(curExt));
+    }
 
     const pubKey = localStorage.getItem('pubKey') === null ? {} : JSON.parse(localStorage.getItem('pubKey'));
     if(pubKey.status) dispatch(setPubKey(pubKey));
 
     const tokenList = localStorage.getItem('tokenList') === null ? [] : JSON.parse(localStorage.getItem('tokenList'));
-    if(tokenList.length) dispatch(setTokenList(tokenList));
+    if(tokenList.length) {
+      tokenList.forEach(async item => await subscribe(item.walletAddress));
+      dispatch(setTokenList(tokenList));
+    }
 
     const transactionsList = localStorage.getItem('transactionsList') === null ? [] : JSON.parse(localStorage.getItem('transactionsList'));
     if(transactionsList.length) dispatch(setTransactionsList(transactionsList));
