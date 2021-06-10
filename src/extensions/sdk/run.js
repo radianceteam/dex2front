@@ -255,6 +255,7 @@ export async function connectToPair(curExt,pairAddr) {
         let connectPairFunc = await callMethod("connectPair", {pairAddr: pairAddr}, clientContract)
         console.log("connectPairFunc",connectPairFunc)
         await getClientForConnect({pairAddr: pairAddr, runMethod:runMethod,callMethod:callMethod,contract:contract,clientAddress:getClientAddressFromRoot.dexclient,clientContract:clientContract})
+        
     } catch (e) {
         console.log("catch E", e);
         return e
@@ -293,16 +294,16 @@ export async function connectToPairStep2DeployWallets(connectionData) {
     if(newArr.length===0){
         return new UserException("y already have all pair wallets")
     }
-try{
-    await newArr.map(async (item,i)=>{
-       let soUint = await getShardConnectPairQUERY(clientAdr,targetShard,item)
-       await callMethod("connectRoot", {root: item, souint:soUint,gramsToConnector:500000000,gramsToRoot:1500000000}, clientContract).then(respt=>{
-       })
-    })
-}catch (e) {
-    console.log("this",e)
-    return e
-}
+    try{
+        await newArr.map(async (item,i)=>{
+        let soUint = await getShardConnectPairQUERY(clientAdr,targetShard,item)
+        await callMethod("connectRoot", {root: item, souint:soUint,gramsToConnector:500000000,gramsToRoot:1500000000}, clientContract).then(respt=>{
+        })
+        })
+    }catch (e) {
+        console.log("this",e)
+        return e
+    }
 
 }
 

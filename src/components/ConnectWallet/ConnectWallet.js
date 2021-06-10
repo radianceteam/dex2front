@@ -36,7 +36,8 @@ function ConnectWallet() {
       }
 
       try {
-        const walletAddress = curExt._extLib.address;  
+        // const walletAddress = curExt._extLib.address;  
+        const walletAddress = pubKey.dexclient;
         const clientBalance = await getClientBalance(walletAddress);
         let tokenList = await getAllClientWallets(pubKey.dexclient);
 

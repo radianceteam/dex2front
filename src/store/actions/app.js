@@ -5,8 +5,6 @@ import {
   CONNECT_WALLET,
   CLOSE_CONNECTING,
   SET_WALLET_IS_CONNECTED,
-  SHOW_ACCOUNT,
-  HIDE_ACCOUNT,
   SHOW_POPUP,
   HIDE_POPUP,
  } from './types';
@@ -22,7 +20,7 @@ export function setExtensionsList(payload) {
 }
 
 export function setCurExt(payload) {
-  localStorage.setItem('curExt', JSON.stringify(payload));
+  localStorage.setItem('extName', payload._extLib ? payload._extLib.name : '');
   return { type: SET_CUR_EXT, payload }
 }
 

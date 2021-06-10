@@ -26,8 +26,14 @@ function Input(props) {
   const swapFromToken = useSelector(state => state.swapReducer.fromToken);
   const swapToToken = useSelector(state => state.swapReducer.toToken);
 
+  const swapFromValue = useSelector(state => state.swapReducer.fromInputValue);
+  const swapToValue = useSelector(state => state.swapReducer.toInputValue);
+
   const poolFromToken = useSelector(state => state.poolReducer.fromToken);
   const poolToToken = useSelector(state => state.poolReducer.toToken);
+
+  const poolFromValue = useSelector(state => state.poolReducer.fromInputValue);
+  const poolToValue = useSelector(state => state.poolReducer.toInputValue);
 
   const pairsList = useSelector(state => state.walletReducer.pairsList);
 
@@ -64,7 +70,6 @@ function Input(props) {
 
   async function handleClick() {
     try {
-      await _.checkExtensionAvailability();
       if(location.pathname.includes('swap')) {
         if(props.type === 'to' && !swapFromToken.symbol) {
           dispatch(showPopup({type: 'error', message: 'Please, choose from token first.'}));
@@ -79,9 +84,7 @@ function Input(props) {
         }
       }
     } catch(e) {
-      if(e.message === 'Extension not available.') {
-        dispatch(showPopup({type: 'extension'}));
-      }
+      dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}))
     }
   }
 
@@ -89,18 +92,15 @@ function Input(props) {
     if(location.pathname.includes('swap')) {
       if(props.type === 'from') {
         dispatch(setSwapFromInputValue(value));
-        dispatch(setSwapToInputValue(value * swapRate));
-      } else if(props.type === 'to') {
-        dispatch(setSwapToInputValue(value));
-        dispatch(setSwapFromInputValue(value / swapRate));
+        dispatch(setSwapToInputValue(parseFloat((value * swapRate).toFixed(4))));
+      // } else if(props.type === 'to') {
+        // dispatch(setSwapToInputValue(value));
+        // dispatch(setSwapFromInputValue(parseFloat((value / swapRate).toFixed(4))));
       }
     } else if(location.pathname.includes('add-liquidity')) {
       if(props.type === 'from') {
         dispatch(setPoolFromInputValue(value));
         dispatch(setPoolToInputValue(value * poolRate));
-      } else if(props.type === 'to') {
-        dispatch(setPoolToInputValue(value));
-        dispatch(setPoolFromInputValue(value / poolRate));
       }
     }
   }
@@ -114,18 +114,18 @@ function Input(props) {
       <div className="input">
         <div className="input-wrapper">
           <span className="input-title">{props.text}</span>
-          <span className="input-balance">{(walletIsConnected && props.token.symbol) && `Balance: ${props.token.balance > 0 ? props.token.balance.toFixed(4) : props.token.balance}`}</span>
+          <span className="input-balance">{(walletIsConnected && props.token.symbol) && `Balance: ${props.token.balance > 0 ? parseFloat(props.token.balance.toFixed(4)) : props.token.balance}`}</span>
         </div>
         <div className="input-wrapper">
           <input
             type="number"
-            className="input-field"
-            value={props.value > 0 ? props.value.toFixed(4) : ''}
-            onChange={event => setValue(parseFloat(event.target.value))}
+            className={props.value > 0 ? "input-field" : "input-field input-field--zero"}
+            value={props.value}
+            onChange={event => setValue(+event.target.value)}
             onKeyPress={event => handleKeyPress(event)}
-            // readOnly={props.type === 'to'}
             min="0"
             placeholder="0"
+            readOnly={props.readOnly}
           />
 
           { !props.token.symbol ? (

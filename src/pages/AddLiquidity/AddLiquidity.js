@@ -47,6 +47,10 @@ function AddLiquidity () {
     }
   }, [fromToken, toToken]);
 
+  const provideLiquidityHandler = () => {
+    
+  }
+
   return (
     <div className="container">
       <MainBlock
@@ -74,9 +78,10 @@ function AddLiquidity () {
               type={'to'}
               text={toValue > 0 ? <>To <span>(estimated)</span></> : 'To'}
               token={toToken}
-              value={toValue.toFixed(4)}
+              value={parseFloat(toValue.toFixed(4))}
+              readOnly
             />
-            { (fromToken.id && toToken.id) && (
+            { (fromToken.symbol && toToken.symbol) && (
               <div className="add-liquidity-wrapper">
                 <div>
                   <span>{rateBA.toFixed(7)}</span>
@@ -93,7 +98,7 @@ function AddLiquidity () {
               </div>
             )}
             { walletIsConnected ?
-              <button className={(fromToken.id && toToken.id && fromValue && toValue) ? "btn mainblock-btn" : "btn mainblock-btn btn--disabled"}>Supply</button> :
+              <button onClick={provideLiquidityHandler} className={(fromToken.symbol && toToken.symbol && fromValue && toValue) ? "btn mainblock-btn" : "btn mainblock-btn btn--disabled"}>Supply</button> :
               <button className="btn mainblock-btn" onClick={() => history.push('/account')}>Connect wallet</button>
             }
           </div>

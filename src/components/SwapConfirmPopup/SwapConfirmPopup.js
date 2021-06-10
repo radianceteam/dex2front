@@ -1,7 +1,6 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { connectDEXpair, getClientPairs, getClientRoots, getWallet, swap } from '../../freeton';
-import { swapA, swapB } from '../../extensions/sdk/run';
+import { swapA, swapB, connectToPair } from '../../extensions/sdk/run';
 import { showPopup } from '../../store/actions/app';
 import { setSwapAsyncIsWaiting, setSwapFromInputValue, setSwapFromToken, setSwapToInputValue, setSwapToToken } from '../../store/actions/swap';
 import { setPairsList, setTokenList } from '../../store/actions/wallet';
@@ -9,6 +8,7 @@ import CloseBtn from '../CloseBtn/CloseBtn';
 import MainBlock from '../MainBlock/MainBlock';
 import { iconGenerator } from '../../iconGenerator';
 import miniSwap from '../../images/icons/mini-swap.png';
+import { checkClientPairExists, getAllClientWallets, subscribe } from '../../extensions/webhook/script';
 import './SwapConfirmPopup.scss';
 
 function SwapConfirmPopup(props) {
@@ -17,6 +17,7 @@ function SwapConfirmPopup(props) {
   const appTheme = useSelector(state => state.appReducer.appTheme);
 
   let curExt = useSelector(state => state.appReducer.curExt);
+  let pubKey = useSelector(state => state.walletReducer.pubKey);
 
   const fromToken = useSelector(state => state.swapReducer.fromToken);
   const toToken = useSelector(state => state.swapReducer.toToken);
@@ -32,6 +33,30 @@ function SwapConfirmPopup(props) {
   async function handleSwap() {
     dispatch(setSwapAsyncIsWaiting(true));
     props.hideConfirmPopup();
+
+    let pairIsConnected = await checkClientPairExists(pubKey.address, pairId);
+    if(!pairIsConnected) {
+      try {
+        await connectToPair(curExt, pairId);
+        let tokenList = await getAllClientWallets(pubKey.dexclient);
+
+        if(tokenList.length) {          
+          tokenList.forEach(async item => await subscribe(item.walletAddress));
+          
+          tokenList = tokenList.filter(i => !i.symbol.includes('/')).map(i => (
+            {
+              ...i,
+              symbol: i.symbol === 'WTON' ? 'TON' : i.symbol
+            })
+          );
+        }
+
+        dispatch(setTokenList(tokenList));
+        pairIsConnected = true;
+      } catch(e) {
+        dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
+      }      
+    }
 
     // let clientPairs = await getClientPairs();
 
@@ -68,53 +93,54 @@ function SwapConfirmPopup(props) {
     //     dispatch(setSwapAsyncIsWaiting(false));
     //   }
     // }
-
-    try {
-      await pairsList.forEach(async i => {
-        if(fromToken.symbol === i.symbolA && toToken.symbol === i.symbolB) {
-          await swapA(curExt, pairId, fromValue * 1000000000);
-        } else if(fromToken.symbol === i.symbolB && toToken.symbol === i.symbolA) {
-          await swapB(curExt, pairId, fromValue * 1000000000);
+    if(pairIsConnected) {
+      try {
+        await pairsList.forEach(async i => {
+          if(fromToken.symbol === i.symbolA && toToken.symbol === i.symbolB) {
+            await swapA(curExt, pairId, fromValue * 1000000000);
+          } else if(fromToken.symbol === i.symbolB && toToken.symbol === i.symbolA) {
+            await swapB(curExt, pairId, fromValue * 1000000000);
+          }
+        })
+        // await swap(pairId, fromValue, fromToken);
+        // dispatch(await getWallet());
+        // let payload;
+        // tokenList.forEach(i => {
+        //   if(i.id === '0:63e60c263fd73436caf57a8b783f078822c22bf761b6c0ad79cc9e218c5b6faa') {
+        //     payload =  {
+        //       id: '0:63e60c263fd73436caf57a8b783f078822c22bf761b6c0ad79cc9e218c5b6faa',
+        //       symbol: 'TON',
+        //       balance: i.balance
+        //     }
+        //   }
+        // })
+  
+        dispatch(setSwapFromToken({
+          walletAddress: '',
+          symbol: '',
+          balance: 0
+        }));
+        dispatch(setSwapToToken({
+          walletAddress: '',
+          symbol: '',
+          balance: 0
+        }));
+        dispatch(setSwapFromInputValue(0));
+        dispatch(setSwapToInputValue(0));
+        dispatch(showPopup({type: 'success'}));
+        dispatch(setSwapAsyncIsWaiting(false));
+      } catch(e) {
+        console.log(e);
+        switch (e.message) {
+          case 'Canceled by user.':
+            dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
+            break;
+          default:
+            dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
+            break;
         }
-      })
-      // await swap(pairId, fromValue, fromToken);
-      // dispatch(await getWallet());
-      // let payload;
-      // tokenList.forEach(i => {
-      //   if(i.id === '0:63e60c263fd73436caf57a8b783f078822c22bf761b6c0ad79cc9e218c5b6faa') {
-      //     payload =  {
-      //       id: '0:63e60c263fd73436caf57a8b783f078822c22bf761b6c0ad79cc9e218c5b6faa',
-      //       symbol: 'TON',
-      //       balance: i.balance
-      //     }
-      //   }
-      // })
-
-      dispatch(setSwapFromToken({
-        walletAddress: '',
-        symbol: '',
-        balance: 0
-      }));
-      dispatch(setSwapToToken({
-        walletAddress: '',
-        symbol: '',
-        balance: 0
-      }));
-      dispatch(setSwapFromInputValue(0));
-      dispatch(setSwapToInputValue(0));
-      dispatch(showPopup({type: 'success'}));
-      dispatch(setSwapAsyncIsWaiting(false));
-    } catch(e) {
-      console.log(e);
-      switch (e.message) {
-        case 'Canceled by user.':
-          dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
-          break;
-        default:
-          dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
-          break;
+        dispatch(setSwapAsyncIsWaiting(false));
       }
-      dispatch(setSwapAsyncIsWaiting(false));
     }
   }
 
