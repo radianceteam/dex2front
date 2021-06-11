@@ -3,7 +3,9 @@ import {
   SET_PUBKEY,
   SET_TOKEN_LIST,
   SET_PAIRS_LIST,
-  SET_TRANSACTIONS_LIST
+  SET_LIQUIDITY_LIST,
+  SET_TRANSACTIONS_LIST,
+  SET_SUBSCRIBE_DATA
 } from '../actions/types';
 
 const initialState = {
@@ -17,7 +19,9 @@ const initialState = {
   },
   tokenList: [],
   pairsList: [],
-  transactionsList: []
+  liquidityList: [],
+  transactionsList: [],
+  subscribeData: {}
 };
 
 const walletReducer = (state = initialState, { type, payload }) => {
@@ -45,10 +49,20 @@ const walletReducer = (state = initialState, { type, payload }) => {
         ...state,
         pairsList: payload
       };
+    case SET_LIQUIDITY_LIST:
+      return {
+        ...state,
+        liquidityList: payload
+      };
     case SET_TRANSACTIONS_LIST:
       return {
         ...state,
         transactionsList: payload
+      };
+    case SET_SUBSCRIBE_DATA:
+      return {
+        ...state,
+        subscribeData: payload
       };
     default:
       return state;

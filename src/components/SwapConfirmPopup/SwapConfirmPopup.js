@@ -58,41 +58,6 @@ function SwapConfirmPopup(props) {
       }      
     }
 
-    // let clientPairs = await getClientPairs();
-
-    // if(!clientPairs.includes(pairId)) {
-    //   try {
-    //     await connectDEXpair(pairId);
-    //     while(!clientPairs.includes(pairId)) {
-    //       clientPairs = await getClientPairs();
-    //       console.log('Connecting pair...');
-    //     }
-    //     let check = true;
-    //     while(check) {
-    //       let payload = await getClientRoots();
-    //       payload.forEach(i => {
-    //         if(i.id === fromToken.id) {
-    //           payload.forEach(j => {
-    //             if(j.id === toToken.id) {
-    //               dispatch(setTokenList(payload));
-    //               check = false;
-    //             }
-    //           })
-    //         }
-    //       })
-    //     }
-    //   } catch(e) {
-    //     switch (e.message) {
-    //       case 'Canceled by user.':
-    //         dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
-    //         break;
-    //       default:
-    //         dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
-    //         break;
-    //     }
-    //     dispatch(setSwapAsyncIsWaiting(false));
-    //   }
-    // }
     if(pairIsConnected) {
       try {
         await pairsList.forEach(async i => {
@@ -101,34 +66,7 @@ function SwapConfirmPopup(props) {
           } else if(fromToken.symbol === i.symbolB && toToken.symbol === i.symbolA) {
             await swapB(curExt, pairId, fromValue * 1000000000);
           }
-        })
-        // await swap(pairId, fromValue, fromToken);
-        // dispatch(await getWallet());
-        // let payload;
-        // tokenList.forEach(i => {
-        //   if(i.id === '0:63e60c263fd73436caf57a8b783f078822c22bf761b6c0ad79cc9e218c5b6faa') {
-        //     payload =  {
-        //       id: '0:63e60c263fd73436caf57a8b783f078822c22bf761b6c0ad79cc9e218c5b6faa',
-        //       symbol: 'TON',
-        //       balance: i.balance
-        //     }
-        //   }
-        // })
-  
-        dispatch(setSwapFromToken({
-          walletAddress: '',
-          symbol: '',
-          balance: 0
-        }));
-        dispatch(setSwapToToken({
-          walletAddress: '',
-          symbol: '',
-          balance: 0
-        }));
-        dispatch(setSwapFromInputValue(0));
-        dispatch(setSwapToInputValue(0));
-        dispatch(showPopup({type: 'success'}));
-        dispatch(setSwapAsyncIsWaiting(false));
+        }) 
       } catch(e) {
         console.log(e);
         switch (e.message) {

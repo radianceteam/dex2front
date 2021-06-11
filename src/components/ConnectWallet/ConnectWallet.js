@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import {useSelector, useDispatch} from 'react-redux';
 import {closeConnecting, setWalletIsConnected, showPopup} from '../../store/actions/app';
-import {setPubKey, setTokenList, setWallet} from '../../store/actions/wallet';
+import {setLiquidityList, setPubKey, setTokenList, setWallet} from '../../store/actions/wallet';
 import { setSwapFromToken, setSwapToToken } from '../../store/actions/swap';
 import { setPoolFromToken, setPoolToToken } from '../../store/actions/pool';
 import { getAllClientWallets, getClientBalance, checkPubKey, subscribe } from '../../extensions/webhook/script.js';
@@ -40,19 +40,24 @@ function ConnectWallet() {
         const walletAddress = pubKey.dexclient;
         const clientBalance = await getClientBalance(walletAddress);
         let tokenList = await getAllClientWallets(pubKey.dexclient);
+        let liquidityList = [];
 
         if(tokenList.length) {          
           tokenList.forEach(async item => await subscribe(item.walletAddress));
           
+          liquidityList = tokenList.filter(i => i.symbol.includes('/'));
+
           tokenList = tokenList.filter(i => !i.symbol.includes('/')).map(i => (
             {
               ...i,
               symbol: i.symbol === 'WTON' ? 'TON' : i.symbol
             })
-          );
+          );          
+          
+          dispatch(setTokenList(tokenList));
+          dispatch(setLiquidityList(liquidityList));
         }
-
-        dispatch(setTokenList(tokenList));
+        
         dispatch(setPubKey(pubKey));
         dispatch(setWallet({id: walletAddress, balance: clientBalance}));
 

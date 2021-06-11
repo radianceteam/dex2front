@@ -21,6 +21,9 @@ import {abiContract} from "@tonclient/core";
 // import {getWalletBalance} from "../sdk/run";
 import {checkExtensions, getCurrentExtension} from "../extensions/checkExtensions";
 
+import {store} from '../../index'
+import {setSubscribeData} from '../../store/actions/wallet'
+
 const RootContract = new Account(DEXrootContract, {address:Radiance.networks['2'].dexroot, client});
 
 
@@ -326,6 +329,7 @@ export async function subscribe(address) {
             }
             let caseID = await checkMessagesAmount({transactionID:params.result.id, src:params.result.src,dst:params.result.dst,created_at:params.result.created_at, amountOfTokens: decoded.value.tokens})
             console.log("caseIDВВВВВ",caseID);
+            if(caseID && caseID.dst) store.dispatch(setSubscribeData(caseID));
         }
     })).handle;
     console.log({"subID":subscribeID,subscribedAddress:address})
