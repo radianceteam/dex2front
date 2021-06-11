@@ -236,7 +236,7 @@ export async function getAllPairsWoithoutProvider() {
         itemData.rateBA = +bal.decoded.output.balanceReserve[item[1].root0] / +bal.decoded.output.balanceReserve[item[1].root1]
         normlizeWallets.push(itemData)
     }
-    console.log("{normlizeWallets}",normlizeWallets)
+    // console.log("{normlizeWallets}",normlizeWallets)
     return normlizeWallets
 
 }

@@ -100,7 +100,7 @@ function Input(props) {
     } else if(location.pathname.includes('add-liquidity')) {
       if(props.type === 'from') {
         dispatch(setPoolFromInputValue(value));
-        dispatch(setPoolToInputValue(value * poolRate));
+        dispatch(setPoolToInputValue(parseFloat((value * poolRate).toFixed(4))));
       }
     }
   }

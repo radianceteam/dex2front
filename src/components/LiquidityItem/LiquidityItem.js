@@ -5,7 +5,7 @@ import './LiquidityItem.scss';
 
 function LiquidityItem({walletAddress, symbol}) {
   const symbols = symbol.split('/');
-  console.log(walletAddress);
+  
   return (
     <div className="liquidity-item">
       <div>

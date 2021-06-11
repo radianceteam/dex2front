@@ -93,17 +93,17 @@ function AddLiquidity () {
                 type={'to'}
                 text={toValue > 0 ? <>To <span>(estimated)</span></> : 'To'}
                 token={toToken}
-                value={parseFloat(toValue.toFixed(4))}
+                value={toValue}
                 readOnly
               />
               { (fromToken.symbol && toToken.symbol) && (
                 <div className="add-liquidity-wrapper">
                   <div>
-                    <span>{rateBA.toFixed(7)}</span>
+                    <span>{parseFloat(rateBA.toFixed(4))}</span>
                     {fromTokenSymbol} per 1 {toTokenSymbol}
                   </div>
                   <div>
-                    <span>{rateAB.toFixed(7)}</span>
+                    <span>{parseFloat(rateAB.toFixed(4))}</span>
                     {toTokenSymbol} per 1 {fromTokenSymbol}
                   </div>
                   <div>
@@ -119,7 +119,7 @@ function AddLiquidity () {
             </div>
           }
       />)}
-      
+
       { poolConfirmPopupIsVisible && 
         <PoolConfirmPopup 
           hideConfirmPopup={setPoolConfirmPopupIsVisible.bind(this, false)}

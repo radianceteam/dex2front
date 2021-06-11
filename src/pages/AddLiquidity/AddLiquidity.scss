@@ -26,6 +26,12 @@
   }
 }
 
+@media screen and (max-width: 1025px) {
+  .add-liquidity-plus {
+    margin: 20px auto;
+  }
+}
+
 @media screen and (max-width: 769px) {
   .add-liquidity-wrapper {
     flex-direction: column;
