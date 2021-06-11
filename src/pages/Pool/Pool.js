@@ -12,6 +12,7 @@ function Pool () {
 
   const wallet = useSelector(state => state.walletReducer.wallet);
   const walletIsConnected = useSelector(state => state.appReducer.walletIsConnected);
+  const liquidityList = useSelector(state => state.walletReducer.liquidityList);
 
   return (
     <div className="container">
@@ -24,12 +25,15 @@ function Pool () {
         content={
           !walletIsConnected ?
             <button className="btn mainblock-btn" onClick={() => history.push('/account')}>Connect wallet</button> :
-            <>
-              <LiquidityItem />
-              <LiquidityItem />
-              <LiquidityItem />
-              <LiquidityItem />
-            </>
+            <div className="pool-wrapper">
+              {!liquidityList.length ? 'You don’t have liquidity pairs yet' : liquidityList.map(i => (
+                <LiquidityItem 
+                  walletAddress={i.walletAddress}
+                  symbol={i.symbol}
+                  key={i.walletAddress}
+                  />
+              ))}
+            </div>
         }
       />
     </div>
