@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useHistory } from 'react-router';
 import { useSelector, useDispatch } from 'react-redux';
 import { setCurExt, setWalletIsConnected } from '../../store/actions/app';
-import { setPubKey, setTokenList, setTransactionsList, setWallet } from '../../store/actions/wallet';
+import { setLiquidityList, setPubKey, setTokenList, setTransactionsList, setWallet } from '../../store/actions/wallet';
 import { getAllMessagesAndAllTransaction } from '../../freeton';
 import MainBlock from '../../components/MainBlock/MainBlock';
 import ConnectWallet from '../../components/ConnectWallet/ConnectWallet';
@@ -33,7 +33,7 @@ function Account() {
     dispatch(setCurExt({}));
     dispatch(setPubKey({status: false, address: ''}));
     dispatch(setTokenList([]));
-    dispatch(setTransactionsList([]))
+    dispatch(setLiquidityList([]));
     // dispatch(setTransactionsList([]));
     history.goBack()
   }

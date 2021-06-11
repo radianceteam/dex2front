@@ -4,6 +4,7 @@ import fETH from './images/tokens/wETH.svg';
 import USDT from './images/tokens/wUSDT.svg';
 import USDC from './images/tokens/USDC.svg';
 import DAI from './images/tokens/DAI.svg';
+import BNB from './images/tokens/BNB.svg';
 
 export function iconGenerator(icon) {
   switch (icon) {
@@ -19,6 +20,8 @@ export function iconGenerator(icon) {
       return USDC;
     case 'DAI':
       return DAI;
+    case 'BNB':
+      return BNB;
     default:
       break;
   }
