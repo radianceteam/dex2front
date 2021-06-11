@@ -302,6 +302,23 @@ async function body(abi, body, internal = true) {
         return e.code
     }
 }
+//abiContract(abi),
+async function _body(abi, body, internal = true) {
+    try {
+        const decodedBody = 
+            await client.abi.decode_message_body({
+                abi: abi,  
+                body: body,
+                is_internal: internal
+            })
+        
+        // console.log('decodedBody:' + decodedBody + '; abi:' + abi + '; body:' + body);
+        return decodedBody
+    } catch (e) {
+        console.log('abi:' + abi + '; body:' + body + ';' + e)
+        return e.code
+    }
+}
 
 
 export async function subscribe(address) {
@@ -337,16 +354,13 @@ export async function subscribe(address) {
 
             console.log("resBody",resBody);
 
-            let payload = await body(TONTokenWalletContract.abi,resBody.value.payload)
-            if (payload === 304) {payload = await body(DEXclientContract.abi, resBody.value.payload)}
-            if (payload === 304) {payload = await body(DEXPairContract.abi, resBody.value.payload)}
-            if (payload === 304) {payload = await body(SafeMultisigWallet.abi, resBody.value.payload)}
-            if (payload === 304) {payload = await body(RootTokenContract.abi, resBody.value.payload)}
-            if (payload === 304) {payload = await body(DEXrootContract.abi, resBody.value.payload)}
+            let payload = await _body(TONTokenWalletContract.abi,resBody.value.payload)
+            if (payload === 304) {payload = await _body(DEXclientContract.abi, resBody.value.payload)}
+            if (payload === 304) {payload = await _body(DEXPairContract.abi, resBody.value.payload)}
+            if (payload === 304) {payload = await _body(SafeMultisigWallet.abi, resBody.value.payload)}
+            if (payload === 304) {payload = await _body(RootTokenContract.abi, resBody.value.payload)}
+            if (payload === 304) {payload = await _body(DEXrootContract.abi, resBody.value.payload)}
             console.log("payload",payload);
-
-            console.log("payload",payload);
-
 
 
             // let caseID = await checkMessagesAmount({transactionID:params.result.id, "created_at":params.result.created_at, amountOfTokens: resInput.tokens, grams:resInput.grams,})
