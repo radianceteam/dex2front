@@ -82,7 +82,7 @@ function SelectItem(props) {
           <p className="select-item-descr">{props.symbol}</p>
         </div>
       </div>
-      { walletIsConnected && <span className="select-item-balance">{props.balance > 0 ? props.balance.toFixed(4) : props.balance}</span> }
+      { walletIsConnected && <span className="select-item-balance">{props.balance > 0 ? parseFloat(props.balance.toFixed(4)) : props.balance}</span> }
     </div>
   )
 }

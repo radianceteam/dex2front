@@ -66,6 +66,12 @@
 }
 
 @media screen and (max-width: 1025px) {
+  .pool {
+    &-wrapper {
+      margin-right: -20px;
+      padding-right: 11px;
+    }
+  }
   .liquidity-btn {
     padding: 8px 12px;
     border-radius: 12px;

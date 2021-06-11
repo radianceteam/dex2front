@@ -65,8 +65,14 @@ function App() {
     dispatch(setExtensionsList(extensionsList));
 
     const pairs = await getAllPairsWoithoutProvider();
-    dispatch(setPairsList(pairs))
+    dispatch(setPairsList(pairs));
+
+    setInterval(async () => {
+      const pairs = await getAllPairsWoithoutProvider();
+      dispatch(setPairsList(pairs));
+    }, 5000);
   }, []);
+
 
 
   useEffect(() => {
