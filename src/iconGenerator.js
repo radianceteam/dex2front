@@ -7,22 +7,21 @@ import DAI from './images/tokens/DAI.svg';
 import BNB from './images/tokens/BNB.svg';
 
 export function iconGenerator(icon) {
-  switch (icon) {
-    case 'TON':
-      return TON;
-    case 'fBTC':
-      return fBTC;
-    case 'fETH':
-      return fETH;
-    case 'USDT':
-      return USDT;
-    case 'USDC':
-      return USDC;
-    case 'DAI':
-      return DAI;
-    case 'BNB':
-      return BNB;
-    default:
-      break;
+  if(icon.includes('TON')) {
+    return TON;
+  } else if(icon.includes('BTC')) {
+    return fBTC;
+  } else if(icon.includes('ETH')) {
+    return fETH;
+  } else if(icon.includes('USDT')) {
+    return USDT;
+  } else if(icon.includes('USDC')) {
+    return USDC;
+  } else if(icon.includes('DAI')) {
+    return DAI;
+  } else if(icon.includes('BNB')) {
+    return BNB;
+  } else {
+    return;
   }
 }

@@ -9,7 +9,8 @@ import SearchInput from '../SearchInput/SearchInput';
 import Item from '../Item/Item';
 import './ClientWallets.scss';
 
-function ClientWallets() {
+function ClientWallets(props) {
+
     const dispatch = useDispatch();
     const [filter, setFilter] = useState('');
 
