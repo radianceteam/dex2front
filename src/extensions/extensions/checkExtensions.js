@@ -64,7 +64,10 @@ async function extraton() {
     curExtenson.callMethod = async (methodName, params, contract) => {
         return await contract.methods[methodName].call(params)
     };
-
+    curExtenson.SendTransfer = async (to,amount) => {
+        let wallet = signer.getWallet()
+        return await wallet.transfer(to, amount, false,"")
+    }
     return curExtenson
 }
 
@@ -104,6 +107,14 @@ async function broxus() {
             bounce: false
         })
     };
+    curExtenson.SendTransfer = async (to,amount) => {
+        return await ton.sendMessage({
+            sender: curExtenson.address,
+            recipient: new Address(to),
+            amount: amount,
+            bounce: false
+        })
+    }
     return curExtenson
 }
 

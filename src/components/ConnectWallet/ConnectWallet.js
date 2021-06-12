@@ -25,6 +25,7 @@ function ConnectWallet() {
   useEffect(() => {
     (async function() {
       const pubKey = await checkPubKey(curExt._extLib.pubkey);
+      console.log(pubKey);
       if(!pubKey.status) {
         try {
           await setCreator(curExt);
@@ -36,10 +37,12 @@ function ConnectWallet() {
       }
 
       try {
-        // const walletAddress = curExt._extLib.address;  
+        // const walletAddress = curExt._extLib.address;
         const walletAddress = pubKey.dexclient;
         const clientBalance = await getClientBalance(walletAddress);
+
         let tokenList = await getAllClientWallets(pubKey.dexclient);
+        console.log(pubKey)
         let liquidityList = [];
 
         if(tokenList.length) {          

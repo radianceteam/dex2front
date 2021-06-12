@@ -21,7 +21,7 @@ contract DEXClient is ITokensReceivedCallback, IDEXClient, IDEXConnect {
 
   // Grams constants
   uint128 constant GRAMS_CONNECT_PAIR = 500000000;
-  uint128 constant GRAMS_SET_CALLBACK_ADDR = 15000000;
+  uint128 constant GRAMS_SET_CALLBACK_ADDR = 100000000;
   uint128 constant GRAMS_SWAP = 500000000;
   uint128 constant GRAMS_PROCESS_LIQUIDITY = 500000000;
   uint128 constant GRAMS_RETURN_LIQUIDITY = 500000000;
@@ -37,6 +37,7 @@ contract DEXClient is ITokensReceivedCallback, IDEXClient, IDEXConnect {
   mapping (address => address) public rootConnector;
   mapping (address => Connector) connectors;
 
+  // Callback structure. Use only for dev
   struct Callback {
     address token_wallet;
     address token_root;
@@ -73,6 +74,7 @@ contract DEXClient is ITokensReceivedCallback, IDEXClient, IDEXConnect {
     _;
   }
 
+  // Modifier that allows only owner to accept any external calls.
   modifier checkOwnerAndAccept {
     require(msg.pubkey() == tvm.pubkey(), 102);
     tvm.accept();
@@ -126,6 +128,7 @@ contract DEXClient is ITokensReceivedCallback, IDEXClient, IDEXConnect {
     }
   }
 
+  // Function for compute connector address
   function computeConnectorAddress(uint256 souint) private inline view returns (address) {
     TvmCell stateInit = tvm.buildStateInit({
       contr: DEXConnector,
@@ -136,10 +139,12 @@ contract DEXClient is ITokensReceivedCallback, IDEXClient, IDEXConnect {
     return address(tvm.hash(stateInit));
   }
 
+  // Function for get computed connector address
   function getConnectorAddress(uint256 connectorSoArg) public view responsible returns (address) {
     return { value: 0, bounce: false, flag: 64 } computeConnectorAddress( connectorSoArg);
   }
 
+  // Function for connect to Root
   function connectRoot(address root, uint256 souint, uint128 gramsToConnector, uint128 gramsToRoot) public checkOwnerAndAccept returns (bool statusConnected){
     statusConnected = false;
     if (!rootWallet.exists(root)) {
@@ -162,6 +167,7 @@ contract DEXClient is ITokensReceivedCallback, IDEXClient, IDEXConnect {
     }
   }
 
+  // Function for callback from DEX Connector in process connect to Root
   function connectCallback(address wallet) public override alwaysAccept {
     address connector = msg.sender;
     if (connectors.exists(connector)) {
@@ -266,6 +272,7 @@ contract DEXClient is ITokensReceivedCallback, IDEXClient, IDEXConnect {
     }
   }
 
+  // Function to receive callbacks from DEXClient TONToken Wallets and processing.
   function tokensReceivedCallback(
     address token_wallet,
     address token_root,
@@ -295,6 +302,7 @@ contract DEXClient is ITokensReceivedCallback, IDEXClient, IDEXConnect {
     callbacks[counterCallback] = cc;
   }
 
+  // Function for get callback
   function getCallback(uint id) public view checkOwnerAndAccept returns (
     address token_wallet,
     address token_root,
@@ -322,8 +330,14 @@ contract DEXClient is ITokensReceivedCallback, IDEXClient, IDEXConnect {
     payload_arg2 = cc.payload_arg2;
   }
 
-  function getBalance() public pure checkOwnerAndAccept returns (uint128 balance){
-    balance = address(this).balance;
+  // Function for get this contract TON gramms balance
+  function thisBalance() private inline  pure returns (uint128) {
+    return address(this).balance;
+  }
+
+  // Function for external get this contract TON gramms balance
+  function getBalance() public pure responsible returns (uint128) {
+    return { value: 0, bounce: false, flag: 64 } thisBalance();
   }
 
   // Function to create DEXpair by DEXclient via DEXroot.
@@ -347,6 +361,40 @@ contract DEXClient is ITokensReceivedCallback, IDEXClient, IDEXConnect {
     require (!(address(this).balance < grammsTotal),105);
     TvmCell body = tvm.encodeBody(IDEXRoot(rootDEX).createDEXpair, root0,root1,pairSoArg,connectorSoArg0,connectorSoArg1,rootSoArg,rootName,rootSymbol,rootDecimals,grammsForPair,grammsForRoot,grammsForConnector,grammsForWallet);
     rootDEX.transfer({value:grammsTotal, bounce:false, flag: 1, body:body});
+  }
+
+  // Function to get connected pair data.
+  function getPairData(address pairAddr) public view alwaysAccept returns (
+    bool pairStatus,
+    address pairRootA,
+    address pairWalletA,
+    address pairRootB,
+    address pairWalletB,
+    address pairRootAB,
+    address curPair
+  ){
+    Pair cp = pairs[pairAddr];
+    pairStatus = cp.status;
+    pairRootA = cp.rootA;
+    pairWalletA = cp.walletA;
+    pairRootB = cp.rootB;
+    pairWalletB = cp.walletB;
+    pairRootAB = cp.rootAB;
+    curPair = pairAddr;
+  }
+
+  // Function to send Tokens.
+  function sendTokens(address tokenRoot, address to, uint128 tokens, uint128 grams) public checkOwnerAndAccept view returns (bool sendTokenStatus){
+    sendTokenStatus = false;
+    if (rootConnector[tokenRoot] != address(0)) {
+      address connector = rootConnector[tokenRoot];
+      TvmBuilder builder;
+      builder.store(uint8(4), address(this), rootWallet[tokenRoot]);
+      TvmCell payload = builder.toCell();
+      TvmCell body = tvm.encodeBody(IDEXConnector(connector).transfer, to, tokens, payload);
+      connector.transfer({value: grams, bounce:true, body:body});
+      sendTokenStatus = true;
+    }
   }
 
   // Function to receive plain transfers.

@@ -6,7 +6,6 @@ pragma AbiHeader pubkey;
 import "./DEXClient.sol";
 import "./DEXPair.sol";
 import "./RootTokenContract.sol";
-import "./Giver.sol";
 import "./interfaces/IDEXRoot.sol";
 
 contract DEXroot is IDEXRoot {
@@ -18,7 +17,6 @@ contract DEXroot is IDEXRoot {
 	TvmCell public codeDEXconnector;
 	TvmCell public codeRootToken;
 	TvmCell public codeTONTokenWallet;
-	TvmCell public codeGiver;
 
 	mapping(address => mapping(address => address)) roots;
 
@@ -37,6 +35,8 @@ contract DEXroot is IDEXRoot {
 	address[] public clientKeys;
 
 	mapping(address => uint128) public balanceOf;
+	mapping(uint256 => address) public creators;
+
 
 	// Grams constants
 	uint128 constant public GRAMS_CREATE_DEX_CLIENT = 1 ton;
@@ -50,6 +50,13 @@ contract DEXroot is IDEXRoot {
 	// Modifier that allows public function to accept external calls only from the contract owner.
 	modifier checkOwnerAndAccept {
 		require(msg.pubkey() == tvm.pubkey(), 101);
+		tvm.accept();
+		_;
+	}
+
+	// Modifier that allows public function to accept external signed calls only.
+	modifier checkCreatorAndAccept {
+		require(msg.pubkey() != 0, 103);
 		tvm.accept();
 		_;
 	}
@@ -90,10 +97,10 @@ contract DEXroot is IDEXRoot {
 		codeTONTokenWallet = code;
 	}
 
-	function setGiverCode(TvmCell code) public checkOwnerAndAccept {
-		codeGiver = code;
+	function setCreator(address giverAddr) public checkCreatorAndAccept {
+		uint256 pubkey = msg.pubkey();
+		creators[pubkey] = giverAddr;
 	}
-
 
 	function computeClientAddress(uint256 pubkey, uint256 souint) private inline view returns (address) {
 		TvmCell stateInit = tvm.buildStateInit({
@@ -109,27 +116,12 @@ contract DEXroot is IDEXRoot {
 		return { value: 0, bounce: false, flag: 64 } computeClientAddress(clientPubKey,clientSoArg);
 	}
 
-	function computeGiverAddress(uint256 pubkey) private inline view returns (address) {
-		TvmCell stateInit = tvm.buildStateInit({
-			contr: Giver,
-			varInit: {},
-			code: codeGiver,
-			pubkey: pubkey
-		});
-		return address(tvm.hash(stateInit));
-	}
-
-	function getGiverAddress(uint256 giverPubKey) public view responsible returns (address) {
-		return { value: 0, bounce: false, flag: 64 } computeGiverAddress(giverPubKey);
-	}
-
 	function createDEXclient(uint256 pubkey, uint256 souint) public alwaysAccept returns (address deployedAddress, bool statusCreate){
 		statusCreate = false;
 		deployedAddress = address(0);
-		address payeer = computeGiverAddress(pubkey);
-		uint128 grammsForClient = balanceOf[payeer];
-		require (!pubkeys.exists(pubkey) && !(grammsForClient < GRAMS_CREATE_DEX_CLIENT), 106);
-		balanceOf[payeer] = 0;
+		uint128 prepay = balanceOf[creators[pubkey]];
+		require (!pubkeys.exists(pubkey) && !(prepay < GRAMS_CREATE_DEX_CLIENT), 106);
+		delete balanceOf[creators[pubkey]];
 		TvmCell stateInit = tvm.buildStateInit({
 			contr: DEXClient,
 			varInit: {rootDEX:address(this),soUINT:souint,codeDEXConnector:codeDEXconnector},
@@ -140,7 +132,7 @@ contract DEXroot is IDEXRoot {
 			stateInit: stateInit,
 			flag: 0,
 			bounce : false,
-			value : grammsForClient
+			value : (prepay - 3100000)
 		}();
 		pubkeys[pubkey] = deployedAddress;
 		clients[deployedAddress] = pubkey;
