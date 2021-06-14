@@ -23,6 +23,7 @@ function App() {
   const pubKey = useSelector(state => state.walletReducer.pubKey);
   const walletIsConnected = useSelector(state => state.appReducer.walletIsConnected);
   const swapAsyncIsWaiting = useSelector(state => state.swapReducer.swapAsyncIsWaiting);
+  const transactionsList = useSelector(state => state.walletReducer.transactionsList);
   const poolAsyncIsWaiting = useSelector(state => state.poolReducer.poolAsyncIsWaiting);
   const subscribeData = useSelector(state => state.walletReducer.subscribeData);
   const curExt = useSelector(state => state.appReducer.curExt);
@@ -65,6 +66,7 @@ function App() {
     dispatch(setExtensionsList(extensionsList));
 
     const pairs = await getAllPairsWoithoutProvider();
+
     dispatch(setPairsList(pairs));
 
     //setInterval(async () => {
@@ -84,7 +86,9 @@ function App() {
   useEffect(async () => {
     if(subscribeData.dst) {
       const clientBalance = await getClientBalance(pubKey.address);
-
+      let item = localStorage.getItem("currentElement");
+      if(transactionsList[item]) transactionsList[item].toValue = subscribeData.amountOfTokens / 1e9;
+      if (transactionsList.length) dispatch(setTransactionsList(transactionsList));
       let msgiAddress = curExt._extLib.address;
       let msigBalance = await getClientBalance(msgiAddress);
       dispatch(setWallet({id: msgiAddress, balance: msigBalance}));

@@ -209,7 +209,7 @@ export async function checkPubKey(clientPubkey) {
  */
 
 export async function getAllPairsWoithoutProvider() {
-    const acc = new Account(DEXrootContract, {address: "0:74a70fecf38874f6b6e131df9aa1099d8ed3046312f233cb36aba5f6fb2513ff", client});
+    const acc = new Account(DEXrootContract, {address: Radiance.networks["2"].dexroot, client});
     const response = await acc.runLocal("pairs", {});
 
     let normlizeWallets = []

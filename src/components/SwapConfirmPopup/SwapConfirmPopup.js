@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { swapA, swapB, connectToPair } from '../../extensions/sdk/run';
 import { showPopup } from '../../store/actions/app';
 import { setSwapAsyncIsWaiting, setSwapFromInputValue, setSwapFromToken, setSwapToInputValue, setSwapToToken } from '../../store/actions/swap';
-import { setPairsList, setTokenList } from '../../store/actions/wallet';
+import {setPairsList, setTokenList, setTransactionsList} from '../../store/actions/wallet';
 import CloseBtn from '../CloseBtn/CloseBtn';
 import MainBlock from '../MainBlock/MainBlock';
 import { iconGenerator } from '../../iconGenerator';
@@ -18,6 +18,8 @@ function SwapConfirmPopup(props) {
 
   let curExt = useSelector(state => state.appReducer.curExt);
   let pubKey = useSelector(state => state.walletReducer.pubKey);
+
+  const transactionsList = useSelector(state => state.walletReducer.transactionsList);
 
   const fromToken = useSelector(state => state.swapReducer.fromToken);
   const toToken = useSelector(state => state.swapReducer.toToken);
@@ -62,9 +64,37 @@ function SwapConfirmPopup(props) {
       try {
         await pairsList.forEach(async i => {
           if(fromToken.symbol === i.symbolA && toToken.symbol === i.symbolB) {
-            await swapA(curExt, pairId, fromValue * 1000000000);
+            let res = await swapA(curExt, pairId, fromValue * 1000000000);
+
+            if(!res.code) {
+              let olderLength = transactionsList.length;
+              let newLength = transactionsList.push({
+                type: "swap",
+                fromValue: fromValue,
+                fromSymbol: fromToken.symbol,
+                toValue: null,
+                toSymbol: toToken.symbol
+              })
+              let item = newLength - 1
+              console.log(olderLength, newLength, item, transactionsList[item], transactionsList.length);
+              localStorage.setItem("currentElement", item);
+              if (transactionsList.length) await dispatch(setTransactionsList(transactionsList));
+            }
           } else if(fromToken.symbol === i.symbolB && toToken.symbol === i.symbolA) {
-            await swapB(curExt, pairId, fromValue * 1000000000);
+            let res = await swapB(curExt, pairId, fromValue * 1000000000);
+            if(!res.code) {
+              let olderLength = transactionsList.length;
+              let newLength = transactionsList.push({
+                type: "swap",
+                fromValue: fromValue,
+                fromSymbol: fromToken.symbol,
+                toValue: null,
+                toSymbol: toToken.symbol
+              })
+              let item = (newLength - olderLength) - 1
+              localStorage.setItem("currentElement", item);
+              if (transactionsList.length) await dispatch(setTransactionsList(transactionsList));
+            }
           }
         }) 
       } catch(e) {

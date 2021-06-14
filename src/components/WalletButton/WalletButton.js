@@ -9,7 +9,7 @@ function WalletButton() {
     const isVisible = useSelector(state => state.clientWallets.clientWalletsFromSelectIsVisible);
     return (
         <React.Fragment>
-            <button className="btn action-btn header-btn more" onClick={() => dispatch(showClientWalletsFromSelect())}>
+            <button  title="Client wallets" className="btn action-btn header-btn more" onClick={() => dispatch(showClientWalletsFromSelect())}>
                 <svg xmlns="http://www.w3.org/2000/svg" width="26px" height="26px" viewBox="0 0 26 26" version="1.1">
                     <g id="surface1">
                         <path

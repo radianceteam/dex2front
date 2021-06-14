@@ -35,7 +35,7 @@ function Popup(props) {
                 </svg>
                 <p className="popup-title">Transaction Submitted</p>
                 <button className="btn popup-btn" onClick={() => dispatch(hidePopup())}>Cool</button>
-                <a href={`https://net.ton.live/transactions/transactionDetails?id=${props.link}`} className="popup-link">View on ton.live</a>
+                <a href={`https://net.ton.live/messages/messageDetails?id=${props.link}`} className="popup-link">View on ton.live</a>
               </>
             )}
 

@@ -6,6 +6,7 @@ import {NavLink} from 'react-router-dom';
 import Wallet from '../Wallet/Wallet'
 import HeaderMore from '../HeaderMore/HeaderMore'
 import WalletButton from '../WalletButton/WalletButton'
+import PoolExplorerButton from '../PoolExplorerButton/PoolExplorerButton'
 import './Header.scss';
 
 function Header() {
@@ -30,6 +31,7 @@ function Header() {
       <div className="header-wrap">
         <Wallet />
         <WalletButton />
+        <PoolExplorerButton />
         <button className="btn action-btn header-btn" onClick={() => dispatch(changeTheme(theme === "light" ? "dark" : "light"))}>
           {theme === 'light' ? (
             <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
