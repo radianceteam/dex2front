@@ -60,17 +60,17 @@ function App() {
 
     const transactionsList = localStorage.getItem('transactionsList') === null ? [] : JSON.parse(localStorage.getItem('transactionsList'));
     if(transactionsList.length) dispatch(setTransactionsList(transactionsList));
-    
+
     const extensionsList = await checkExtensions();
     dispatch(setExtensionsList(extensionsList));
 
     const pairs = await getAllPairsWoithoutProvider();
     dispatch(setPairsList(pairs));
 
-    setInterval(async () => {
-      const pairs = await getAllPairsWoithoutProvider();
-      dispatch(setPairsList(pairs));
-    }, 5000);
+    // setInterval(async () => {
+    //   const pairs = await getAllPairsWoithoutProvider();
+    //   dispatch(setPairsList(pairs));
+    // }, 5000);
   }, []);
 
 
@@ -85,14 +85,14 @@ function App() {
     if(subscribeData.dst) {
       const clientBalance = await getClientBalance(pubKey.address);
       dispatch(setWallet({id: pubKey.address, balance: clientBalance}));
-      
+
       let tokenList = await getAllClientWallets(pubKey.address);
       let liquidityList = [];
 
-      if(tokenList.length) {       
-        console.log('token list');   
+      if(tokenList.length) {
+        console.log('token list');
         tokenList.forEach(async item => await subscribe(item.walletAddress));
-        
+
         liquidityList = tokenList.filter(i => i.symbol.includes('/'));
 
         tokenList = tokenList.filter(i => !i.symbol.includes('/')).map(i => (
@@ -100,8 +100,8 @@ function App() {
             ...i,
             symbol: i.symbol === 'WTON' ? 'TON' : i.symbol
           })
-        );          
-        
+        );
+
         dispatch(setTokenList(tokenList));
         dispatch(setLiquidityList(liquidityList));
       }
@@ -120,7 +120,7 @@ function App() {
           balance: 0
         }));
         dispatch(setSwapFromInputValue(0));
-        dispatch(setSwapToInputValue(0)); 
+        dispatch(setSwapToInputValue(0));
         dispatch(setSwapAsyncIsWaiting(false));
       } else if(poolAsyncIsWaiting) {
         dispatch(showPopup({type: 'success', link: subscribeData.transactionID}));
@@ -135,7 +135,7 @@ function App() {
           balance: 0
         }));
         dispatch(setPoolFromInputValue(0));
-        dispatch(setPoolToInputValue(0)); 
+        dispatch(setPoolToInputValue(0));
         dispatch(setPoolAsyncIsWaiting(false));
       }
     }
