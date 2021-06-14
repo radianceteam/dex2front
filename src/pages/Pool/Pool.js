@@ -27,11 +27,11 @@ function Pool () {
             <button className="btn mainblock-btn" onClick={() => history.push('/account')}>Connect wallet</button> :
             <div className="pool-wrapper">
               {!liquidityList.length ? 'You don’t have liquidity pairs yet' : liquidityList.map(i => (
-                <LiquidityItem 
-                  walletAddress={i.walletAddress}
+                <LiquidityItem
                   symbol={i.symbol}
+                  balance={i.balance}
                   key={i.walletAddress}
-                  />
+                />
               ))}
             </div>
         }

@@ -28,8 +28,11 @@ function PoolConfirmPopup(props) {
       await processLiquidity(curExt, pairId, fromValue * 1000000000, toValue * 1000000000);
     } catch(e) {
       console.log(e);
-      switch (e.message) {
+      switch (e.text) {
         case 'Canceled by user.':
+          dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
+          break;
+        case 'Rejected by user':
           dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
           break;
         default:

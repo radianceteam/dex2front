@@ -40,6 +40,7 @@ function getShardThis(string) {
 }
 
 export async function getShardConnectPairQUERY(clientAddress,targetShard,rootAddress) {
+    console.log(5,1);
     let connectorSoArg0;
     let status = false;
     let n = 0;
@@ -51,11 +52,16 @@ export async function getShardConnectPairQUERY(clientAddress,targetShard,rootAdd
 
     let shardW
     let walletAddr
+    console.log(5,2);
     while (!status) {
+        console.log(6,1);
         let response = await accClient.runLocal("getConnectorAddress", {_answer_id: 0, connectorSoArg: n})
+        console.log(6,2);
         connectorAddr = response.decoded.output.value0;
         // console.log("connectorAddr",connectorAddr)
+        console.log(6,3);
         shardC = getShardThis(connectorAddr);
+        console.log(6,4);
         console.log("shardC", shardC, targetShard)
         if (shardC === targetShard) {
 
@@ -70,12 +76,15 @@ export async function getShardConnectPairQUERY(clientAddress,targetShard,rootAdd
                 console.log("getWalletAddress:", walletAddr);
 
                 status = true;
-            } else {console.log(n);}
-        } else {console.log(n);}
+            } else {console.log(n, 'second');}
+        } else {console.log(n, 'first');}
         n++;
     }
     console.log("connectorSoArg0",connectorSoArg0,"shardC",shardC,"shardW",shardW,"targetShard",targetShard,"connectorAddr",connectorAddr,"walletAddr",walletAddr)
+    
+    console.log(5,3);
     return connectorSoArg0
+
 }
 
 
@@ -348,4 +357,18 @@ let checkMessagesAmount = function(messageID){
     }
     checkerArr.push(messageID)
     return messageID
+}
+
+export async function getPairsTotalSupply(pairAddress) {
+    // let pairAddress = "0:7c7b1e586e807f97826d0bcf032567043e37f6531c45eb986feb177c81c8409c"
+    const acc = new Account(DEXPairContract, {address: pairAddress, client});
+    try{
+        const response = await acc.runLocal("totalSupply", {});
+        let pairTotalSupply = response.decoded.output.totalSupply;
+        console.log("pairTotalSupply",pairTotalSupply)
+        return pairTotalSupply
+    } catch (e) {
+        console.log("catch E", e);
+        return e
+    }
 }

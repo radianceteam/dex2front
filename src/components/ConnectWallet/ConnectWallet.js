@@ -22,8 +22,7 @@ function ConnectWallet() {
   let poolFromToken = useSelector(state => state.poolReducer.fromToken);
   let poolToToken = useSelector(state => state.poolReducer.toToken);
 
-  useEffect(() => {
-    (async function() {
+  useEffect(async () => {
       const pubKey = await checkPubKey(curExt._extLib.pubkey);
       console.log(pubKey);
       if(!pubKey.status) {
@@ -37,16 +36,19 @@ function ConnectWallet() {
       }
 
       try {
+
         const walletAddress = pubKey.dexclient;
         let msgiAddress = curExt._extLib.address;
         let msigBalance = await getClientBalance(msgiAddress);
+        console.log("walletAddress",msgiAddress,"msigBalance",msigBalance)
+
         const clientBalance = await getClientBalance(walletAddress);
         let tokenList = await getAllClientWallets(pubKey.dexclient);
         let liquidityList = [];
 
-        if(tokenList.length) {          
+        if(tokenList.length) {
           tokenList.forEach(async item => await subscribe(item.walletAddress));
-          
+
           liquidityList = tokenList.filter(i => i.symbol.includes('/'));
 
           tokenList = tokenList.filter(i => !i.symbol.includes('/')).map(i => (
@@ -54,12 +56,12 @@ function ConnectWallet() {
               ...i,
               symbol: i.symbol === 'WTON' ? 'TON' : i.symbol
             })
-          );          
-          
+          );
+
           dispatch(setTokenList(tokenList));
           dispatch(setLiquidityList(liquidityList));
         }
-        
+
         dispatch(setPubKey(pubKey));
         dispatch(setWallet({id: msgiAddress, balance: msigBalance}));
 
@@ -90,7 +92,6 @@ function ConnectWallet() {
         dispatch(closeConnecting());
         dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
       }
-    })()
   }, []);
 
   return (

@@ -49,7 +49,6 @@ function Swap () {
         <MainBlock
           smallTitle={false}
           title={'Swap'}
-
           content={
             <div>
               <Input
@@ -74,7 +73,7 @@ function Swap () {
                 <button className="btn mainblock-btn" onClick={() => history.push('/account')}>Connect wallet</button>
               }
               { (fromToken.symbol && toToken.symbol) && <p className="swap-rate">Price <span>{parseFloat(rate.toFixed(4))} {toToken.symbol}</span> per <span>{fromToken.symbol}</span></p> }
-              
+
             </div>
           }
           />

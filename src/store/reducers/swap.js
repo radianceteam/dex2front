@@ -18,13 +18,11 @@ const initialState = {
   fromToken: {
     walletAddress: '',
     symbol: '',
-    icon: '',
     balance: 0
   },
   toToken: {
     walletAddress: '',
     symbol: '',
-    icon: '',
     balance: 0
   },
   rate: 0,

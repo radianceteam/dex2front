@@ -284,6 +284,7 @@ export async function connectToPair(curExt,pairAddr) {
     // let pairAddr = "0:7e97c915eeb2cad1e0977225b6a9d96ed79902f01c46c60e3362a1e2a5da1912"
     // let curExt = {};
     // await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
+
     const {contract,callMethod,runMethod,pubkey,SendTransfer} = curExt._extLib
     let getClientAddressFromRoot = await checkPubKey(pubkey)
     if(getClientAddressFromRoot.status === false){
@@ -303,9 +304,11 @@ export async function connectToPair(curExt,pairAddr) {
         console.log("catch E", e);
         return e
     }
+    console.log(2,2);
 }
 
 export async function getClientForConnect(data) {
+    console.log(3,1);
     const {pairAddr, clientAddress, contract, runMethod, callMethod,clientContract} = data
     try {
         let soUINT = await runMethod("soUINT", {}, clientContract)
@@ -322,11 +325,13 @@ export async function getClientForConnect(data) {
         console.log("catch E", e);
         return e
     }
+    console.log(3,2);
 }
 
 
 
 export async function connectToPairStep2DeployWallets(connectionData) {
+    console.log(4,1);
     let { curPair,clientAdr,callMethod, clientContract,clientRoots} = connectionData;
 
     let targetShard = getShard(clientAdr);
@@ -338,15 +343,25 @@ export async function connectToPairStep2DeployWallets(connectionData) {
         return new UserException("y already have all pair wallets")
     }
     try{
-        await newArr.map(async (item,i)=>{
+
+        console.log(4,111);
+        
+        for (const item of newArr) {
+        // await newArr.forEach(async (item,i)=>{
+            console.log(4,11);
             let soUint = await getShardConnectPairQUERY(clientAdr,targetShard,item)
+            console.log(4,12);
             await callMethod("connectRoot", {root: item, souint:soUint,gramsToConnector:500000000,gramsToRoot:1500000000}, clientContract).then(respt=>{
             })
-        })
+        }
+        // )
+        console.log(4,112);
+
     }catch (e) {
         console.log("this",e)
         return e
     }
+    console.log(4,2);
 
 }
 
