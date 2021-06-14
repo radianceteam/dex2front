@@ -37,12 +37,11 @@ function ConnectWallet() {
       }
 
       try {
-        // const walletAddress = curExt._extLib.address;
         const walletAddress = pubKey.dexclient;
+        let msgiAddress = curExt._extLib.address;
+        let msigBalance = await getClientBalance(msgiAddress);
         const clientBalance = await getClientBalance(walletAddress);
-
         let tokenList = await getAllClientWallets(pubKey.dexclient);
-        console.log(pubKey)
         let liquidityList = [];
 
         if(tokenList.length) {          
@@ -62,7 +61,7 @@ function ConnectWallet() {
         }
         
         dispatch(setPubKey(pubKey));
-        dispatch(setWallet({id: walletAddress, balance: clientBalance}));
+        dispatch(setWallet({id: msgiAddress, balance: msigBalance}));
 
         tokenList.forEach(i => {
           if(swapFromToken.symbol === i.symbol) {

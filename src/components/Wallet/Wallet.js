@@ -20,7 +20,7 @@ function Wallet() {
       {!walletIsConnected ?
         <button className="btn wallet-btn" onClick={handleClick}>Connect wallet</button> :
         <div className="wallet-wrap" onClick={() => history.push('/account')}>
-          <span className="wallet-ballance">{wallet.balance.toFixed(4)} TON</span>
+          <span className="wallet-ballance">Gas: {wallet.balance.toFixed(4)} TON</span>
           <span className="wallet-key">{wallet.id.slice(0, 5)}...{wallet.id.slice(-4)}</span>
         </div>
       }

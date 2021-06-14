@@ -25,7 +25,7 @@ function App() {
   const swapAsyncIsWaiting = useSelector(state => state.swapReducer.swapAsyncIsWaiting);
   const poolAsyncIsWaiting = useSelector(state => state.poolReducer.poolAsyncIsWaiting);
   const subscribeData = useSelector(state => state.walletReducer.subscribeData);
-
+  const curExt = useSelector(state => state.appReducer.curExt);
   useEffect(async () => {
     const theme = localStorage.getItem('appTheme') === null ? 'light' : localStorage.getItem('appTheme');
     if(appTheme !== theme) dispatch(changeTheme(theme));
@@ -67,10 +67,10 @@ function App() {
     const pairs = await getAllPairsWoithoutProvider();
     dispatch(setPairsList(pairs));
 
-    setInterval(async () => {
-      const pairs = await getAllPairsWoithoutProvider();
-      dispatch(setPairsList(pairs));
-    }, 5000);
+    //setInterval(async () => {
+    //  const pairs = await getAllPairsWoithoutProvider();
+    //  dispatch(setPairsList(pairs));
+    //}, 5000);
   }, []);
 
 
@@ -84,7 +84,10 @@ function App() {
   useEffect(async () => {
     if(subscribeData.dst) {
       const clientBalance = await getClientBalance(pubKey.address);
-      dispatch(setWallet({id: pubKey.address, balance: clientBalance}));
+
+      let msgiAddress = curExt._extLib.address;
+      let msigBalance = await getClientBalance(msgiAddress);
+      dispatch(setWallet({id: msgiAddress, balance: msigBalance}));
       
       let tokenList = await getAllClientWallets(pubKey.address);
       let liquidityList = [];
