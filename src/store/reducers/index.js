@@ -12,7 +12,7 @@ export default combineReducers({
   walletReducer,
   swapReducer,
   poolReducer,
-  manageReducer
+  manageReducer,
   clientWallets,
   poolExplorer
 });
