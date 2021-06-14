@@ -80,7 +80,7 @@ export async function getShardConnectPairQUERY(clientAddress,targetShard,rootAdd
         n++;
     }
     console.log("connectorSoArg0",connectorSoArg0,"shardC",shardC,"shardW",shardW,"targetShard",targetShard,"connectorAddr",connectorAddr,"walletAddr",walletAddr)
-    
+
     console.log(5,3);
     return connectorSoArg0
 
@@ -162,6 +162,7 @@ export async function checkClientPairExists(clientAddress,pairAddress) {
 
 
 export async function getAllClientWallets(clientAddress) {
+
     const acc = new Account(DEXclientContract, {address: clientAddress, client});
     const response = await acc.runLocal("rootWallet", {});
 
@@ -218,7 +219,8 @@ export async function checkPubKey(clientPubkey) {
  */
 
 export async function getAllPairsWoithoutProvider() {
-    const acc = new Account(DEXrootContract, {address: Radiance.networks['2'].dexroot, client});
+
+    const acc = new Account(DEXrootContract, {address: Radiance.networks["2"].dexroot, client});
     const response = await acc.runLocal("pairs", {});
 
     let normlizeWallets = []
@@ -286,6 +288,7 @@ export async function getClientBalance(clientAddress) {
 
 const decode = {
     async message(abi, boc) {
+
         try {
             const decodedMessage = (
                 await TonClient.default.abi.decode_message({
@@ -328,6 +331,7 @@ export async function subscribe(address) {
         order:[{path:"created_at",direction:'DESC'}],
         result: "id boc created_at body dst src",
     }, async (params,responseType) => {
+
         if (responseType === ResponseType.Custom) {
             let decoded = await decode.message(DEXrootContract.abi, params.result.boc)
             if (decoded === 304) {decoded = await decode.message(RootTokenContract.abi, params.result.boc)}

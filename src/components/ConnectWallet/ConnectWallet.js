@@ -36,15 +36,15 @@ function ConnectWallet() {
       }
 
       try {
-        // const walletAddress2 = curExt._extLib.address;
+
         const walletAddress = pubKey.dexclient;
         let msgiAddress = curExt._extLib.address;
         let msigBalance = await getClientBalance(msgiAddress);
-        console.log("walletAddress",msgiAddress,"msigBalance",msigBalance)
-        const clientBalance = await getClientBalance(walletAddress);
-        if(pubKey.status) {
-          let tokenList = await getAllClientWallets(pubKey.dexclient);
-          let liquidityList = [];
+console.log("walletAddress",walletAddress,"msgiAddress",msgiAddress,"msigBalance",msigBalance)
+        // const clientBalance = await getClientBalance(walletAddress);
+        let tokenList = await getAllClientWallets(pubKey.dexclient);
+        console.log("tokenList",tokenList)
+        let liquidityList = [];
 
         if(tokenList.length) {
           tokenList.forEach(async item => await subscribe(item.walletAddress));
@@ -65,32 +65,28 @@ function ConnectWallet() {
         dispatch(setPubKey(pubKey));
         dispatch(setWallet({id: msgiAddress, balance: msigBalance}));
 
+        tokenList.forEach(i => {
+          if(swapFromToken.symbol === i.symbol) {
+            swapFromToken.balance = i.balance;
+            swapFromToken.walletAddress = i.walletAddress;
+            dispatch(setSwapFromToken(swapFromToken));
+          } else if(swapToToken.symbol === i.symbol) {
+            swapToToken.balance = i.balance;
+            swapToToken.walletAddress = i.walletAddress;
+            dispatch(setSwapToToken(swapToToken));
+          } else if(poolFromToken.symbol === i.symbol) {
+            poolFromToken.balance = i.balance;
+            poolFromToken.walletAddress = i.walletAddress;
+            dispatch(setPoolFromToken(poolFromToken));
+          } else if(poolToToken.symbol === i.symbol) {
+            poolToToken.balance = i.balance;
+            poolToToken.walletAddress = i.walletAddress;
+            dispatch(setPoolToToken(poolToToken));
+          }
+        })
 
-
-
-          tokenList.forEach(i => {
-            if (swapFromToken.symbol === i.symbol) {
-              swapFromToken.balance = i.balance;
-              swapFromToken.walletAddress = i.walletAddress;
-              dispatch(setSwapFromToken(swapFromToken));
-            } else if (swapToToken.symbol === i.symbol) {
-              swapToToken.balance = i.balance;
-              swapToToken.walletAddress = i.walletAddress;
-              dispatch(setSwapToToken(swapToToken));
-            } else if (poolFromToken.symbol === i.symbol) {
-              poolFromToken.balance = i.balance;
-              poolFromToken.walletAddress = i.walletAddress;
-              dispatch(setPoolFromToken(poolFromToken));
-            } else if (poolToToken.symbol === i.symbol) {
-              poolToToken.balance = i.balance;
-              poolToToken.walletAddress = i.walletAddress;
-              dispatch(setPoolToToken(poolToToken));
-            }
-          })
-
-          dispatch(setWalletIsConnected(true));
-          dispatch(closeConnecting());
-        }
+        dispatch(setWalletIsConnected(true));
+        dispatch(closeConnecting());
       } catch (err) {
         console.log(err);
         dispatch(closeConnecting());

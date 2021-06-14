@@ -53,7 +53,8 @@ function Manage() {
     dispatch(setManageAsyncIsWaiting(true));
 
     try {
-      await returnLiquidity(curExt, pairId, ((balance.toFixed(2) * rangeValue) / 100) * 1000000000);
+      console.log("NUMMMM",Number(((balance.toFixed() * rangeValue) / 100) * 1000000000))
+      await returnLiquidity(curExt, pairId, ((balance.toFixed() * rangeValue) / 100) * 1000000000);
     } catch(e) {
       console.log(e);
       switch (e.text) {
