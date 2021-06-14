@@ -1,5 +1,6 @@
 import React, {useEffect} from 'react';
 import {useSelector, useDispatch} from 'react-redux';
+import {useHistory} from 'react-router-dom';
 import {closeConnecting, setWalletIsConnected, showPopup} from '../../store/actions/app';
 import {setLiquidityList, setPubKey, setTokenList, setWallet} from '../../store/actions/wallet';
 import { setSwapFromToken, setSwapToToken } from '../../store/actions/swap';
@@ -13,6 +14,7 @@ import './ConnectWallet.scss';
 
 function ConnectWallet() {
   const dispatch = useDispatch();
+  const history = useHistory();
 
   let curExt = useSelector(state => state.appReducer.curExt);
 
@@ -40,7 +42,6 @@ function ConnectWallet() {
         const walletAddress = pubKey.dexclient;
         let msgiAddress = curExt._extLib.address;
         let msigBalance = await getClientBalance(msgiAddress);
-        console.log("walletAddress",msgiAddress,"msigBalance",msigBalance)
 
         const clientBalance = await getClientBalance(walletAddress);
         let tokenList = await getAllClientWallets(pubKey.dexclient);
@@ -63,7 +64,7 @@ function ConnectWallet() {
         }
 
         dispatch(setPubKey(pubKey));
-        dispatch(setWallet({id: msgiAddress, balance: msigBalance}));
+        dispatch(setWallet({id: walletAddress, balance: clientBalance}));
 
         tokenList.forEach(i => {
           if(swapFromToken.symbol === i.symbol) {
@@ -87,6 +88,7 @@ function ConnectWallet() {
 
         dispatch(setWalletIsConnected(true));
         dispatch(closeConnecting());
+        history.push("/swap")
       } catch (err) {
         console.log(err);
         dispatch(closeConnecting());

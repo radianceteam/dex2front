@@ -92,7 +92,7 @@ function App() {
       if (transactionsList.length) dispatch(setTransactionsList(transactionsList));
       let msgiAddress = curExt._extLib.address;
       let msigBalance = await getClientBalance(msgiAddress);
-      dispatch(setWallet({id: msgiAddress, balance: msigBalance}));
+      //dispatch(setWallet({id: msgiAddress, balance: msigBalance}));
      
       let tokenList = await getAllClientWallets(pubKey.address);
       let liquidityList = [];

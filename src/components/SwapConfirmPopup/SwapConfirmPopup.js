@@ -67,7 +67,14 @@ function SwapConfirmPopup(props) {
         await pairsList.forEach(async i => {
           if(fromToken.symbol === i.symbolA && toToken.symbol === i.symbolB) {
             let res = await swapA(curExt, pairId, fromValue * 1000000000);
-
+            if(res.code) {
+              if(res.code === 1000) {
+                dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
+              }
+              else {
+                dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
+              }
+            }
             if(!res.code) {
               let olderLength = transactionsList.length;
               let newLength = transactionsList.push({
@@ -84,6 +91,16 @@ function SwapConfirmPopup(props) {
             }
           } else if(fromToken.symbol === i.symbolB && toToken.symbol === i.symbolA) {
             let res = await swapB(curExt, pairId, fromValue * 1000000000);
+            if(res.code) {
+              if(res.code === 1000) {
+                dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
+                dispatch(setSwapAsyncIsWaiting(false));
+              }
+              else {
+                dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
+                dispatch(setSwapAsyncIsWaiting(false));
+              }
+            }
             if(!res.code) {
               let olderLength = transactionsList.length;
               let newLength = transactionsList.push({

@@ -70,7 +70,7 @@ function PoolConfirmPopup(props) {
             <div className="mainblock-footer-wrap">
               <div>
                 <div  className="pool-confirm-wrap">
-                  <p className="mainblock-footer-value">0.0001</p>
+                  <p className="mainblock-footer-value">{fromValue}</p>
                   <p className="mainblock-footer-subtitle">{fromToken.symbol} deposited</p>
                 </div>
                 <div>
@@ -80,7 +80,7 @@ function PoolConfirmPopup(props) {
               </div>
               <div>
                 <div  className="pool-confirm-wrap">
-                  <p className="mainblock-footer-value">10000003</p>
+                  <p className="mainblock-footer-value">{toValue}</p>
                   <p className="mainblock-footer-subtitle">{toToken.symbol} deposited</p>
                 </div>
                 <div>

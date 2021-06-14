@@ -13,6 +13,7 @@ function Wallet() {
   const handleClick = () => {
     dispatch(connectWallet());
     history.push('/account');
+
   }
 
   return (

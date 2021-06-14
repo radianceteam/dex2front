@@ -235,7 +235,7 @@ export async function returnLiquidity(curExt,pairAddr, tokens) {
     }
     try {
         const clientContract = await contract(DEXclientContract.abi, getClientAddressFromRoot.dexclient);
-        const returnLiquidity = await callMethod("returnLiquidity", {pairAddr:pairAddr, tokens:tokens}, clientContract)
+        const returnLiquidity = await callMethod("returnLiquidity", {pairAddr:pairAddr, tokens: tokens}, clientContract)
         return returnLiquidity
     } catch (e) {
         console.log("catch E returnLiquidity", e);

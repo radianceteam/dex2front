@@ -137,7 +137,7 @@ function Input(props) {
             </button>
           ) : (
             <>
-              { (walletIsConnected && props.type === 'from') && <button className="input-max" onClick={() => setValue(props.token.balance)}>MAX</button> }
+              { (walletIsConnected && props.type === 'from') && <button className="input-max" onClick={() => setValue(parseFloat(props.token.balance).toFixed(4))}>MAX</button> }
               <button className="input-select" onClick={() => handleClick()}>
                 <img src={iconGenerator(props.token.symbol)} alt={props.token.symbol} className="input-token-img"/>
                 <span>{props.token && props.token.symbol}</span>
