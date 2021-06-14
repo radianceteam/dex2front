@@ -127,7 +127,7 @@ function AddLiquidity () {
           rateBA={rateBA}
         /> }
 
-      { poolAsyncIsWaiting && <WaitingPopup text={`Providing ${fromValue} ${fromToken.symbol} and ${toValue} ${toToken.symbol}`} /> }
+      { poolAsyncIsWaiting && <WaitingPopup text={`Supplying ${fromValue} ${fromToken.symbol} and ${toValue} ${toToken.symbol}`} /> }
     </div>
   )
 }

@@ -1,10 +1,38 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import {useHistory } from 'react-router-dom';
 import { iconGenerator } from '../../iconGenerator';
+import { setManageBalance, setManageFromToken, setManagePairId, setManageRateAB, setManageRateBA, setManageToToken } from '../../store/actions/manage';
 import './LiquidityItem.scss';
 
-function LiquidityItem({walletAddress, symbol}) {
+function LiquidityItem({symbol, balance}) {
+  const history = useHistory();
+  const dispatch = useDispatch();
   const symbols = symbol.split('/');
+  
+  const pairsList = useSelector(state => state.walletReducer.pairsList);
+
+  const handleClick = () => {
+    const fromToken = symbols[0].replaceAll('DS-', '');    
+    dispatch(setManageBalance(balance));
+
+    pairsList.forEach(i => {
+      if(i.symbolA.includes(fromToken) && i.symbolB.includes(symbols[1])) {
+        dispatch(setManageFromToken({symbol: fromToken, reserve: i.reserveA}));
+        dispatch(setManageToToken({symbol: symbols[1], reserve: i.reservetB}));
+        dispatch(setManagePairId(i.pairAddress))
+        dispatch(setManageRateAB(i.rateAB))
+        dispatch(setManageRateBA(i.rateBA))
+      } else if(i.symbolB.includes(fromToken) && i.symbolA.includes(symbols[1])) {
+        dispatch(setManageFromToken({symbol: fromToken, reserve: i.reservetB}));
+        dispatch(setManageToToken({symbol: symbols[1], reserve: i.reserveA}));
+        dispatch(setManagePairId(i.pairAddress))
+        dispatch(setManageRateAB(i.rateAB))
+        dispatch(setManageRateBA(i.rateBA))
+      }
+    })
+    history.push('/manage');
+  }
   
   return (
     <div className="liquidity-item">
@@ -13,7 +41,7 @@ function LiquidityItem({walletAddress, symbol}) {
         <img src={iconGenerator(symbols[1])} alt={symbols[1]} />
         <span className="liquidity-item-text">{symbols[0]}/{symbols[1]}</span>
       </div>
-      <Link to={'/manage?fromSymbol=0:63e60c263fd73436caf57a8b783f078822c22bf761b6c0ad79cc9e218c5b6faa&toSymbol=0:327518a58690234e6baa5ae3724198cc8689c3d8b35f6433c07f12b06d796b0c'} className="liquidity-item-btn">Manage</Link>
+      <button onClick={handleClick} className="liquidity-item-btn">Manage</button>
     </div>
   )
 }

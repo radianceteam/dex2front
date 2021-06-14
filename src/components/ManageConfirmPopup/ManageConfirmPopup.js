@@ -1,14 +1,38 @@
 import React from 'react'
-import { Link, useHistory } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import MainBlock from '../MainBlock/MainBlock';
-import TON from '../../images/tokens/TON.svg';
-import wBTC from '../../images/tokens/wBTC.svg';
-import wETH from '../../images/tokens/wETH.svg';
-import wUSDT from '../../images/tokens/wUSDT.svg';
+import { iconGenerator } from '../../iconGenerator';
 import './ManageConfirmPopup.scss';
+import { setPoolFromToken, setPoolPairId, setPoolToToken } from '../../store/actions/pool';
 
 function ManageConfirmPopup(props) {
   const history = useHistory();
+  const dispatch = useDispatch();
+
+  const tokenList = useSelector(state => state.walletReducer.tokenList);
+  const fromToken = useSelector(state => state.manageReducer.fromToken);
+  const toToken = useSelector(state => state.manageReducer.toToken);
+  const balance = useSelector(state => state.manageReducer.balance);
+  const pairId = useSelector(state => state.manageReducer.pairId);
+
+  const handleSupplyClick = () => {
+    tokenList.forEach(i => {
+      if(i.symbol.includes(fromToken.symbol)) {
+        dispatch(setPoolFromToken({
+          symbol: i.symbol,
+          balance: i.balance
+        }))
+      } else if(i.symbol.includes(toToken.symbol)) {
+        dispatch(setPoolToToken({
+          symbol: i.symbol,
+          balance: i.balance
+        }))      
+      }
+    })
+    dispatch(setPoolPairId(pairId))
+    history.push("/add-liquidity")
+  }
 
   return (
     <div className="popup-wrapper">
@@ -22,12 +46,12 @@ function ManageConfirmPopup(props) {
         content={
           <>
             <div className="confirm-block">
-              <span className="confirm-value">3.485</span>
-              <img className="confirm-icon" src={TON} alt="TON"/>
-              <img className="confirm-icon" src={wUSDT} alt="wUSDT"/>
-              <span className="confirm-token">ETH/AMP</span>
+              <span className="confirm-value">{parseFloat(balance.toFixed(4))}</span>
+              <img className="confirm-icon" src={iconGenerator(fromToken.symbol)} alt={fromToken.symbol} />
+              <img className="confirm-icon" src={iconGenerator(toToken.symbol)} alt={toToken.symbol} />
+              <span className="confirm-token">{fromToken.symbol}/{toToken.symbol}</span>
             </div>
-            <Link to={'/add-liquidity'} className="btn popup-btn">Supply</Link>
+            <button onClick={handleSupplyClick} to={'/add-liquidity'} className="btn popup-btn">Supply</button>
             <div className="manage-remove-link"><span onClick={() => props.func()}>Remove</span></div>
           </>
         }

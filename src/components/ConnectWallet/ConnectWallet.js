@@ -22,9 +22,9 @@ function ConnectWallet() {
   let poolFromToken = useSelector(state => state.poolReducer.fromToken);
   let poolToToken = useSelector(state => state.poolReducer.toToken);
 
-  useEffect(() => {
-    (async function() {
+  useEffect(async () => {
       const pubKey = await checkPubKey(curExt._extLib.pubkey);
+      console.log(pubKey);
       if(!pubKey.status) {
         try {
           await setCreator(curExt);
@@ -91,7 +91,6 @@ function ConnectWallet() {
         dispatch(closeConnecting());
         dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
       }
-    })()
   }, []);
 
   return (

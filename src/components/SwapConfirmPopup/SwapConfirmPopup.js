@@ -37,9 +37,11 @@ function SwapConfirmPopup(props) {
     let pairIsConnected = await checkClientPairExists(pubKey.address, pairId);
     if(!pairIsConnected) {
       try {
+        console.log(1);
         await connectToPair(curExt, pairId);
+        console.log(2);
         let tokenList = await getAllClientWallets(pubKey.dexclient);
-
+          console.log(3);
         if(tokenList.length) {          
           tokenList.forEach(async item => await subscribe(item.walletAddress));
           
@@ -69,8 +71,11 @@ function SwapConfirmPopup(props) {
         }) 
       } catch(e) {
         console.log(e);
-        switch (e.message) {
+        switch (e.text) {
           case 'Canceled by user.':
+            dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
+            break;
+          case 'Rejected by user':
             dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
             break;
           default:
