@@ -21,8 +21,8 @@ import {abiContract} from "@tonclient/core";
 // import {getWalletBalance} from "../sdk/run";
 import {checkExtensions, getCurrentExtension} from "../extensions/checkExtensions";
 
-const RootContract = new Account(DEXrootContract, {address:Radiance.networks['2'].dexroot, client});
-
+import {store} from '../../index'
+import {setSubscribeData} from '../../store/actions/wallet'
 
 function hex2a(hex) {
     let str = '';
@@ -35,6 +35,8 @@ function hex2a(hex) {
 function getShardThis(string) {
     return string[2];
 }
+
+
 
 export async function getShardConnectPairQUERY(clientAddress,targetShard,rootAddress) {
     let connectorSoArg0;
@@ -77,18 +79,19 @@ export async function getShardConnectPairQUERY(clientAddress,targetShard,rootAdd
 
 
 export async function getRootCreators() {
-    try {
-
-        let RootCreators = await RootContract.runLocal("creators", {}).catch(e=>console.log(e))
+    // try {
+    const RootContract = new Account(DEXrootContract, {address:Radiance.networks['2'].dexroot, client});
+        let RootCreators = await RootContract.runLocal("creators", {})
         console.log("curWalletBalance",RootCreators.decoded.output.creators)
         return RootCreators.decoded.output
-    } catch (e) {
-        console.log("catch E", e);
-        return e
-    }
+    // } catch (e) {
+    //     console.log("catch E", e);
+    //     return e
+    // }
 }
 export async function getRootBalanceOF() {
     try {
+        const RootContract = new Account(DEXrootContract, {address:Radiance.networks['2'].dexroot, client});
 
         let RootbalanceOf = await RootContract.runLocal("balanceOf", {})
         console.log("balanceOf",RootbalanceOf.decoded.output.balanceOf)
@@ -187,6 +190,8 @@ export async function getAllClientWallets(clientAddress) {
 
 export async function checkPubKey(clientPubkey) {
     try {
+        const RootContract = new Account(DEXrootContract, {address:Radiance.networks['2'].dexroot, client});
+
         let response = await RootContract.runLocal("checkPubKey", {pubkey:"0x"+clientPubkey})
         let checkedData = response.decoded.output;
         return checkedData
@@ -204,7 +209,7 @@ export async function checkPubKey(clientPubkey) {
  */
 
 export async function getAllPairsWoithoutProvider() {
-    const acc = new Account(DEXrootContract, {address: "0:74a70fecf38874f6b6e131df9aa1099d8ed3046312f233cb36aba5f6fb2513ff", client});
+    const acc = new Account(DEXrootContract, {address: Radiance.networks['2'].dexroot, client});
     const response = await acc.runLocal("pairs", {});
 
     let normlizeWallets = []
@@ -236,7 +241,7 @@ export async function getAllPairsWoithoutProvider() {
         itemData.rateBA = +bal.decoded.output.balanceReserve[item[1].root0] / +bal.decoded.output.balanceReserve[item[1].root1]
         normlizeWallets.push(itemData)
     }
-    // console.log("{normlizeWallets}",normlizeWallets)
+    console.log("{normlizeWallets}",normlizeWallets)
     return normlizeWallets
 
 }
@@ -302,24 +307,6 @@ async function body(abi, body, internal = true) {
         return e.code
     }
 }
-//abiContract(abi),
-async function _body(abi, body, internal = true) {
-    try {
-        const decodedBody = 
-            await client.abi.decode_message_body({
-                abi: abi,  
-                body: body,
-                is_internal: internal
-            })
-        
-        // console.log('decodedBody:' + decodedBody + '; abi:' + abi + '; body:' + body);
-        return decodedBody
-    } catch (e) {
-        console.log('abi:' + abi + '; body:' + body + ';' + e)
-        return e.code
-    }
-}
-
 
 export async function subscribe(address) {
 
@@ -329,77 +316,34 @@ export async function subscribe(address) {
             dst: { eq: address },
         },
         limit:1,
-        // order:[{path:"created_at",direction:DESC}],
         order:[{path:"created_at",direction:'DESC'}],
-        result: "id boc created_at body",
+        result: "id boc created_at body dst src",
     }, async (params,responseType) => {
         if (responseType === ResponseType.Custom) {
-            // let decoded = await decode.message(DEXrootContract.abi, params.result.boc)
-            // if (decoded === 304) {decoded = await decode.message(RootTokenContract.abi, params.result.boc)}
-            // if (decoded === 304) {decoded = await decode.message(TONTokenWalletContract.abi, params.result.boc)}
-            // if (decoded === 304) {decoded = await decode.message(SafeMultisigWallet.abi, params.result.boc)}
-            // if (decoded === 304) {decoded = await decode.message(DEXPairContract.abi, params.result.boc)}
-            // if (decoded === 304) {decoded = await decode.message(DEXclientContract.abi, params.result.boc)}
-
-// console.log("params.result.id", params.result.id)
-// console.log("created_at_string", params.result.created_at)
-//             let resInput = decoded.value
-
-            let resBody = await body(DEXclientContract.abi, params.result.body)
-            if (resBody === 304) {resBody = await body(DEXrootContract.abi, params.result.body)}
-            if (resBody === 304) {resBody = await body(DEXPairContract.abi, params.result.body)}
-            if (resBody === 304) {resBody = await body(SafeMultisigWallet.abi, params.result.body)}
-            if (resBody === 304) {resBody = await body(RootTokenContract.abi, params.result.body)}
-            if (resBody === 304) {resBody = await body(TONTokenWalletContract.abi, params.result.body)}
-
-            console.log("resBody",resBody);
-
-            let payload = await _body(TONTokenWalletContract.abi,resBody.value.payload)
-            if (payload === 304) {payload = await _body(DEXclientContract.abi, resBody.value.payload)}
-            if (payload === 304) {payload = await _body(DEXPairContract.abi, resBody.value.payload)}
-            if (payload === 304) {payload = await _body(SafeMultisigWallet.abi, resBody.value.payload)}
-            if (payload === 304) {payload = await _body(RootTokenContract.abi, resBody.value.payload)}
-            if (payload === 304) {payload = await _body(DEXrootContract.abi, resBody.value.payload)}
-            console.log("payload",payload);
-
-
-            // let caseID = await checkMessagesAmount({transactionID:params.result.id, "created_at":params.result.created_at, amountOfTokens: resInput.tokens, grams:resInput.grams,})
-      //TODO get webhook data here
-      //       console.log("params.result.body",typeof params.result.body, params.result.body)
-            // await chek(caseID)
+            let decoded = await decode.message(DEXrootContract.abi, params.result.boc)
+            if (decoded === 304) {decoded = await decode.message(RootTokenContract.abi, params.result.boc)}
+            if (decoded === 304) {decoded = await decode.message(TONTokenWalletContract.abi, params.result.boc)}
+            if (decoded === 304) {decoded = await decode.message(SafeMultisigWallet.abi, params.result.boc)}
+            if (decoded === 304) {decoded = await decode.message(DEXPairContract.abi, params.result.boc)}
+            if (decoded === 304) {decoded = await decode.message(DEXclientContract.abi, params.result.boc)}
+            if(decoded.value.grams){
+                return null
+            }
+            let caseID = await checkMessagesAmount({transactionID:params.result.id, src:params.result.src,dst:params.result.dst,created_at:params.result.created_at, amountOfTokens: decoded.value.tokens})
+            console.log("caseIDВВВВВ",caseID);
+            if(caseID && caseID.dst) store.dispatch(setSubscribeData(caseID));
         }
     })).handle;
-    // await _db.saveSubscribeID({"subID":subscribeID,"address":address})
-    console.log({"subID":subscribeID,"address":address})
-    // return {"status":"success", "subscribed address": address}
+    console.log({"subID":subscribeID,subscribedAddress:address})
+    return {status:"success", subscribedAddress: address}
 }
 let checkerArr = [];
 let checkMessagesAmount = function(messageID){
-    // checkerArr.push(messageID)
-
     for (let i = 0; i < checkerArr.length; i++) {
         if (checkerArr[i].transactionID === messageID.transactionID) {
-            // checkerArr.push(messageID)
             return null
         }
-        // else {console.log("message:",messageID)}
-        // return null
     }
     checkerArr.push(messageID)
-    // if(checkerArr.length === 2){
-    // checkerArr.filter(function(item, pos) {
-    //         return checkerArr.indexOf(item) === pos;
-    //     })
-    //     // checkerArr.map(item=> {
-    //     //     return item.grams === 0
-    // })
-    //     // if(checkerArr[0] === checkerArr[1]){
-    //     //     checkerArr = [];
-    //     //     console.log("checkerArr[0]",checkerArr[0])
-    //     //     return checkerArr[0]
-    //     // }
-    // }
-    // console.log("checkerArr",checkerArr)
-    console.log("message:",messageID)
-    return null
+    return messageID
 }

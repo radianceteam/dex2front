@@ -6,7 +6,7 @@ import {DEXrootContract} from "../contracts/DEXRoot.js";
 import {DEXclientContract} from "../contracts/DEXClient.js";
 import {RootTokenContract} from "../contracts/RootTokenContract.js";
 import {SafeMultisigWallet} from "../msig/SafeMultisigWallet.js";
-import {getRootCreators, getShardConnectPairQUERY, checkPubKey} from "../webhook/script"
+import {getRootCreators, getShardConnectPairQUERY, checkPubKey, getClientBalance} from "../webhook/script"
 
 TonClient.useBinaryLibrary(libWeb);
 
@@ -30,22 +30,29 @@ function getShard(string) {
 export async function setCreator(curExt) {
     const {name, address, pubkey, contract, runMethod, callMethod, internal} = curExt._extLib
 
-    // let checkClientExists = await checkPubKey(pubkey)
+    let checkClientExists = await checkPubKey(pubkey)
 
-    // if(checkClientExists.status){
-    //     console.log(UserException("y already have dex client"))
-    //     return new UserException("y already have dex client")
-    // }else {
+    if(checkClientExists.status){
+        console.log(UserException("y already have dex client"))
+        return new UserException("y already have dex client")
+    }else {
         try {
 
             const rootContract = await contract(DEXrootContract.abi, Radiance.networks['2'].dexroot);
-            let deployresp = await callMethod("setCreator", {giverAddr: address}, rootContract)
-            let checkClientExists = await getRootCreators().catch(e=>console.log(e))
+
+
+            let checkClientExists = await getRootCreators()
+            if(checkClientExists.creators["0x"+pubkey]){
+                await onSharding(curExt)
+                return
+            }
+            await callMethod("setCreator", {giverAddr: address}, rootContract)
             let n = 0
             while (!checkClientExists.creators["0x"+pubkey]){
+
                 checkClientExists = await getRootCreators()
                 n++
-                if(n>100){
+                if(n>500){
 
                     return new UserException("yps, something goes wrong, try again")
                 }
@@ -59,7 +66,7 @@ export async function setCreator(curExt) {
             console.log("catch E", e);
             return e
         }
-    // }
+    }
 }
 /**
  * Function to get shard id to deploy dex client
@@ -133,7 +140,22 @@ export async function createDEXclient(curExt, shardData) {
     }
 }
 
+/**
+ * Function to transfer tons
+ * @author   max_akkerman
+ * @param   {curExt:object, addressTo:string, amount:number}
+ * @return   {object} processSwapA
+ */
 
+export async function transfer(SendTransfer,addressTo,amount) {
+    try {
+        const transfer = await SendTransfer(addressTo,amount)
+        return transfer
+    } catch(e) {
+        console.log("e",e)
+        return e
+    }
+}
 /**
  * Function to swap A
  * @author   max_akkerman
@@ -142,11 +164,16 @@ export async function createDEXclient(curExt, shardData) {
  */
 
 export async function swapA(curExt,pairAddr, qtyA) {
-    const {pubkey, contract, callMethod} = curExt._extLib
+    const {pubkey, contract, callMethod,SendTransfer} = curExt._extLib
     let getClientAddressFromRoot = await checkPubKey(pubkey)
     if(getClientAddressFromRoot.status === false){
         return getClientAddressFromRoot
     }
+    let checkClientBalance = await getClientBalance(getClientAddressFromRoot.dexclient)
+    if(500000000 < checkClientBalance){
+        await transfer(SendTransfer,getClientAddressFromRoot.dexclient,3000000000)
+    }
+    console.log("pairAddr",pairAddr,"qtyA",qtyA)
     try {
         const clientContract = await contract(DEXclientContract.abi, getClientAddressFromRoot.dexclient);
         const processSwapA = await callMethod("processSwapA", {pairAddr:pairAddr, qtyA:qtyA}, clientContract)
@@ -166,10 +193,14 @@ export async function swapA(curExt,pairAddr, qtyA) {
  */
 
 export async function swapB(curExt,pairAddr, qtyB) {
-    const {pubkey, contract, callMethod} = curExt._extLib
+    const {pubkey, contract, callMethod,SendTransfer} = curExt._extLib
     let getClientAddressFromRoot = await checkPubKey(pubkey)
     if(getClientAddressFromRoot.status === false){
         return getClientAddressFromRoot
+    }
+    let checkClientBalance = await getClientBalance(getClientAddressFromRoot.dexclient)
+    if(500000000 < checkClientBalance){
+        await transfer(SendTransfer,getClientAddressFromRoot.dexclient,3000000000)
     }
     try {
         const clientContract = await contract(DEXclientContract.abi, getClientAddressFromRoot.dexclient);
@@ -193,10 +224,14 @@ export async function swapB(curExt,pairAddr, qtyB) {
 export async function returnLiquidity(curExt,pairAddr, tokens) {
     // let curExt = {};
     // await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
-    const {name, address, pubkey, contract, runMethod, callMethod} = curExt._extLib
+    const {pubkey, contract, SendTransfer, callMethod} = curExt._extLib
     let getClientAddressFromRoot = await checkPubKey(pubkey)
     if(getClientAddressFromRoot.status === false){
         return getClientAddressFromRoot
+    }
+    let checkClientBalance = await getClientBalance(getClientAddressFromRoot.dexclient)
+    if(500000000 < checkClientBalance){
+        await transfer(SendTransfer,getClientAddressFromRoot.dexclient,3000000000)
     }
     try {
         const clientContract = await contract(DEXclientContract.abi, getClientAddressFromRoot.dexclient);
@@ -218,10 +253,14 @@ export async function returnLiquidity(curExt,pairAddr, tokens) {
 export async function processLiquidity(curExt,pairAddr, qtyA, qtyB) {
     // let curExt = {};
     // await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
-    const {name, address, pubkey, contract, runMethod, callMethod} = curExt._extLib
+    const {pubkey, contract, SendTransfer, callMethod} = curExt._extLib
     let getClientAddressFromRoot = await checkPubKey(pubkey)
     if(getClientAddressFromRoot.status === false){
         return getClientAddressFromRoot
+    }
+    let checkClientBalance = await getClientBalance(getClientAddressFromRoot.dexclient)
+    if(500000000 < checkClientBalance){
+        await transfer(SendTransfer,getClientAddressFromRoot.dexclient,3000000000)
     }
     try {
         const clientContract = await contract(DEXclientContract.abi, getClientAddressFromRoot.dexclient);
@@ -245,17 +284,21 @@ export async function connectToPair(curExt,pairAddr) {
     // let pairAddr = "0:7e97c915eeb2cad1e0977225b6a9d96ed79902f01c46c60e3362a1e2a5da1912"
     // let curExt = {};
     // await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
-    const {contract,callMethod,runMethod,pubkey} = curExt._extLib
+    const {contract,callMethod,runMethod,pubkey,SendTransfer} = curExt._extLib
     let getClientAddressFromRoot = await checkPubKey(pubkey)
     if(getClientAddressFromRoot.status === false){
         return getClientAddressFromRoot
+    }
+    let checkClientBalance = await getClientBalance(getClientAddressFromRoot.dexclient)
+    if(500000000 < checkClientBalance){
+        await transfer(SendTransfer,getClientAddressFromRoot.dexclient,3000000000)
     }
     try {
         const clientContract = await contract(DEXclientContract.abi, getClientAddressFromRoot.dexclient);
         let connectPairFunc = await callMethod("connectPair", {pairAddr: pairAddr}, clientContract)
         console.log("connectPairFunc",connectPairFunc)
         await getClientForConnect({pairAddr: pairAddr, runMethod:runMethod,callMethod:callMethod,contract:contract,clientAddress:getClientAddressFromRoot.dexclient,clientContract:clientContract})
-        
+
     } catch (e) {
         console.log("catch E", e);
         return e

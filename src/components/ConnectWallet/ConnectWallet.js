@@ -36,53 +36,58 @@ function ConnectWallet() {
       }
 
       try {
-        // const walletAddress = curExt._extLib.address;  
+        // const walletAddress2 = curExt._extLib.address;
         const walletAddress = pubKey.dexclient;
+        let msgiAddress = curExt._extLib.address;
+        let msigBalance = await getClientBalance(msgiAddress);
+        console.log("walletAddress",msgiAddress,"msigBalance",msigBalance)
         const clientBalance = await getClientBalance(walletAddress);
-        let tokenList = await getAllClientWallets(pubKey.dexclient);
-        let liquidityList = [];
+        if(pubKey.status) {
+          let tokenList = await getAllClientWallets(pubKey.dexclient);
+          let liquidityList = [];
 
-        if(tokenList.length) {          
-          tokenList.forEach(async item => await subscribe(item.walletAddress));
-          
-          liquidityList = tokenList.filter(i => i.symbol.includes('/'));
+          if (tokenList.length) {
+            tokenList.forEach(async item => await subscribe(item.walletAddress));
 
-          tokenList = tokenList.filter(i => !i.symbol.includes('/')).map(i => (
-            {
-              ...i,
-              symbol: i.symbol === 'WTON' ? 'TON' : i.symbol
-            })
-          );          
-          
-          dispatch(setTokenList(tokenList));
-          dispatch(setLiquidityList(liquidityList));
-        }
-        
-        dispatch(setPubKey(pubKey));
-        dispatch(setWallet({id: walletAddress, balance: clientBalance}));
+            liquidityList = tokenList.filter(i => i.symbol.includes('/'));
 
-        tokenList.forEach(i => {
-          if(swapFromToken.symbol === i.symbol) {
-            swapFromToken.balance = i.balance;
-            swapFromToken.walletAddress = i.walletAddress;
-            dispatch(setSwapFromToken(swapFromToken));
-          } else if(swapToToken.symbol === i.symbol) {
-            swapToToken.balance = i.balance;
-            swapToToken.walletAddress = i.walletAddress;
-            dispatch(setSwapToToken(swapToToken));
-          } else if(poolFromToken.symbol === i.symbol) {
-            poolFromToken.balance = i.balance;
-            poolFromToken.walletAddress = i.walletAddress;
-            dispatch(setPoolFromToken(poolFromToken));
-          } else if(poolToToken.symbol === i.symbol) {
-            poolToToken.balance = i.balance;
-            poolToToken.walletAddress = i.walletAddress;
-            dispatch(setPoolToToken(poolToToken));
+            tokenList = tokenList.filter(i => !i.symbol.includes('/')).map(i => (
+                {
+                  ...i,
+                  symbol: i.symbol === 'WTON' ? 'TON' : i.symbol
+                })
+            );
+
+            dispatch(setTokenList(tokenList));
+            dispatch(setLiquidityList(liquidityList));
           }
-        })
 
-        dispatch(setWalletIsConnected(true));
-        dispatch(closeConnecting());
+          dispatch(setPubKey(pubKey));
+          dispatch(setWallet({id: msgiAddress, balance: msigBalance}));
+
+          tokenList.forEach(i => {
+            if (swapFromToken.symbol === i.symbol) {
+              swapFromToken.balance = i.balance;
+              swapFromToken.walletAddress = i.walletAddress;
+              dispatch(setSwapFromToken(swapFromToken));
+            } else if (swapToToken.symbol === i.symbol) {
+              swapToToken.balance = i.balance;
+              swapToToken.walletAddress = i.walletAddress;
+              dispatch(setSwapToToken(swapToToken));
+            } else if (poolFromToken.symbol === i.symbol) {
+              poolFromToken.balance = i.balance;
+              poolFromToken.walletAddress = i.walletAddress;
+              dispatch(setPoolFromToken(poolFromToken));
+            } else if (poolToToken.symbol === i.symbol) {
+              poolToToken.balance = i.balance;
+              poolToToken.walletAddress = i.walletAddress;
+              dispatch(setPoolToToken(poolToToken));
+            }
+          })
+
+          dispatch(setWalletIsConnected(true));
+          dispatch(closeConnecting());
+        }
       } catch (err) {
         console.log(err);
         dispatch(closeConnecting());
