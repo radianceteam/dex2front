@@ -162,7 +162,9 @@ export async function checkClientPairExists(clientAddress,pairAddress) {
 
 
 export async function getAllClientWallets(clientAddress) {
+
     const acc = new Account(DEXclientContract, {address: clientAddress, client});
+    console.log(5555)
     const response = await acc.runLocal("rootWallet", {});
 
     let normalizeWallets = []
@@ -216,7 +218,7 @@ export async function checkPubKey(clientPubkey) {
  */
 
 export async function getAllPairsWoithoutProvider() {
-    const acc = new Account(DEXrootContract, {address: "0:74a70fecf38874f6b6e131df9aa1099d8ed3046312f233cb36aba5f6fb2513ff", client});
+    const acc = new Account(DEXrootContract, {address: Radiance.networks["2"].dexroot, client});
     const response = await acc.runLocal("pairs", {});
 
     let normlizeWallets = []
@@ -284,6 +286,7 @@ export async function getClientBalance(clientAddress) {
 
 const decode = {
     async message(abi, boc) {
+
         try {
             const decodedMessage = (
                 await TonClient.default.abi.decode_message({
@@ -326,6 +329,7 @@ export async function subscribe(address) {
         order:[{path:"created_at",direction:'DESC'}],
         result: "id boc created_at body dst src",
     }, async (params,responseType) => {
+
         if (responseType === ResponseType.Custom) {
             let decoded = await decode.message(DEXrootContract.abi, params.result.boc)
             if (decoded === 304) {decoded = await decode.message(RootTokenContract.abi, params.result.boc)}

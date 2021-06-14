@@ -39,7 +39,7 @@ function Input(props) {
 
   const swapRate = useSelector(state => state.swapReducer.rate);
   const poolRate = useSelector(state => state.poolReducer.rate);
-
+  console.log(pairsList, swapRate, poolRate, poolFromToken, poolToToken, poolFromValue, swapFromValue, swapFromToken, poolToValue, swapToValue);
   const [value, setValue] = useState(props.value);
 
   useEffect(async () => {

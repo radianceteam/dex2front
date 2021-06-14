@@ -4,6 +4,8 @@ import walletReducer from "./wallet";
 import poolReducer from "./pool";
 import swapReducer from "./swap";
 import manageReducer from "./manage";
+import clientWallets from "./clientWallets";
+import poolExplorer from "./poolExplorer";
 
 export default combineReducers({
   appReducer,
@@ -11,4 +13,6 @@ export default combineReducers({
   swapReducer,
   poolReducer,
   manageReducer
+  clientWallets,
+  poolExplorer
 });
