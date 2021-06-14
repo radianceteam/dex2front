@@ -22,9 +22,9 @@ function ConnectWallet() {
   let poolFromToken = useSelector(state => state.poolReducer.fromToken);
   let poolToToken = useSelector(state => state.poolReducer.toToken);
 
-  useEffect(() => {
-    (async function() {
+  useEffect(async () => {
       const pubKey = await checkPubKey(curExt._extLib.pubkey);
+      console.log(pubKey);
       if(!pubKey.status) {
         try {
           await setCreator(curExt);
@@ -46,24 +46,27 @@ function ConnectWallet() {
           let tokenList = await getAllClientWallets(pubKey.dexclient);
           let liquidityList = [];
 
-          if (tokenList.length) {
-            tokenList.forEach(async item => await subscribe(item.walletAddress));
+        if(tokenList.length) {
+          tokenList.forEach(async item => await subscribe(item.walletAddress));
 
-            liquidityList = tokenList.filter(i => i.symbol.includes('/'));
+          liquidityList = tokenList.filter(i => i.symbol.includes('/'));
 
-            tokenList = tokenList.filter(i => !i.symbol.includes('/')).map(i => (
-                {
-                  ...i,
-                  symbol: i.symbol === 'WTON' ? 'TON' : i.symbol
-                })
-            );
+          tokenList = tokenList.filter(i => !i.symbol.includes('/')).map(i => (
+            {
+              ...i,
+              symbol: i.symbol === 'WTON' ? 'TON' : i.symbol
+            })
+          );
 
-            dispatch(setTokenList(tokenList));
-            dispatch(setLiquidityList(liquidityList));
-          }
+          dispatch(setTokenList(tokenList));
+          dispatch(setLiquidityList(liquidityList));
+        }
 
-          dispatch(setPubKey(pubKey));
-          dispatch(setWallet({id: msgiAddress, balance: msigBalance}));
+        dispatch(setPubKey(pubKey));
+        dispatch(setWallet({id: msgiAddress, balance: msigBalance}));
+
+
+
 
           tokenList.forEach(i => {
             if (swapFromToken.symbol === i.symbol) {
@@ -93,7 +96,6 @@ function ConnectWallet() {
         dispatch(closeConnecting());
         dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
       }
-    })()
   }, []);
 
   return (

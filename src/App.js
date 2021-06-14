@@ -1,12 +1,13 @@
 import React, {useEffect} from 'react';
 import {useSelector, useDispatch} from 'react-redux';
-import {Switch, Route, Redirect, useLocation} from 'react-router-dom';
+import {Switch, Route, Redirect, useLocation, useHistory} from 'react-router-dom';
 import {changeTheme, setCurExt, setExtensionsList, setWalletIsConnected, showPopup} from './store/actions/app';
 import {setLiquidityList, setPairsList, setPubKey, setSubscribeData, setTokenList, setTransactionsList, setWallet} from './store/actions/wallet';
 import { getAllClientWallets, getAllPairsWoithoutProvider, getClientBalance, subscribe } from './extensions/webhook/script';
 import { checkExtensions, getCurrentExtension } from './extensions/extensions/checkExtensions';
 import { setSwapAsyncIsWaiting, setSwapFromInputValue, setSwapFromToken, setSwapToInputValue, setSwapToToken } from './store/actions/swap';
 import { setPoolAsyncIsWaiting, setPoolFromInputValue, setPoolFromToken, setPoolToInputValue, setPoolToToken } from './store/actions/pool';
+import { setManageAsyncIsWaiting, setManageBalance, setManageFromToken, setManagePairId, setManageRateAB, setManageRateBA, setManageToToken } from './store/actions/manage';
 import Account from './pages/Account/Account';
 import Swap from './pages/Swap/Swap';
 import Pool from './pages/Pool/Pool';
@@ -18,12 +19,14 @@ import AddLiquidity from './pages/AddLiquidity/AddLiquidity';
 function App() {
   const dispatch = useDispatch();
   const location = useLocation();
+  const history = useHistory();
   const popup = useSelector(state => state.appReducer.popup);
   const appTheme = useSelector(state => state.appReducer.appTheme);
   const pubKey = useSelector(state => state.walletReducer.pubKey);
   const walletIsConnected = useSelector(state => state.appReducer.walletIsConnected);
   const swapAsyncIsWaiting = useSelector(state => state.swapReducer.swapAsyncIsWaiting);
   const poolAsyncIsWaiting = useSelector(state => state.poolReducer.poolAsyncIsWaiting);
+  const manageAsyncIsWaiting = useSelector(state => state.manageReducer.manageAsyncIsWaiting);
   const subscribeData = useSelector(state => state.walletReducer.subscribeData);
 
   useEffect(async () => {
@@ -77,9 +80,9 @@ function App() {
 
   useEffect(() => {
     window.addEventListener('beforeunload', function(e) {
-      if(swapAsyncIsWaiting || poolAsyncIsWaiting) e.returnValue = ''
+      if(swapAsyncIsWaiting || poolAsyncIsWaiting || manageAsyncIsWaiting) e.returnValue = ''
     })
-  }, [swapAsyncIsWaiting, poolAsyncIsWaiting]);
+  }, [swapAsyncIsWaiting, poolAsyncIsWaiting, manageAsyncIsWaiting]);
 
   useEffect(async () => {
     if(subscribeData.dst) {
@@ -107,7 +110,6 @@ function App() {
       }
 
       if(swapAsyncIsWaiting) {
-        console.log('popup');
         dispatch(showPopup({type: 'success', link: subscribeData.transactionID}));
         dispatch(setSwapFromToken({
           walletAddress: '',
@@ -137,6 +139,22 @@ function App() {
         dispatch(setPoolFromInputValue(0));
         dispatch(setPoolToInputValue(0));
         dispatch(setPoolAsyncIsWaiting(false));
+      } else if(manageAsyncIsWaiting) {
+        dispatch(showPopup({type: 'success', link: subscribeData.transactionID}));
+        dispatch(setManageFromToken({
+          symbol: '',
+          reserve: 0
+        }));
+        dispatch(setManageToToken({
+          symbol: '',
+          reserve: 0
+        }));
+        dispatch(setManageBalance(0));
+        dispatch(setManagePairId(''));
+        dispatch(setManageRateAB(0));
+        dispatch(setManageRateBA(0));
+        dispatch(setManageAsyncIsWaiting(false));
+        history.push('/pool')
       }
     }
   }, [subscribeData]);
