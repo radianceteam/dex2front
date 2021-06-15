@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useSelector, useDispatch} from 'react-redux';
 import {Switch, Route, Redirect, useLocation, useHistory} from 'react-router-dom';
 import {changeTheme, setCurExt, setExtensionsList, setWalletIsConnected, showPopup} from './store/actions/app';
@@ -34,6 +34,17 @@ function App() {
   const manageAsyncIsWaiting = useSelector(state => state.manageReducer.manageAsyncIsWaiting);
   const subscribeData = useSelector(state => state.walletReducer.subscribeData);
   const curExt = useSelector(state => state.appReducer.curExt);
+
+
+  const mediaMatch = window.matchMedia('(min-width: 768px)');
+  const [matches, setMatches] = useState(mediaMatch.matches);
+
+  useEffect(() => {
+    const handler = e => setMatches(e.matches);
+    mediaMatch.addListener(handler);
+    return () => mediaMatch.removeListener(handler);
+  });
+
   useEffect(async () => {
     const theme = localStorage.getItem('appTheme') === null ? 'light' : localStorage.getItem('appTheme');
     if(appTheme !== theme) dispatch(changeTheme(theme));
@@ -182,6 +193,11 @@ function App() {
 
   return (
     <>
+      {!matches && <div className="mobileBlock">
+        <p className="account-body-title" style={{"marginTop": "50px"}}>
+          Oops, soon we will support mobile wallets, wait for updates
+        </p>
+      </div>}
       <Header />
       <Switch location={location}>
         <Route path="/account" component={Account} />

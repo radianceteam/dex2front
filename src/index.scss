@@ -18,7 +18,7 @@
     font-weight: 700;
     font-style: normal;
   }
-  
+
   :root {
     --bg-color: #ffffff;
     --primary-color: #626262;
@@ -52,7 +52,7 @@
     --range-slider-bg-inner-color: transparent;
     --range-slider-fill-color: linear-gradient(92.92deg, #3569F0 0%, rgba(69, 88, 255, 0.8) 57.82%);
   }
-  
+
   html[data-theme="dark"] {
     --bg-color: #2D2F35;
     --primary-color: #BBBBBB;
@@ -91,7 +91,7 @@
     box-sizing: border-box;
     // transition: color .2s, background-color .2s;
   }
-  
+
   body {
     font-family: "Gilroy", sans-serif;
     color: var(--primary-color);
@@ -199,7 +199,7 @@
       margin-bottom: 0;
       color: var(--mainblock-title-color);
     }
-  
+
     &-block {
       padding: 20px;
       background: rgba(255, 255, 255, 0.06);
@@ -209,7 +209,7 @@
       align-items: center;
       margin: 16px 0;
     }
-  
+
     &-value {
       font-size: 40px;
       font-weight: 700;
@@ -218,13 +218,13 @@
       display: flex;
       align-items: center;
     }
-  
+
     &-icon {
       margin-right: 12px;
       width: 32px;
       height: 32px;
     }
-  
+
     &-token {
       font-size: 26px;
       font-weight: 700;
@@ -232,7 +232,7 @@
       display: flex;
       align-items: center;
     }
-  
+
     &-text {
       color: var(--popup-title-color);
       margin: 0 0 16px;
@@ -260,7 +260,7 @@
       padding: 20px 0;
       border-radius: 18px;
     }
-    
+
     .action-btn {
       padding: 10px;
       border-radius: 12px;
@@ -275,3 +275,18 @@
       top: 20%;
     }
   }
+
+.mobileBlock {
+  background-color: var(--bg-color);
+  background-image: var(--app-bg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0px;
+  top: 0px;
+  z-index: 555;
+  text-align: center;
+}
