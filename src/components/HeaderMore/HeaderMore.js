@@ -6,7 +6,7 @@ function HeaderMore() {
   const [isVisible, setVisible] = useState(false);
 
   return (
-    <button className="btn action-btn header-btn more" onClick={() => setVisible(!isVisible)}>
+    <button className="btn action-btn header-btn more" onClick={() => setVisible(!isVisible)} onBlur={()=> setVisible(false)}>
       <svg width="36" height="8" viewBox="0 0 36 8" fill="none" xmlns="http://www.w3.org/2000/svg">
         <circle cx="4" cy="4" r="4" fill="#41444E"/>
         <circle cx="18" cy="4" r="4" fill="#41444E"/>
