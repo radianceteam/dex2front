@@ -1,8 +1,8 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { useHistory } from 'react-router';
 import { useSelector, useDispatch } from 'react-redux';
 import { connectWallet, setCurExt, showPopup } from '../../store/actions/app';
-import { getCurrentExtension } from '../../extensions/extensions/checkExtensions';
+import {checkExtensions, getCurrentExtension} from '../../extensions/extensions/checkExtensions';
 import  extratonIcon from '../../extensions/extratonIcon.png'
 import  broxusIcon from '../../extensions/broxusIcon.png'
 import MainBlock from '../MainBlock/MainBlock';
@@ -23,16 +23,28 @@ function extensionIcon(name) {
 function ExtensionsList() {
   const history = useHistory();
   const dispatch = useDispatch();
+  // const [extensionsList,setExtensionsList] = useState([])
   const extensionsList = useSelector(state => state.appReducer.extensionsList);
 
+  // useEffect(async ()=>{
+  //   try {
+  //     await checkExtensions().then(res=>
+  //         setExtensionsList(res)
+  //     )
+  //   }catch(e){
+  //     return e
+  //   }
+  // },[])
   function handleClick(name) {
     extensionsList.forEach(async i => {
       if(i.name === name) {
         if(i.available) {
+          console.log("extensionsList",extensionsList)
           let curExt = await getCurrentExtension(name);
           dispatch(setCurExt(curExt));
           dispatch(connectWallet());
         } else {
+          console.log("should be here",extensionsList)
           dispatch(showPopup({type: 'extension', message: i.name, link: i.link}));
         }
       }
@@ -40,7 +52,7 @@ function ExtensionsList() {
   }
 
   return (
-    !extensionsList.length ? 
+    !extensionsList.length ?
       <Loader /> :
       <MainBlock
         title={'Select an extension'}
@@ -59,7 +71,7 @@ function ExtensionsList() {
             ))}
           </div>
         }
-      />    
+      />
   )
 }
 

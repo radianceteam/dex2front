@@ -27,6 +27,10 @@ function App() {
   const swapAsyncIsWaiting = useSelector(state => state.swapReducer.swapAsyncIsWaiting);
   const transactionsList = useSelector(state => state.walletReducer.transactionsList);
   const poolAsyncIsWaiting = useSelector(state => state.poolReducer.poolAsyncIsWaiting);
+  const tokenList = useSelector(state => state.walletReducer.tokenList);
+  const liquidityList = useSelector(state => state.walletReducer.liquidityList);
+
+
   const manageAsyncIsWaiting = useSelector(state => state.manageReducer.manageAsyncIsWaiting);
   const subscribeData = useSelector(state => state.walletReducer.subscribeData);
   const curExt = useSelector(state => state.appReducer.curExt);
@@ -34,39 +38,51 @@ function App() {
     const theme = localStorage.getItem('appTheme') === null ? 'light' : localStorage.getItem('appTheme');
     if(appTheme !== theme) dispatch(changeTheme(theme));
 
+
+
+    const extensionsList = await checkExtensions();
+    console.log("extensionsList",extensionsList)
+
+
+    let checkExt = extensionsList.filter(item=> {
+      return item.available
+    })
+    console.log("checkExt",checkExt)
+    dispatch(setExtensionsList(extensionsList));
+
+
+
+
+
     const wallet = localStorage.getItem('wallet') === null ? {} : JSON.parse(localStorage.getItem('wallet'));
     if(wallet.id) {
       dispatch(setWallet(wallet));
       dispatch(setWalletIsConnected(true));
     }
 
-    const extName = localStorage.getItem('extName');
-    if(extName) {
-      let curExt = await getCurrentExtension(extName);
-      console.log(curExt);
-      dispatch(setCurExt(curExt));
-    }
+
+
+
 
     const pubKey = localStorage.getItem('pubKey') === null ? {} : JSON.parse(localStorage.getItem('pubKey'));
     if(pubKey.status) dispatch(setPubKey(pubKey));
 
-    const tokenList = localStorage.getItem('tokenList') === null ? [] : JSON.parse(localStorage.getItem('tokenList'));
+    const tokenList = localStorage.getItem('tokenList') === null ? tokenList : JSON.parse(localStorage.getItem('tokenList'));
     if(tokenList.length) {
       tokenList.forEach(async item => await subscribe(item.walletAddress));
       dispatch(setTokenList(tokenList));
     }
 
-    const liquidityList = localStorage.getItem('liquidityList') === null ? [] : JSON.parse(localStorage.getItem('liquidityList'));
+    const liquidityList = localStorage.getItem('liquidityList') === null ? liquidityList : JSON.parse(localStorage.getItem('liquidityList'));
     if(liquidityList.length) {
       liquidityList.forEach(async item => await subscribe(item.walletAddress));
       dispatch(setLiquidityList(liquidityList));
     }
 
-    const transactionsList = localStorage.getItem('transactionsList') === null ? [] : JSON.parse(localStorage.getItem('transactionsList'));
+    // const transactionsList = localStorage.getItem('transactionsList') === null ? [] : JSON.parse(localStorage.getItem('transactionsList'));
     if(transactionsList.length) dispatch(setTransactionsList(transactionsList));
 
-    const extensionsList = await checkExtensions();
-    dispatch(setExtensionsList(extensionsList));
+
 
     const pairs = await getAllPairsWoithoutProvider();
 

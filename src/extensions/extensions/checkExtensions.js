@@ -22,6 +22,7 @@ export async function checkExtensions() {
 }
 
 function checkExtensionAvailability() {
+
     return window.freeton !== undefined;
 }
 

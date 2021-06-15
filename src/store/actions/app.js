@@ -21,6 +21,7 @@ export function setExtensionsList(payload) {
 
 export function setCurExt(payload) {
   localStorage.setItem('extName', payload._extLib ? payload._extLib.name : '');
+  console.log("payload._extLib",payload._extLib)
   return { type: SET_CUR_EXT, payload }
 }
 

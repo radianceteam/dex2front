@@ -39,14 +39,23 @@ function SwapConfirmPopup(props) {
     let pairIsConnected = await checkClientPairExists(pubKey.address, pairId);
     if(!pairIsConnected) {
       try {
-        console.log(1);
-        await connectToPair(curExt, pairId);
-        console.log(2);
-        let tokenList = await getAllClientWallets(pubKey.dexclient);
-          console.log(3);
-        if(tokenList.length) {
+        let connectRes = await connectToPair(curExt, pairId);
+        console.log("connectRes",connectRes,"pubKey",pubKey);
+        let tokenList = await getAllClientWallets(pubKey.address);
+        let y = 0
+        console.log("tokenList",tokenList);
+        while(tokenList.length < connectRes.amountOfWallets){
+          tokenList = await getAllClientWallets(pubKey.address);
+          y++
+          console.log("while11",tokenList.length,"connectRes.amountOfWallets",connectRes.amountOfWallets)
+          if(y>500){
+            dispatch(showPopup({type: 'error', message: 'Oops, too much time for deploying. Please connect your wallet again.'}));
+          }
+        }
+        console.log("1.1")
+         if(tokenList.length) {
           tokenList.forEach(async item => await subscribe(item.walletAddress));
-
+           console.log("1.2")
           tokenList = tokenList.filter(i => !i.symbol.includes('/')).map(i => (
             {
               ...i,
@@ -54,11 +63,12 @@ function SwapConfirmPopup(props) {
             })
           );
         }
-
+        console.log("1.3",tokenList)
         dispatch(setTokenList(tokenList));
+        dispatch(setSwapAsyncIsWaiting(false));
         pairIsConnected = true;
       } catch(e) {
-        dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
+        dispatch(showPopup({type: 'error', message: '222Oops, something went wrong. Please try again.'}));
       }
     }
 

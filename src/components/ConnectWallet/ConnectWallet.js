@@ -5,12 +5,12 @@ import {setLiquidityList, setPubKey, setTokenList, setWallet} from '../../store/
 import { setSwapFromToken, setSwapToToken } from '../../store/actions/swap';
 import { setPoolFromToken, setPoolToToken } from '../../store/actions/pool';
 import { getAllClientWallets, getClientBalance, checkPubKey, subscribe } from '../../extensions/webhook/script.js';
-import { setCreator } from '../../extensions/sdk/run';
+import { setCreator,transfer } from '../../extensions/sdk/run';
 import MainBlock from '../MainBlock/MainBlock';
 import CloseBtn from '../CloseBtn/CloseBtn';
 import Loader from '../Loader/Loader';
 import './ConnectWallet.scss';
-
+const Radiance = require('../../extensions/Radiance.json');
 function ConnectWallet() {
   const dispatch = useDispatch();
 
@@ -23,25 +23,26 @@ function ConnectWallet() {
   let poolToToken = useSelector(state => state.poolReducer.toToken);
 
   useEffect(async () => {
-      const pubKey = await checkPubKey(curExt._extLib.pubkey);
+      let pubKey = await checkPubKey(curExt._extLib.pubkey);
       console.log(pubKey);
       if(!pubKey.status) {
         try {
-          await setCreator(curExt);
+           let tranferToDex = await transfer(curExt._extLib.SendTransfer,Radiance.networks['2'].dexroot,10000000000)
+          let dexCLientStatus = await setCreator(curExt);
+          console.log("dexCLientStatus",dexCLientStatus)
         } catch (err) {
           console.log(err);
           dispatch(closeConnecting());
           dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
         }
       }
-
+        pubKey = await checkPubKey(curExt._extLib.pubkey);
       try {
 
-        const walletAddress = pubKey.dexclient;
+
         let msgiAddress = curExt._extLib.address;
         let msigBalance = await getClientBalance(msgiAddress);
-console.log("walletAddress",walletAddress,"msgiAddress",msgiAddress,"msigBalance",msigBalance)
-        // const clientBalance = await getClientBalance(walletAddress);
+
         let tokenList = await getAllClientWallets(pubKey.dexclient);
         console.log("tokenList",tokenList)
         let liquidityList = [];
@@ -60,11 +61,15 @@ console.log("walletAddress",walletAddress,"msgiAddress",msgiAddress,"msigBalance
 
           dispatch(setTokenList(tokenList));
           dispatch(setLiquidityList(liquidityList));
+            localStorage.setItem('tokenList', JSON.stringify(tokenList));
+            localStorage.setItem('liquidityList', JSON.stringify(liquidityList));
         }
 
         dispatch(setPubKey(pubKey));
         dispatch(setWallet({id: msgiAddress, balance: msigBalance}));
 
+          localStorage.setItem('pubKey', JSON.stringify(pubKey));
+          localStorage.setItem('wallet', JSON.stringify({id: msgiAddress, balance: msigBalance}));
         tokenList.forEach(i => {
           if(swapFromToken.symbol === i.symbol) {
             swapFromToken.balance = i.balance;

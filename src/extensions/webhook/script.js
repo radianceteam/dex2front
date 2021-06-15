@@ -39,7 +39,6 @@ function getShardThis(string) {
 
 
 export async function getShardConnectPairQUERY(clientAddress,targetShard,rootAddress) {
-    console.log(5,1);
     let connectorSoArg0;
     let status = false;
     let n = 0;
@@ -51,37 +50,25 @@ export async function getShardConnectPairQUERY(clientAddress,targetShard,rootAdd
 
     let shardW
     let walletAddr
-    console.log(5,2);
     while (!status) {
-        console.log(6,1);
         let response = await accClient.runLocal("getConnectorAddress", {_answer_id: 0, connectorSoArg: n})
-        console.log(6,2);
         connectorAddr = response.decoded.output.value0;
-        // console.log("connectorAddr",connectorAddr)
-        console.log(6,3);
         shardC = getShardThis(connectorAddr);
-        console.log(6,4);
         console.log("shardC", shardC, targetShard)
         if (shardC === targetShard) {
-
-            console.log("getConnectorAddress:", connectorAddr);
             let resp = await RootTknContract.runLocal("getWalletAddress", {_answer_id: 0, wallet_public_key_: 0, owner_address_: connectorAddr})
             walletAddr = resp.decoded.output.value0;
             shardW = getShardThis(walletAddr);
-            console.log("shardW",shardW,targetShard)
             if (shardW === targetShard) {
                 console.log("Bingo!");
                 connectorSoArg0 = n;
                 console.log("getWalletAddress:", walletAddr);
-
                 status = true;
             } else {console.log(n, 'second');}
         } else {console.log(n, 'first');}
         n++;
     }
-    console.log("connectorSoArg0",connectorSoArg0,"shardC",shardC,"shardW",shardW,"targetShard",targetShard,"connectorAddr",connectorAddr,"walletAddr",walletAddr)
-
-    console.log(5,3);
+    // console.log("connectorSoArg0",connectorSoArg0,"shardC",shardC,"shardW",shardW,"targetShard",targetShard,"connectorAddr",connectorAddr,"walletAddr",walletAddr)
     return connectorSoArg0
 
 }
@@ -165,7 +152,7 @@ export async function getAllClientWallets(clientAddress) {
 
     const acc = new Account(DEXclientContract, {address: clientAddress, client});
     const response = await acc.runLocal("rootWallet", {});
-
+console.log("clientAddress",clientAddress,"response",response)
     let normalizeWallets = []
     try {
         for (const item of Object.entries(response.decoded.output.rootWallet)) {
@@ -183,7 +170,7 @@ export async function getAllClientWallets(clientAddress) {
 
             normalizeWallets.push(itemData)
         }
-        console.log(normalizeWallets);
+        console.log("normalizeWalletsn",normalizeWallets);
         return normalizeWallets
     } catch (e) {
         console.log("catch E", e);
@@ -251,6 +238,7 @@ export async function getAllPairsWoithoutProvider() {
         itemData.rateAB = +bal.decoded.output.balanceReserve[item[1].root1] / +bal.decoded.output.balanceReserve[item[1].root0]
         itemData.rateBA = +bal.decoded.output.balanceReserve[item[1].root0] / +bal.decoded.output.balanceReserve[item[1].root1]
         normlizeWallets.push(itemData)
+        itemData.totalSupply = await getPairsTotalSupply(item[0])
     }
     console.log("{normlizeWallets}",normlizeWallets)
     return normlizeWallets
@@ -362,12 +350,10 @@ let checkMessagesAmount = function(messageID){
 }
 
 export async function getPairsTotalSupply(pairAddress) {
-    // let pairAddress = "0:7c7b1e586e807f97826d0bcf032567043e37f6531c45eb986feb177c81c8409c"
     const acc = new Account(DEXPairContract, {address: pairAddress, client});
     try{
         const response = await acc.runLocal("totalSupply", {});
         let pairTotalSupply = response.decoded.output.totalSupply;
-        console.log("pairTotalSupply",pairTotalSupply)
         return pairTotalSupply
     } catch (e) {
         console.log("catch E", e);

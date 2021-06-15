@@ -1,8 +1,9 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { connectWallet } from '../../store/actions/app';
+import {connectWallet, setExtensionsList} from '../../store/actions/app';
 import './Wallet.scss'
+import {checkExtensions} from "../../extensions/extensions/checkExtensions";
 
 function Wallet() {
   const history = useHistory();
@@ -10,8 +11,16 @@ function Wallet() {
   const walletIsConnected = useSelector(state => state.appReducer.walletIsConnected);
   const wallet = useSelector(state => state.walletReducer.wallet);
 
-  const handleClick = () => {
+  const handleClick = async () => {
     dispatch(connectWallet());
+
+    // const extensionsList = await checkExtensions();
+    // let checkExt = extensionsList.filter(item=> {
+    //   return item.available
+    // })
+    // if(checkExt.length){    //   dispatch(setExtensionsList(extensionsList));
+    // }
+
     history.push('/account');
   }
 

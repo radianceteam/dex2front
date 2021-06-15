@@ -15,7 +15,13 @@ function ManageConfirmPopup(props) {
   const toToken = useSelector(state => state.manageReducer.toToken);
   const balance = useSelector(state => state.manageReducer.balance);
   const pairId = useSelector(state => state.manageReducer.pairId);
+  const pairS = useSelector(state => state.walletReducer.pairsList);
 
+  let curPair = pairS.filter(item=>item.pairAddress === pairId)
+  let poolShare = (balance*100)/(curPair[0].totalSupply/1000000000)
+console.log("poolShare",poolShare,"curPair[0].totalSupply",curPair[0].totalSupply)
+  let pooledTokensA = (curPair[0].reserveA/1000000000)*poolShare
+  let pooledTokensB = (curPair[0].reservetB/1000000000)*poolShare
   const handleSupplyClick = () => {
     tokenList.forEach(i => {
       if(i.symbol.includes(fromToken.symbol)) {
@@ -27,7 +33,7 @@ function ManageConfirmPopup(props) {
         dispatch(setPoolToToken({
           symbol: i.symbol,
           balance: i.balance
-        }))      
+        }))
       }
     })
     dispatch(setPoolPairId(pairId))
@@ -60,23 +66,24 @@ function ManageConfirmPopup(props) {
             <div className="mainblock-footer-wrap">
               <div>
                 <div className="swap-confirm-wrap">
-                  <p className="mainblock-footer-value">1.738</p>
+                  <p className="mainblock-footer-value">{parseFloat(balance.toFixed(4))}</p>
                   <p className="mainblock-footer-subtitle">Your total pool tokens</p>
                 </div>
                 <div>
-                  <p className="mainblock-footer-value">3.25824</p>
-                  <p className="mainblock-footer-subtitle">Pooled UNI</p>
+                  <p className="mainblock-footer-value">{poolShare.toFixed(4)}</p>
+                  <p className="mainblock-footer-subtitle">Your pool share</p>
                 </div>
               </div>
               <div>
                 <div className="swap-confirm-wrap">
-                  <p className="mainblock-footer-value">3.25824</p>
-                  <p className="mainblock-footer-subtitle">Pooled UNI</p>
+                  <p className="mainblock-footer-value">{pooledTokensA.toFixed(4)}</p>
+                  <p className="mainblock-footer-subtitle">Pooled {fromToken.symbol}</p>
                 </div>
                 <div>
-                  <p className="mainblock-footer-value">0.03%</p>
-                  <p className="mainblock-footer-subtitle">Your pool share</p>
+                  <p className="mainblock-footer-value">{pooledTokensB.toFixed(4)}</p>
+                  <p className="mainblock-footer-subtitle">Pooled {toToken.symbol}</p>
                 </div>
+
               </div>
             </div>
           </div>

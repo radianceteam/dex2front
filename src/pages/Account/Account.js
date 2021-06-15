@@ -34,8 +34,12 @@ function Account() {
     dispatch(setPubKey({status: false, address: ''}));
     dispatch(setTokenList([]));
     dispatch(setLiquidityList([]));
+    localStorage.setItem('tokenList', JSON.stringify({}));
+    localStorage.setItem('liquidityList', JSON.stringify({}));
+    localStorage.setItem('pubKey', JSON.stringify({}));
+    localStorage.setItem('wallet', JSON.stringify({}));
     // dispatch(setTransactionsList([]));
-    history.goBack()
+    // history.goBack()
   }
 
   return (
