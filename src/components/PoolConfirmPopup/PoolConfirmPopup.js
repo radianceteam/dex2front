@@ -6,6 +6,7 @@ import { showPopup } from '../../store/actions/app';
 import { iconGenerator } from '../../iconGenerator';
 import MainBlock from '../MainBlock/MainBlock';
 import CloseBtn from '../CloseBtn/CloseBtn';
+import {setTransactionsList} from "../../store/actions/wallet";
 
 function PoolConfirmPopup(props) {
   const dispatch = useDispatch();
@@ -14,6 +15,8 @@ function PoolConfirmPopup(props) {
 
   const fromToken = useSelector(state => state.poolReducer.fromToken);
   const toToken = useSelector(state => state.poolReducer.toToken);
+
+  const transactionsList = useSelector(state => state.walletReducer.transactionsList);
 
   const fromValue = useSelector(state => state.poolReducer.fromInputValue);
   const toValue = useSelector(state => state.poolReducer.toInputValue);
@@ -25,7 +28,21 @@ function PoolConfirmPopup(props) {
     props.hideConfirmPopup();
 
     try {
+      console.log(fromValue, toValue)
       await processLiquidity(curExt, pairId, fromValue * 1000000000, toValue * 1000000000);
+      let olderLength = transactionsList.length;
+      let newLength = transactionsList.push({
+        type: "processLiquidity",
+        fromValue: fromValue,
+        fromSymbol: fromToken.symbol,
+        toValue: toValue * 1000000000,
+        toSymbol: toToken.symbol
+      })
+      let item = newLength - 1
+      console.log(olderLength, newLength, item, transactionsList[item], transactionsList.length);
+      localStorage.setItem("currentElement", item);
+      localStorage.setItem("lastType", "swap");
+      if (transactionsList.length) await dispatch(setTransactionsList(transactionsList));
     } catch(e) {
       console.log(e);
       switch (e.text) {
@@ -61,7 +78,7 @@ function PoolConfirmPopup(props) {
               <img className="confirm-icon" src={iconGenerator(toToken.symbol)} alt={toToken.symbol}/>
               <span className="confirm-token">{fromToken.symbol}/{toToken.symbol}</span>
             </div>
-            <p className="confirm-text">Outpoot is estimated. If the price changes by more than 0.5% your transaction will revert</p>
+            <p className="confirm-text">Output is estimated. If the price changes by more than 0.5% your transaction will revert</p>
             <button className="btn popup-btn" onClick={() => handleSuply()}>Confirm Supply</button>
           </>
         }

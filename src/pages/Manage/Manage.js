@@ -11,6 +11,7 @@ import MainBlock from '../../components/MainBlock/MainBlock';
 import ManageConfirmPopup from '../../components/ManageConfirmPopup/ManageConfirmPopup';
 import WaitingPopup from '../../components/WaitingPopup/WaitingPopup';
 import './Manage.scss';
+import {setTransactionsList} from "../../store/actions/wallet";
 
 function Manage() {
   const dispatch = useDispatch();
@@ -23,6 +24,8 @@ function Manage() {
   const balance = useSelector(state => state.manageReducer.balance);
   const pairId = useSelector(state => state.manageReducer.pairId);
   const manageAsyncIsWaiting = useSelector(state => state.manageReducer.manageAsyncIsWaiting);
+
+  const transactionsList = useSelector(state => state.walletReducer.transactionsList);
 
   const [managePopupIsVisible, setManagePopupIsVisible] = useState(true);
   const [manageRemoveIsVisible, setManageRemoveIsVisible] = useState(false);
@@ -53,7 +56,23 @@ function Manage() {
     dispatch(setManageAsyncIsWaiting(true));
 
     try {
-      await returnLiquidity(curExt, pairId, ((balance.toFixed(2) * rangeValue) / 100 * 1000000000).toFixed(0));
+      let res = await returnLiquidity(curExt, pairId, ((balance.toFixed(2) * rangeValue) / 100 * 1000000000).toFixed(0));
+      if(!res.code) {
+        let olderLength = transactionsList.length;
+        let newLength = transactionsList.push({
+          type: "returnLiquidity",
+          fromValue: qtyA,
+          fromSymbol: fromToken.symbol,
+          toValue: qtyB,
+          toSymbol: toToken.symbol
+        })
+        let item = newLength - 1
+        console.log(olderLength, newLength, item, transactionsList[item], transactionsList.length);
+        localStorage.setItem("currentElement", item);
+        localStorage.setItem("lastType", "returnLiquidity");
+        if (transactionsList.length) await dispatch(setTransactionsList(transactionsList));
+      }
+
     } catch(e) {
       console.log(e);
       switch (e.text) {

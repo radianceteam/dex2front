@@ -87,6 +87,7 @@ function SwapConfirmPopup(props) {
               let item = newLength - 1
               console.log(olderLength, newLength, item, transactionsList[item], transactionsList.length);
               localStorage.setItem("currentElement", item);
+              localStorage.setItem("lastType", "swap");
               if (transactionsList.length) await dispatch(setTransactionsList(transactionsList));
             }
           } else if(fromToken.symbol === i.symbolB && toToken.symbol === i.symbolA) {
@@ -112,6 +113,7 @@ function SwapConfirmPopup(props) {
               })
               let item = (newLength - olderLength) - 1
               localStorage.setItem("currentElement", item);
+              localStorage.setItem("lastType", "swap");
               if (transactionsList.length) await dispatch(setTransactionsList(transactionsList));
             }
           }

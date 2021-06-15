@@ -24,9 +24,6 @@ import {checkExtensions, getCurrentExtension} from "../extensions/checkExtension
 import {store} from '../../index'
 import {setSubscribeData} from '../../store/actions/wallet'
 
-const RootContract = new Account(DEXrootContract, {address:Radiance.networks['2'].dexroot, client});
-
-
 function hex2a(hex) {
     let str = '';
     for (let i = 0; i < hex.length; i += 2) {
@@ -38,6 +35,8 @@ function hex2a(hex) {
 function getShardThis(string) {
     return string[2];
 }
+
+
 
 export async function getShardConnectPairQUERY(clientAddress,targetShard,rootAddress) {
     console.log(5,1);
@@ -89,18 +88,19 @@ export async function getShardConnectPairQUERY(clientAddress,targetShard,rootAdd
 
 
 export async function getRootCreators() {
-    try {
-
-        let RootCreators = await RootContract.runLocal("creators", {}).catch(e=>console.log(e))
+    // try {
+    const RootContract = new Account(DEXrootContract, {address:Radiance.networks['2'].dexroot, client});
+        let RootCreators = await RootContract.runLocal("creators", {})
         console.log("curWalletBalance",RootCreators.decoded.output.creators)
         return RootCreators.decoded.output
-    } catch (e) {
-        console.log("catch E", e);
-        return e
-    }
+    // } catch (e) {
+    //     console.log("catch E", e);
+    //     return e
+    // }
 }
 export async function getRootBalanceOF() {
     try {
+        const RootContract = new Account(DEXrootContract, {address:Radiance.networks['2'].dexroot, client});
 
         let RootbalanceOf = await RootContract.runLocal("balanceOf", {})
         console.log("balanceOf",RootbalanceOf.decoded.output.balanceOf)
@@ -162,9 +162,7 @@ export async function checkClientPairExists(clientAddress,pairAddress) {
 
 
 export async function getAllClientWallets(clientAddress) {
-
     const acc = new Account(DEXclientContract, {address: clientAddress, client});
-    console.log(5555)
     const response = await acc.runLocal("rootWallet", {});
 
     let normalizeWallets = []
@@ -201,6 +199,8 @@ export async function getAllClientWallets(clientAddress) {
 
 export async function checkPubKey(clientPubkey) {
     try {
+        const RootContract = new Account(DEXrootContract, {address:Radiance.networks['2'].dexroot, client});
+
         let response = await RootContract.runLocal("checkPubKey", {pubkey:"0x"+clientPubkey})
         let checkedData = response.decoded.output;
         return checkedData
@@ -218,7 +218,7 @@ export async function checkPubKey(clientPubkey) {
  */
 
 export async function getAllPairsWoithoutProvider() {
-    const acc = new Account(DEXrootContract, {address: Radiance.networks["2"].dexroot, client});
+    const acc = new Account(DEXrootContract, {address: Radiance.networks['2'].dexroot, client});
     const response = await acc.runLocal("pairs", {});
 
     let normlizeWallets = []
@@ -250,7 +250,7 @@ export async function getAllPairsWoithoutProvider() {
         itemData.rateBA = +bal.decoded.output.balanceReserve[item[1].root0] / +bal.decoded.output.balanceReserve[item[1].root1]
         normlizeWallets.push(itemData)
     }
-    // console.log("{normlizeWallets}",normlizeWallets)
+    console.log("{normlizeWallets}",normlizeWallets)
     return normlizeWallets
 
 }
@@ -286,7 +286,6 @@ export async function getClientBalance(clientAddress) {
 
 const decode = {
     async message(abi, boc) {
-
         try {
             const decodedMessage = (
                 await TonClient.default.abi.decode_message({
@@ -329,7 +328,6 @@ export async function subscribe(address) {
         order:[{path:"created_at",direction:'DESC'}],
         result: "id boc created_at body dst src",
     }, async (params,responseType) => {
-
         if (responseType === ResponseType.Custom) {
             let decoded = await decode.message(DEXrootContract.abi, params.result.boc)
             if (decoded === 304) {decoded = await decode.message(RootTokenContract.abi, params.result.boc)}

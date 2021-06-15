@@ -87,6 +87,7 @@ function App() {
       const clientBalance = await getClientBalance(pubKey.address);
 
       dispatch(setWallet({id: pubKey.address, balance: clientBalance}));
+      let type = localStorage.getItem("lastType");
       let item = localStorage.getItem("currentElement");
       if(transactionsList[item]) transactionsList[item].toValue = subscribeData.amountOfTokens / 1e9;
       if (transactionsList.length) dispatch(setTransactionsList(transactionsList));

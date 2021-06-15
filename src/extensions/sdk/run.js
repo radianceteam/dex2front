@@ -125,13 +125,13 @@ export async function createDEXclient(curExt, shardData) {
             pubkey: shardData.keys,
             souint: shardData.clientSoArg
         }, rootContract).catch(e => {
-                let ecode = '106';
-                let found = e.text.match(ecode);
-                if(found){
-                    return new UserException("y are not registered at dex root, pls transfer some funds to dex root address")
-                }else{
-                    return e
-                }
+            let ecode = '106';
+            let found = e.text.match(ecode);
+            if(found){
+                return new UserException("y are not registered at dex root, pls transfer some funds to dex root address")
+            }else{
+                return e
+            }
             }
         )
     } catch (e) {
@@ -235,7 +235,7 @@ export async function returnLiquidity(curExt,pairAddr, tokens) {
     }
     try {
         const clientContract = await contract(DEXclientContract.abi, getClientAddressFromRoot.dexclient);
-        const returnLiquidity = await callMethod("returnLiquidity", {pairAddr:pairAddr, tokens: tokens}, clientContract)
+        const returnLiquidity = await callMethod("returnLiquidity", {pairAddr:pairAddr, tokens:tokens}, clientContract)
         return returnLiquidity
     } catch (e) {
         console.log("catch E returnLiquidity", e);
@@ -284,8 +284,8 @@ export async function connectToPair(curExt,pairAddr) {
     // let pairAddr = "0:7e97c915eeb2cad1e0977225b6a9d96ed79902f01c46c60e3362a1e2a5da1912"
     // let curExt = {};
     // await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
-
     const {contract,callMethod,runMethod,pubkey,SendTransfer} = curExt._extLib
+
     let getClientAddressFromRoot = await checkPubKey(pubkey)
     if(getClientAddressFromRoot.status === false){
         return getClientAddressFromRoot
@@ -343,9 +343,8 @@ export async function connectToPairStep2DeployWallets(connectionData) {
         return new UserException("y already have all pair wallets")
     }
     try{
-
         console.log(4,111);
-        
+
         for (const item of newArr) {
         // await newArr.forEach(async (item,i)=>{
             console.log(4,11);
@@ -356,7 +355,6 @@ export async function connectToPairStep2DeployWallets(connectionData) {
         }
         // )
         console.log(4,112);
-
     }catch (e) {
         console.log("this",e)
         return e
@@ -364,4 +362,5 @@ export async function connectToPairStep2DeployWallets(connectionData) {
     console.log(4,2);
 
 }
+
 
