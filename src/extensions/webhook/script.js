@@ -68,7 +68,8 @@ export async function getShardConnectPairQUERY(clientAddress,targetShard,rootAdd
         } else {console.log(n, 'first');}
         n++;
     }
-    // console.log("connectorSoArg0",connectorSoArg0,"shardC",shardC,"shardW",shardW,"targetShard",targetShard,"connectorAddr",connectorAddr,"walletAddr",walletAddr)
+
+    console.log("connectorSoArg0",connectorSoArg0,"shardC",shardC,"shardW",shardW,"targetShard",targetShard,"connectorAddr",connectorAddr,"walletAddr",walletAddr)
     return connectorSoArg0
 
 }
@@ -205,8 +206,8 @@ export async function checkPubKey(clientPubkey) {
  */
 
 export async function getAllPairsWoithoutProvider() {
-console.log("i am here getAllPairsWoithoutProvider")
-    const acc = new Account(DEXrootContract, {address: Radiance.networks["2"].dexroot, client});
+
+    const acc = new Account(DEXrootContract, {address: Radiance.networks['2'].dexroot, client});
     const response = await acc.runLocal("pairs", {});
 
     let normlizeWallets = []
