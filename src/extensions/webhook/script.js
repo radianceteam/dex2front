@@ -70,6 +70,9 @@ export async function getShardConnectPairQUERY(clientAddress,targetShard,rootAdd
     }
 
     console.log("connectorSoArg0",connectorSoArg0,"shardC",shardC,"shardW",shardW,"targetShard",targetShard,"connectorAddr",connectorAddr,"walletAddr",walletAddr)
+
+    console.log(5,3);
+
     return connectorSoArg0
 
 }
@@ -206,7 +209,6 @@ export async function checkPubKey(clientPubkey) {
  */
 
 export async function getAllPairsWoithoutProvider() {
-
     const acc = new Account(DEXrootContract, {address: Radiance.networks['2'].dexroot, client});
     const response = await acc.runLocal("pairs", {});
 
