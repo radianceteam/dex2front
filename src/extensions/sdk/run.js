@@ -176,8 +176,8 @@ export async function swapA(curExt,pairAddr, qtyA) {
         return getClientAddressFromRoot
     }
     let checkClientBalance = await getClientBalance(getClientAddressFromRoot.dexclient)
-    if(500000000 < checkClientBalance*1000000000){
-        console.log("checkClientBalance",checkClientBalance)
+    if(500000000 > (checkClientBalance*1000000000)){
+        console.log("checkClientBalance",500000000 < (checkClientBalance*1000000000), checkClientBalance*1000000000)
         await transfer(SendTransfer,getClientAddressFromRoot.dexclient,3000000000)
     }
     console.log("pairAddr",pairAddr,"qtyA",qtyA)
@@ -206,7 +206,7 @@ export async function swapB(curExt,pairAddr, qtyB) {
         return getClientAddressFromRoot
     }
     let checkClientBalance = await getClientBalance(getClientAddressFromRoot.dexclient)
-    if(500000000 < checkClientBalance*1000000000){
+    if(500000000 > (checkClientBalance*1000000000)){
         await transfer(SendTransfer,getClientAddressFromRoot.dexclient,3000000000)
     }
     try {
@@ -237,7 +237,7 @@ export async function returnLiquidity(curExt,pairAddr, tokens) {
         return getClientAddressFromRoot
     }
     let checkClientBalance = await getClientBalance(getClientAddressFromRoot.dexclient)
-    if(500000000 < checkClientBalance*1000000000){
+    if(500000000 > (checkClientBalance*1000000000)){
         await transfer(SendTransfer,getClientAddressFromRoot.dexclient,3000000000)
     }
     console.log("pairAddr",pairAddr, "tokens",tokens)
@@ -269,7 +269,7 @@ export async function processLiquidity(curExt,pairAddr, qtyA, qtyB) {
     }
     let checkClientBalance = await getClientBalance(getClientAddressFromRoot.dexclient)
     console.log("checkClientBalance",checkClientBalance)
-    if(500000000 < checkClientBalance*1000000000){
+    if(500000000 > (checkClientBalance*1000000000)){
         await transfer(SendTransfer,getClientAddressFromRoot.dexclient,3000000000)
     }
     console.log("pairAddr",pairAddr, "qtyA",qtyA, "qtyB",qtyB)
@@ -299,7 +299,7 @@ export async function connectToPair(curExt,pairAddr) {
     }
     let checkClientBalance = await getClientBalance(getClientAddressFromRoot.dexclient)
     console.log("checkClientBalance",checkClientBalance)
-    if(6000000000 < checkClientBalance*1000000000){
+    if(6000000000 > (checkClientBalance*1000000000)){
         await transfer(SendTransfer,getClientAddressFromRoot.dexclient,8000000000)
     }
     try {

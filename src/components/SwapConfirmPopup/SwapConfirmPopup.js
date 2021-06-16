@@ -26,7 +26,7 @@ function SwapConfirmPopup(props) {
 
   const fromValue = useSelector(state => state.swapReducer.fromInputValue);
   const toValue = useSelector(state => state.swapReducer.toInputValue);
-
+  const swapAsyncIsWaiting = useSelector(state => state.swapReducer.swapAsyncIsWaiting);
   const tokenList = useSelector(state => state.walletReducer.tokenList);
 
   const pairsList = useSelector(state => state.walletReducer.pairsList);
@@ -104,6 +104,8 @@ function SwapConfirmPopup(props) {
               console.log(olderLength, newLength, item, transactionsList[item], transactionsList.length);
               localStorage.setItem("currentElement", item);
               if (transactionsList.length) await dispatch(setTransactionsList(transactionsList));
+            }else{
+              dispatch(setSwapAsyncIsWaiting(false))
             }
           } else if(fromToken.symbol === i.symbolB && toToken.symbol === i.symbolA) {
             let res = await swapB(curExt, pairId, fromValue * 1000000000);
@@ -119,6 +121,8 @@ function SwapConfirmPopup(props) {
               let item = (newLength - olderLength) - 1
               localStorage.setItem("currentElement", item);
               if (transactionsList.length) await dispatch(setTransactionsList(transactionsList));
+            }else{
+              dispatch(setSwapAsyncIsWaiting(false))
             }
           }
         })
