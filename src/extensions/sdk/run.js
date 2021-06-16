@@ -177,6 +177,7 @@ export async function swapA(curExt,pairAddr, qtyA) {
     }
     let checkClientBalance = await getClientBalance(getClientAddressFromRoot.dexclient)
     if(500000000 < checkClientBalance*1000000000){
+        console.log("checkClientBalance",checkClientBalance)
         await transfer(SendTransfer,getClientAddressFromRoot.dexclient,3000000000)
     }
     console.log("pairAddr",pairAddr,"qtyA",qtyA)

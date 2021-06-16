@@ -33,10 +33,10 @@ function Swap () {
 
   function handleConfirm() {
     if(fromToken.symbol && toToken.symbol && fromValue) {
-      // if(fromValue > fromToken.balance ) {
-      //   dispatch(showPopup({type: 'error', message: 'Excess of balance'}));
-      //   return;
-      // }
+      if(fromValue > fromToken.balance ) {
+        dispatch(showPopup({type: 'error', message: 'Excess of balance'}));
+        return;
+      }
       setSwapConfirmPopupIsVisible(true);
     } else {
       dispatch(showPopup({type: 'error', message: 'Fields should not be empty'}));
