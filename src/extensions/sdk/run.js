@@ -6,7 +6,12 @@ import {DEXrootContract} from "../contracts/DEXRoot.js";
 import {DEXclientContract} from "../contracts/DEXClient.js";
 import {RootTokenContract} from "../contracts/RootTokenContract.js";
 import {SafeMultisigWallet} from "../msig/SafeMultisigWallet.js";
-import {getRootCreators, getShardConnectPairQUERY, checkPubKey, getClientBalance} from "../webhook/script"
+import {
+    getRootCreators,
+    getShardConnectPairQUERY,
+    checkPubKey,
+    getClientBalance
+} from "../webhook/script"
 
 TonClient.useBinaryLibrary(libWeb);
 
@@ -28,7 +33,7 @@ function getShard(string) {
  * @return   callback         onSharding()
  */
 export async function setCreator(curExt) {
-    const {name, address, pubkey, contract, runMethod, callMethod, internal} = curExt._extLib
+    const {name, address, pubkey, contract, runMethod, callMethod, SendTransfer, internal} = curExt._extLib
 
     let checkClientExists = await checkPubKey(pubkey)
 
@@ -46,6 +51,7 @@ export async function setCreator(curExt) {
                 await onSharding(curExt)
                 return
             }
+            await transfer(SendTransfer,rootContract.address,3000000000);
             await callMethod("setCreator", {giverAddr: address}, rootContract)
             let n = 0
             while (!checkClientExists.creators["0x"+pubkey]){
@@ -68,6 +74,8 @@ export async function setCreator(curExt) {
         }
     }
 }
+
+
 /**
  * Function to get shard id to deploy dex client
  * @author   max_akkerman

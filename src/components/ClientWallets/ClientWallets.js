@@ -16,19 +16,22 @@ function ClientWallets(props) {
 
     const tokenList = useSelector(state => state.walletReducer.tokenList);
     const LPTokenList = useSelector(state => state.walletReducer.liquidityList);
+
     let toArr = [];
     tokenList.map((i) => {
         toArr.push({
             symbol: i.symbol,
             balance: i.balance,
-            walletAddress: i.walletAddress
+            walletAddress: i.walletAddress,
+            lp: false
         })
     })
     LPTokenList.map((i) => {
         toArr.push({
             symbol: i.symbol,
             balance: i.balance,
-            walletAddress: i.walletAddress
+            walletAddress: i.walletAddress,
+            lp: true
         })
     })
     console.log(LPTokenList);
@@ -45,7 +48,7 @@ function ClientWallets(props) {
 
                 button={<CloseBtn func={handleClose}/>}
                 content={
-                    !tokenList.length || !LPTokenList.length ? <Loader/> :
+                    !tokenList.length && !LPTokenList.length ?  <p className="wallet-ballance">You have not wallets yet</p> :
                         (<>
                             <SearchInput func={setFilter.bind(this)}/>
                             <div className="select-list">
@@ -57,6 +60,7 @@ function ClientWallets(props) {
                                             walletAddress={item.walletAddress}
                                             symbol={item.symbol}
                                             balance={item.balance}
+                                            lp={item.lp}
                                             key={item.symbol}
                                         />
                                     ))

@@ -17,7 +17,7 @@ import {RootTokenContract} from "../contracts/RootTokenContract.js";
 import {SafeMultisigWallet} from "../msig/SafeMultisigWallet.js";
 import {DEXPairContract} from "../contracts/DEXPairContract.js";
 
-import {abiContract} from "@tonclient/core";
+import {abiContract, signerSigningBox} from "@tonclient/core";
 // import {getWalletBalance} from "../sdk/run";
 import {checkExtensions, getCurrentExtension} from "../extensions/checkExtensions";
 
@@ -39,7 +39,6 @@ function getShardThis(string) {
 
 
 export async function getShardConnectPairQUERY(clientAddress,targetShard,rootAddress) {
-    console.log(5,1);
     let connectorSoArg0;
     let status = false;
     let n = 0;
@@ -51,37 +50,29 @@ export async function getShardConnectPairQUERY(clientAddress,targetShard,rootAdd
 
     let shardW
     let walletAddr
-    console.log(5,2);
     while (!status) {
-        console.log(6,1);
         let response = await accClient.runLocal("getConnectorAddress", {_answer_id: 0, connectorSoArg: n})
-        console.log(6,2);
         connectorAddr = response.decoded.output.value0;
-        // console.log("connectorAddr",connectorAddr)
-        console.log(6,3);
         shardC = getShardThis(connectorAddr);
-        console.log(6,4);
         console.log("shardC", shardC, targetShard)
         if (shardC === targetShard) {
-
-            console.log("getConnectorAddress:", connectorAddr);
             let resp = await RootTknContract.runLocal("getWalletAddress", {_answer_id: 0, wallet_public_key_: 0, owner_address_: connectorAddr})
             walletAddr = resp.decoded.output.value0;
             shardW = getShardThis(walletAddr);
-            console.log("shardW",shardW,targetShard)
             if (shardW === targetShard) {
                 console.log("Bingo!");
                 connectorSoArg0 = n;
                 console.log("getWalletAddress:", walletAddr);
-
                 status = true;
             } else {console.log(n, 'second');}
         } else {console.log(n, 'first');}
         n++;
     }
+
     console.log("connectorSoArg0",connectorSoArg0,"shardC",shardC,"shardW",shardW,"targetShard",targetShard,"connectorAddr",connectorAddr,"walletAddr",walletAddr)
-    
+
     console.log(5,3);
+
     return connectorSoArg0
 
 }
@@ -90,9 +81,9 @@ export async function getShardConnectPairQUERY(clientAddress,targetShard,rootAdd
 export async function getRootCreators() {
     // try {
     const RootContract = new Account(DEXrootContract, {address:Radiance.networks['2'].dexroot, client});
-        let RootCreators = await RootContract.runLocal("creators", {})
-        console.log("curWalletBalance",RootCreators.decoded.output.creators)
-        return RootCreators.decoded.output
+    let RootCreators = await RootContract.runLocal("creators", {})
+    console.log("curWalletBalance",RootCreators.decoded.output.creators)
+    return RootCreators.decoded.output
     // } catch (e) {
     //     console.log("catch E", e);
     //     return e
@@ -162,9 +153,10 @@ export async function checkClientPairExists(clientAddress,pairAddress) {
 
 
 export async function getAllClientWallets(clientAddress) {
+
     const acc = new Account(DEXclientContract, {address: clientAddress, client});
     const response = await acc.runLocal("rootWallet", {});
-
+    console.log("clientAddress",clientAddress,"response",response)
     let normalizeWallets = []
     try {
         for (const item of Object.entries(response.decoded.output.rootWallet)) {
@@ -179,10 +171,9 @@ export async function getAllClientWallets(clientAddress) {
             itemData.walletAddress = item[1];
             itemData.symbol = hex2a(curRootData.decoded.output.value0.symbol);
             itemData.balance = +curWalletData.decoded.output.value0.balance / 1000000000;
-
             normalizeWallets.push(itemData)
         }
-        console.log(normalizeWallets);
+        console.log("normalizeWalletsn",normalizeWallets);
         return normalizeWallets
     } catch (e) {
         console.log("catch E", e);
@@ -249,6 +240,7 @@ export async function getAllPairsWoithoutProvider() {
         itemData.rateAB = +bal.decoded.output.balanceReserve[item[1].root1] / +bal.decoded.output.balanceReserve[item[1].root0]
         itemData.rateBA = +bal.decoded.output.balanceReserve[item[1].root0] / +bal.decoded.output.balanceReserve[item[1].root1]
         normlizeWallets.push(itemData)
+        itemData.totalSupply = await getPairsTotalSupply(item[0])
     }
     console.log("{normlizeWallets}",normlizeWallets)
     return normlizeWallets
@@ -286,6 +278,7 @@ export async function getClientBalance(clientAddress) {
 
 const decode = {
     async message(abi, boc) {
+
         try {
             const decodedMessage = (
                 await TonClient.default.abi.decode_message({
@@ -328,6 +321,7 @@ export async function subscribe(address) {
         order:[{path:"created_at",direction:'DESC'}],
         result: "id boc created_at body dst src",
     }, async (params,responseType) => {
+
         if (responseType === ResponseType.Custom) {
             let decoded = await decode.message(DEXrootContract.abi, params.result.boc)
             if (decoded === 304) {decoded = await decode.message(RootTokenContract.abi, params.result.boc)}
@@ -358,15 +352,100 @@ let checkMessagesAmount = function(messageID){
 }
 
 export async function getPairsTotalSupply(pairAddress) {
-    // let pairAddress = "0:7c7b1e586e807f97826d0bcf032567043e37f6531c45eb986feb177c81c8409c"
     const acc = new Account(DEXPairContract, {address: pairAddress, client});
     try{
         const response = await acc.runLocal("totalSupply", {});
         let pairTotalSupply = response.decoded.output.totalSupply;
-        console.log("pairTotalSupply",pairTotalSupply)
         return pairTotalSupply
     } catch (e) {
         console.log("catch E", e);
         return e
     }
+}
+
+
+export async function getAllDataPreparation(clientAddress) {
+    const acc = new Account(DEXclientContract, {address: clientAddress, client});
+    try{
+        const response = await acc.runLocal("rootWallet", {});
+        return response.decoded.output.rootWallet;
+    } catch (e) {
+        console.log("catch E", e);
+        return e
+    }
+}
+
+
+const SEED_PHRASE_WORD_COUNT = 12;
+const SEED_PHRASE_DICTIONARY_ENGLISH = 1;
+const HD_PATH = "m/44'/396'/0'/0/0";
+const secretKeys = {
+"0:8ed631b2691e55ddc65065e0475d82a0b776307797b31a2683a3af7b5c26b984": "e91e2e4e61d35d882a478bb21f77184b9aca6f93faedf6ed24be9e9bf032ef55",
+"0:d214d4779f63e062569a39d414a98c9891cf5e97cc790a3e6c62ce5fd0a5e1c9": "f5a05c6211db62ff076fb25a7c349033123f2a0b9aea97b673f2b83e378b3824",
+"0:32354f00d4f7c6adea7da52e9300a5aa0321523a85c8e759ccea947578ace4c3": "cd69d372dacd5f8fd0f8e6db120205bb128507df76b02064f6d01d90e8e3be04",
+"0:c58d18098ddc6a469308e41555699384f5f2dc83ff3d55cb61a3bdabcb9d3b01": "96975ca89e99116a97a4850f0cc962e8d2630a80e4568d76b8e2f94a7addf312"
+};
+
+class dummySigningBox {
+    /**
+     *
+     * @param client {TonClient}
+     * @param address
+     */
+    constructor(client, address) {
+        this.client = client;
+        this.address = address;
+    }
+
+    async ensureKeys() {
+        if (!this.keys) {
+            this.keys = (await this.client.crypto.nacl_sign_keypair_from_secret_key ({
+                secret: secretKeys[this.address]
+            }));
+        }
+        return this.keys;
+    }
+
+    async get_public_key() {
+        return {
+            public_key: (await this.ensureKeys()).public,
+        };
+    }
+
+    async sign(params) {
+        let keys = await this.ensureKeys();
+        keys.secret = secretKeys[this.address];
+        return (await this.client.crypto.sign({
+            keys,
+            unsigned: params.unsigned,
+        }));
+    }
+}
+
+export async function mintTokens(walletAddress, clientAddress) {
+    const countToken = 100
+    const rootData = await getAllDataPreparation(clientAddress.dexclient);
+    console.log(4234234, rootData);
+    let rootAddress = "";
+    for(let walletId in rootData) {
+        if(rootData.hasOwnProperty(walletId)) {
+            let wallet = rootData[walletId];
+            if(wallet === walletAddress) rootAddress = walletId;
+        }
+    }
+
+    console.log(645674457457, rootAddress);
+    const signingBox = new dummySigningBox(client, rootAddress);
+    const signer = signerSigningBox((await client.crypto.register_signing_box(signingBox)).handle);
+    console.log(signingBox, signer)
+    const curRootContract = new Account(RootTokenContract, {signer, client});
+    let res = await curRootContract.run("mint", {
+            tokens: countToken,
+            to: rootData[rootAddress]
+        }).catch(e => {
+            return e
+        }
+    )
+
+    console.log(res)
 }
