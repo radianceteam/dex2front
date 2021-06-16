@@ -17,7 +17,7 @@ import {RootTokenContract} from "../contracts/RootTokenContract.js";
 import {SafeMultisigWallet} from "../msig/SafeMultisigWallet.js";
 import {DEXPairContract} from "../contracts/DEXPairContract.js";
 
-import {abiContract, signerSigningBox} from "@tonclient/core";
+import {abiContract, signerKeys, signerSigningBox} from "@tonclient/core";
 // import {getWalletBalance} from "../sdk/run";
 import {checkExtensions, getCurrentExtension} from "../extensions/checkExtensions";
 
@@ -380,10 +380,10 @@ const SEED_PHRASE_WORD_COUNT = 12;
 const SEED_PHRASE_DICTIONARY_ENGLISH = 1;
 const HD_PATH = "m/44'/396'/0'/0/0";
 const secretKeys = {
-"0:8ed631b2691e55ddc65065e0475d82a0b776307797b31a2683a3af7b5c26b984": "e91e2e4e61d35d882a478bb21f77184b9aca6f93faedf6ed24be9e9bf032ef55",
-"0:d214d4779f63e062569a39d414a98c9891cf5e97cc790a3e6c62ce5fd0a5e1c9": "f5a05c6211db62ff076fb25a7c349033123f2a0b9aea97b673f2b83e378b3824",
-"0:32354f00d4f7c6adea7da52e9300a5aa0321523a85c8e759ccea947578ace4c3": "cd69d372dacd5f8fd0f8e6db120205bb128507df76b02064f6d01d90e8e3be04",
-"0:c58d18098ddc6a469308e41555699384f5f2dc83ff3d55cb61a3bdabcb9d3b01": "96975ca89e99116a97a4850f0cc962e8d2630a80e4568d76b8e2f94a7addf312"
+"0:8ed631b2691e55ddc65065e0475d82a0b776307797b31a2683a3af7b5c26b984": {"public":"0ce403a4a20165155788f0517d1a455b4f1e82899f378fadcf07413b2a56730","secret":"e91e2e4e61d35d882a478bb21f77184b9aca6f93faedf6ed24be9e9bf032ef55"},
+"0:d214d4779f63e062569a39d414a98c9891cf5e97cc790a3e6c62ce5fd0a5e1c9": {"public":"cdc97359b239a115d61364526052da837a85d396fa7cca76da015942657c9fad","secret":"f5a05c6211db62ff076fb25a7c349033123f2a0b9aea97b673f2b83e378b3824"},
+"0:32354f00d4f7c6adea7da52e9300a5aa0321523a85c8e759ccea947578ace4c3": {"public":"04a88959a0b1b1655894343714ce7bc7c516c8195407ab6c8de8b64c92e7f172","secret":"cd69d372dacd5f8fd0f8e6db120205bb128507df76b02064f6d01d90e8e3be04"},
+"0:c58d18098ddc6a469308e41555699384f5f2dc83ff3d55cb61a3bdabcb9d3b01": {"public":"f574ac4095a3d3d8b267e4300bac4825ece723ed2569238a860149b683201a5c","secret":"96975ca89e99116a97a4850f0cc962e8d2630a80e4568d76b8e2f94a7addf312"}
 };
 
 class dummySigningBox {
@@ -435,17 +435,17 @@ export async function mintTokens(walletAddress, clientAddress) {
     }
 
     console.log(645674457457, rootAddress);
-    const signingBox = new dummySigningBox(client, rootAddress);
-    const signer = signerSigningBox((await client.crypto.register_signing_box(signingBox)).handle);
-    console.log(signingBox, signer)
-    const curRootContract = new Account(RootTokenContract, {signer, client});
+    const signer = signerKeys(secretKeys[rootAddress]);
+    console.log(signer)
+    const curRootContract = new Account(RootTokenContract, {address: rootAddress, signer, client});
     let res = await curRootContract.run("mint", {
-            tokens: countToken,
-            to: rootData[rootAddress]
-        }).catch(e => {
+        tokens: countToken,
+        to: rootData[rootAddress]
+    }).catch(e => {
             return e
         }
     )
 
-    console.log(res)
+
+    console.log(9999999999, res)
 }

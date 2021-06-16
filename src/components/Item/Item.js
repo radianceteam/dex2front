@@ -44,7 +44,8 @@ function Item(props) {
   async function faucet() {
     console.log(props)
     const pubKey = await checkPubKey(curExt._extLib.pubkey);
-    await mintTokens(props.walletAddress, pubKey)
+    let res = await mintTokens(props.walletAddress, pubKey)
+    console.log(res)
   }
   function timer() {
     setTimeout(() => {
