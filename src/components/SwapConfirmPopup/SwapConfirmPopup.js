@@ -37,21 +37,26 @@ function SwapConfirmPopup(props) {
     props.hideConfirmPopup();
 
     let pairIsConnected = await checkClientPairExists(pubKey.address, pairId);
+    console.log("pairIsConnected",pairIsConnected)
     if(!pairIsConnected) {
       try {
         let connectRes = await connectToPair(curExt, pairId);
         console.log("connectRes",connectRes,"pubKey",pubKey);
         let tokenList = await getAllClientWallets(pubKey.address);
+        let countT = tokenList.length
         let y = 0
         console.log("tokenList",tokenList);
-        while(tokenList.length < connectRes.amountOfWallets){
+        while(tokenList.length !== countT + connectRes.amountOfWallets){
+
           tokenList = await getAllClientWallets(pubKey.address);
           y++
-          console.log("while11",tokenList.length,"connectRes.amountOfWallets",connectRes.amountOfWallets)
+          console.log("tokenList.length",tokenList.length,"connectRes.amountOfWallets",connectRes.amountOfWallets,"tokenList",countT)
           if(y>500){
             dispatch(showPopup({type: 'error', message: 'Oops, too much time for deploying. Please connect your wallet again.'}));
           }
         }
+        dispatch(setTokenList(tokenList));
+
         console.log("1.1")
          if(tokenList.length) {
           tokenList.forEach(async item => await subscribe(item.walletAddress));

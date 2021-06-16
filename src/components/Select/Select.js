@@ -11,6 +11,8 @@ import SearchInput from '../SearchInput/SearchInput';
 import SelectItem from '../SelectItem/SelectItem';
 import './Select.scss';
 
+
+
 function Select(props) {
   const location = useLocation();
 
@@ -36,22 +38,24 @@ function Select(props) {
 
   // useEffect(() => {
     let fromArr = [];
-    
+
     pairsList.forEach(i => {
       fromArr.push({
         walletAddress: '',
         symbol: i.symbolA,
-        balance: 0
+        balance: 0,
+        // fullName:getFullName(i.symbolA)
       })
       fromArr.push({
         walletAddress: '',
         symbol: i.symbolB,
-        balance: 0
+        balance: 0,
+        // fullName:getFullName(i.symbolA)
       })
     })
-    
+
     fromArr = fromArr.filter((i, index, arr) => arr.findIndex(j => (j.symbol === i.symbol)) === index);
-    
+
     fromArr.forEach((i, index) => {
       tokenList.forEach(j => {
         if(i.symbol === j.symbol) {
@@ -60,7 +64,7 @@ function Select(props) {
         }
       })
     })
-    
+
     // setFromTokenList(fromArr);
 
     let toArr = [];
@@ -70,18 +74,20 @@ function Select(props) {
 
       arr.forEach(i => {
         if(fromToken.symbol === i.symbolA) {
-          toArr.push({              
+          toArr.push({
             pairId: i.pairAddress,
             walletAddress: '',
             symbol: i.symbolB,
-            balance: 0
+            balance: 0,
+            // fullName:getFullName(i.symbolA)
           });
         } else if(fromToken.symbol === i.symbolB) {
-          toArr.push({              
+          toArr.push({
             pairId: i.pairAddress,
             walletAddress: '',
             symbol: i.symbolA,
-            balance: 0
+            balance: 0,
+            // fullName:getFullName(i.symbolA)
           });
         }
       })
@@ -130,9 +136,10 @@ function Select(props) {
                       symbol={item.symbol}
                       balance={item.balance}
                       isActive={fromToken.symbol === item.symbol}
+                      fullName={item.fullName}
                       key={item.symbol}
                     />
-                ))                  
+                ))
               )}
               { props.type === 'to' && (
                 toArr
@@ -150,7 +157,7 @@ function Select(props) {
                     />
                 ))
               )}
-            </div>                
+            </div>
           </>)
         }
       />

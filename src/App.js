@@ -49,55 +49,62 @@ function App() {
     const theme = localStorage.getItem('appTheme') === null ? 'light' : localStorage.getItem('appTheme');
     if(appTheme !== theme) dispatch(changeTheme(theme));
 
-
-
     const extensionsList = await checkExtensions();
-    console.log("extensionsList",extensionsList)
 
-
-    let checkExt = extensionsList.filter(item=> {
-      return item.available
-    })
-    console.log("checkExt",checkExt)
+    console.log("1",2)
     dispatch(setExtensionsList(extensionsList));
+    console.log("1",3)
 
-
-
-
+    const curExtname = localStorage.getItem('extName') === null ? {} : localStorage.getItem('extName');
+    //
+    // console.log("1",curExtname)
+    let curExtt = await getCurrentExtension(curExtname)
+    // console.log("1",5)
+    dispatch(setCurExt(curExtt));
 
     const wallet = localStorage.getItem('wallet') === null ? {} : JSON.parse(localStorage.getItem('wallet'));
     if(wallet.id) {
       dispatch(setWallet(wallet));
       dispatch(setWalletIsConnected(true));
     }
-
-
-
-
+    const pairs = await getAllPairsWoithoutProvider();
+    console.log("pairs",pairs)
+    dispatch(setPairsList(pairs));
 
     const pubKey = localStorage.getItem('pubKey') === null ? {} : JSON.parse(localStorage.getItem('pubKey'));
+
+    console.log("1",6)
     if(pubKey.status) dispatch(setPubKey(pubKey));
 
-    const tokenList = localStorage.getItem('tokenList') === null ? tokenList : JSON.parse(localStorage.getItem('tokenList'));
-    if(tokenList.length) {
-      tokenList.forEach(async item => await subscribe(item.walletAddress));
-      dispatch(setTokenList(tokenList));
-    }
+    // const tokenList = getAllClientWallets(pubKey.address)
 
-    const liquidityList = localStorage.getItem('liquidityList') === null ? liquidityList : JSON.parse(localStorage.getItem('liquidityList'));
-    if(liquidityList.length) {
-      liquidityList.forEach(async item => await subscribe(item.walletAddress));
+    // const tokenList = localStorage.getItem('tokenList') === null ? tokenList : JSON.parse(localStorage.getItem('tokenList'));
+    console.log("pubKey.address",pubKey)
+
+    let tokenList = await getAllClientWallets(pubKey.dexclient);
+    let liquidityList = [];
+    // console.log('token list',tokenList,"pubKey.address",pubKey.address);
+    if(tokenList.length) {
+      console.log('token list');
+      tokenList.forEach(async item => await subscribe(item.walletAddress));
+
+      liquidityList = tokenList.filter(i => i.symbol.includes('/'));
+
+      tokenList = tokenList.filter(i => !i.symbol.includes('/')).map(i => (
+          {
+            ...i,
+            symbol: i.symbol === 'WTON' ? 'TON' : i.symbol
+          })
+      );
+      localStorage.setItem('tokenList', JSON.stringify(tokenList));
+      localStorage.setItem('liquidityList', JSON.stringify(liquidityList));
+      dispatch(setTokenList(tokenList));
       dispatch(setLiquidityList(liquidityList));
     }
-
-    // const transactionsList = localStorage.getItem('transactionsList') === null ? [] : JSON.parse(localStorage.getItem('transactionsList'));
+//TODO
+    const transactionsList = localStorage.getItem('transactionsList') === null ? [] : JSON.parse(localStorage.getItem('transactionsList'));
     if(transactionsList.length) dispatch(setTransactionsList(transactionsList));
 
-
-
-    const pairs = await getAllPairsWoithoutProvider();
-
-    dispatch(setPairsList(pairs));
 
   }, []);
 
@@ -123,7 +130,7 @@ function App() {
 
       let tokenList = await getAllClientWallets(pubKey.address);
       let liquidityList = [];
-
+      console.log('token list',tokenList,"pubKey.address",pubKey.address);
       if(tokenList.length) {
         console.log('token list');
         tokenList.forEach(async item => await subscribe(item.walletAddress));

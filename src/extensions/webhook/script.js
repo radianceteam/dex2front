@@ -167,7 +167,6 @@ console.log("clientAddress",clientAddress,"response",response)
             itemData.walletAddress = item[1];
             itemData.symbol = hex2a(curRootData.decoded.output.value0.symbol);
             itemData.balance = +curWalletData.decoded.output.value0.balance / 1000000000;
-
             normalizeWallets.push(itemData)
         }
         console.log("normalizeWalletsn",normalizeWallets);
@@ -206,7 +205,7 @@ export async function checkPubKey(clientPubkey) {
  */
 
 export async function getAllPairsWoithoutProvider() {
-
+console.log("i am here getAllPairsWoithoutProvider")
     const acc = new Account(DEXrootContract, {address: Radiance.networks["2"].dexroot, client});
     const response = await acc.runLocal("pairs", {});
 

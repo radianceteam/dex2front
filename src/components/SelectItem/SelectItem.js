@@ -7,6 +7,32 @@ import {hidePoolFromSelect, hidePoolToSelect, setPoolFromToken, setPoolPairId, s
 import {hideSwapFromSelect, hideSwapToSelect, setSwapFromToken, setSwapPairId, setSwapRate, setSwapToInputValue, setSwapToToken} from '../../store/actions/swap';
 import './SelectItem.scss';
 
+function getFullName(name){
+  console.log("name",name)
+  if(name === "TON"){
+    return "FreeTON Crystal"
+  }else if(name === "fBTC"){
+    return "Bitcoin"
+  }else if(name === "WETH"){
+    return "Ether"
+  }else if(name === "fETH"){
+    return "Ether"
+  }else if(name === "WBTC"){
+    return "Bitcoin"
+  }else if(name === "DS-TON/USDT"){
+    return "Pool tokens of TON/USDT pair"
+  }else if(name === "DS-TON/ETH"){
+    return "Pool tokens of TON/ETH pair"
+  }else if(name === "DS-TON/BTC"){
+    return "Pool tokens of TON/BTC pair"
+  }else if(name === "USDT"){
+    return "USDT Tether (erc-20)"
+  }else{
+    return "default tokens"
+  }
+}
+
+
 function SelectItem(props) {
   const dispatch = useDispatch();
   const location = useLocation();
@@ -17,7 +43,7 @@ function SelectItem(props) {
   const swapToToken = useSelector(state => state.swapReducer.toToken);
   const poolFromToken = useSelector(state => state.poolReducer.fromToken);
   const poolToToken = useSelector(state => state.poolReducer.toToken);
-
+console.log("props",props)
   async function handleClick() {
     if(props.isActive) { return }
     if(props.type ==='from') {
@@ -79,7 +105,7 @@ function SelectItem(props) {
         <img src={iconGenerator(props.symbol)} alt={props.symbol}/>
         <div>
           <p className="select-item-title">{props.symbol}</p>
-          <p className="select-item-descr">{props.symbol}</p>
+          <p className="select-item-descr">{getFullName(props.symbol)}</p>
         </div>
       </div>
       { walletIsConnected && <span className="select-item-balance">{props.balance > 0 ? parseFloat(props.balance.toFixed(4)) : props.balance}</span> }

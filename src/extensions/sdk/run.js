@@ -290,7 +290,7 @@ export async function processLiquidity(curExt,pairAddr, qtyA, qtyB) {
  */
 
 export async function connectToPair(curExt,pairAddr) {
-
+    console.log("pairAddr",pairAddr,"curExt",curExt)
     const {contract,callMethod,runMethod,pubkey,SendTransfer} = curExt._extLib
     let getClientAddressFromRoot = await checkPubKey(pubkey)
     if(getClientAddressFromRoot.status === false){

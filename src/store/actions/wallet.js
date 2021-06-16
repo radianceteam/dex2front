@@ -9,12 +9,12 @@ import {
 } from './types';
 
 export function setWallet(payload) {
-  // localStorage.setItem('wallet', JSON.stringify(payload));
+  localStorage.setItem('wallet', JSON.stringify(payload));
   return { type: SET_WALLET, payload };
 };
 
 export function setPubKey(payload) {
-  // localStorage.setItem('pubKey', JSON.stringify(payload));
+  localStorage.setItem('pubKey', JSON.stringify(payload));
   return { type: SET_PUBKEY, payload };
 };
 
@@ -33,7 +33,7 @@ export function setPairsList(payload) {
 };
 
 export function setTransactionsList(payload) {
-  // localStorage.setItem('transactionsList', JSON.stringify(payload));
+  localStorage.setItem('transactionsList', JSON.stringify(payload));
   return { type: SET_TRANSACTIONS_LIST, payload };
 };
 
