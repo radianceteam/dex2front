@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { swapA, swapB, connectToPair } from '../../extensions/sdk/run';
 import { showPopup } from '../../store/actions/app';
 import { setSwapAsyncIsWaiting, setSwapFromInputValue, setSwapFromToken, setSwapToInputValue, setSwapToToken } from '../../store/actions/swap';
-import {setPairsList, setTokenList, setTransactionsList} from '../../store/actions/wallet';
+import {setLiquidityList, setPairsList, setTokenList, setTransactionsList} from '../../store/actions/wallet';
 import CloseBtn from '../CloseBtn/CloseBtn';
 import MainBlock from '../MainBlock/MainBlock';
 import { iconGenerator } from '../../iconGenerator';
@@ -46,7 +46,7 @@ function SwapConfirmPopup(props) {
         let countT = tokenList.length
         let y = 0
         console.log("tokenList",tokenList);
-        while(tokenList.length !== countT + connectRes.amountOfWallets){
+        while(tokenList.length < countT){
 
           tokenList = await getAllClientWallets(pubKey.address);
           y++
@@ -55,21 +55,29 @@ function SwapConfirmPopup(props) {
             dispatch(showPopup({type: 'error', message: 'Oops, too much time for deploying. Please connect your wallet again.'}));
           }
         }
+
         dispatch(setTokenList(tokenList));
 
-        console.log("1.1")
-         if(tokenList.length) {
+
+        let liquidityList = [];
+
+        if(tokenList.length) {
+          console.log('token list');
           tokenList.forEach(async item => await subscribe(item.walletAddress));
-           console.log("1.2")
+
+          liquidityList = tokenList.filter(i => i.symbol.includes('/'));
+
           tokenList = tokenList.filter(i => !i.symbol.includes('/')).map(i => (
-            {
-              ...i,
-              symbol: i.symbol === 'WTON' ? 'TON' : i.symbol
-            })
+              {
+                ...i,
+                symbol: i.symbol === 'WTON' ? 'TON' : i.symbol
+              })
           );
+          localStorage.setItem('tokenList', JSON.stringify(tokenList));
+          localStorage.setItem('liquidityList', JSON.stringify(liquidityList));
+          dispatch(setTokenList(tokenList));
+          dispatch(setLiquidityList(liquidityList));
         }
-        console.log("1.3",tokenList)
-        dispatch(setTokenList(tokenList));
         dispatch(setSwapAsyncIsWaiting(false));
         pairIsConnected = true;
       } catch(e) {
