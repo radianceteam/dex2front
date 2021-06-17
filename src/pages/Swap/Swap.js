@@ -72,6 +72,7 @@ function Swap () {
                 type={'from'}
                 text={'From'}
                 token={fromToken}
+                autoFocus={true}
                 value={fromValue}
               />
               <SwapBtn
@@ -102,3 +103,5 @@ function Swap () {
     </div>
   )
 }
+
+export default Swap

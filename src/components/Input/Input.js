@@ -124,6 +124,7 @@ function Input(props) {
             onChange={event => setValue(+event.target.value)}
             onKeyPress={event => handleKeyPress(event)}
             min="0"
+            autoFocus={props.autoFocus || false}
             placeholder="0"
             readOnly={props.readOnly}
           />

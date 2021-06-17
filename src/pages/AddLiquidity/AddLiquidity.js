@@ -171,6 +171,7 @@ console.log("qtyA, qtyB, reserveA, reserveB,totalSupplyBefore",qtyA, qtyB, reser
               <Input
                 type={'from'}
                 text={'From'}
+                autoFocus={true}
                 token={fromToken}
                 value={fromValue}
               />
