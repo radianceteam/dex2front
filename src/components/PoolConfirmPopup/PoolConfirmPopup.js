@@ -61,7 +61,7 @@ function PoolConfirmPopup(props) {
           <>
             <p className="confirm-subtitle">You will receive</p>
             <div className="confirm-block">
-              <span className="confirm-value">3.2582</span>
+              <span className="confirm-value">~{props.lpAmount}</span>
               <img className="confirm-icon" src={iconGenerator(fromToken.symbol)} alt={fromToken.symbol}/>
               <img className="confirm-icon" src={iconGenerator(toToken.symbol)} alt={toToken.symbol}/>
               <span className="confirm-token">{fromToken.symbol}/{toToken.symbol} Pool Tokens</span>
@@ -70,42 +70,42 @@ function PoolConfirmPopup(props) {
             <button className="btn popup-btn" onClick={() => handleSuply()}>Confirm Supply</button>
           </>
         }
-        footer={
-          <div className="mainblock-footer">
-            <div className="mainblock-footer-wrap">
-              <div>
-                <div  className="pool-confirm-wrap">
-                  <p className="mainblock-footer-value">0.0001</p>
-                  <p className="mainblock-footer-subtitle">{fromToken.symbol} deposited</p>
-                </div>
-                <div>
-                  <p className="mainblock-footer-value">{parseFloat(props.rateBA.toFixed(4))}</p>
-                  <p className="mainblock-footer-subtitle">{fromToken.symbol} per {toToken.symbol}</p>
-                </div>
-              </div>
-              <div>
-                <div  className="pool-confirm-wrap">
-                  <p className="mainblock-footer-value">10000003</p>
-                  <p className="mainblock-footer-subtitle">{toToken.symbol} deposited</p>
-                </div>
-                <div>
-                  <p className="mainblock-footer-value">{parseFloat(props.rateAB.toFixed(4))}</p>
-                  <p className="mainblock-footer-subtitle">{toToken.symbol} per {fromToken.symbol}</p>
-                </div>
-              </div>
-              <div>
-                <div  className="pool-confirm-wrap">
-                  <p className="mainblock-footer-value">999785</p>
-                  <p className="mainblock-footer-subtitle">Rates</p>
-                </div>
-                <div>
-                  <p className="mainblock-footer-value">&lt;0.01%</p>
-                  <p className="mainblock-footer-subtitle">Share of Pool</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        }
+        // footer={
+        //   <div className="mainblock-footer">
+        //     <div className="mainblock-footer-wrap">
+        //       <div>
+        //         <div  className="pool-confirm-wrap">
+        //           <p className="mainblock-footer-value">0.0001</p>
+        //           <p className="mainblock-footer-subtitle">{fromToken.symbol} deposited</p>
+        //         </div>
+        //         <div>
+        //           <p className="mainblock-footer-value">{parseFloat(props.rateBA.toFixed(4))}</p>
+        //           <p className="mainblock-footer-subtitle">{fromToken.symbol} per {toToken.symbol}</p>
+        //         </div>
+        //       </div>
+        //       <div>
+        //         <div  className="pool-confirm-wrap">
+        //           <p className="mainblock-footer-value">10000003</p>
+        //           <p className="mainblock-footer-subtitle">{toToken.symbol} deposited</p>
+        //         </div>
+        //         <div>
+        //           <p className="mainblock-footer-value">{parseFloat(props.rateAB.toFixed(4))}</p>
+        //           <p className="mainblock-footer-subtitle">{toToken.symbol} per {fromToken.symbol}</p>
+        //         </div>
+        //       </div>
+        //       <div>
+        //         <div  className="pool-confirm-wrap">
+        //           <p className="mainblock-footer-value">999785</p>
+        //           <p className="mainblock-footer-subtitle">Rates</p>
+        //         </div>
+        //         <div>
+        //           <p className="mainblock-footer-value">&lt;0.01%</p>
+        //           <p className="mainblock-footer-subtitle">Share of Pool</p>
+        //         </div>
+        //       </div>
+        //     </div>
+        //   </div>
+        // }
       />
     </div>
   )

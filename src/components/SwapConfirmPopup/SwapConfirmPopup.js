@@ -23,7 +23,7 @@ function SwapConfirmPopup(props) {
 
   const fromToken = useSelector(state => state.swapReducer.fromToken);
   const toToken = useSelector(state => state.swapReducer.toToken);
-
+  const rate = useSelector(state => state.swapReducer.rate);
   const fromValue = useSelector(state => state.swapReducer.fromInputValue);
   const toValue = useSelector(state => state.swapReducer.toInputValue);
   const swapAsyncIsWaiting = useSelector(state => state.swapReducer.swapAsyncIsWaiting);
@@ -188,26 +188,30 @@ function SwapConfirmPopup(props) {
         footer={
           <div className="mainblock-footer">
             <div className="mainblock-footer-wrap">
-              <div>
+              {/*<div>*/}
                 <div className="swap-confirm-wrap">
-                  <p className="mainblock-footer-value"><img src={miniSwap} alt=""/> {parseFloat(toValue.toFixed(4))} {toToken.symbol}/{fromToken.symbol}</p>
+                  <p className="mainblock-footer-value"><img src={miniSwap} alt=""/> {parseFloat(rate.toFixed(4))} {toToken.symbol}/{fromToken.symbol}</p>
                   <p className="mainblock-footer-subtitle">Price</p>
                 </div>
-                <div>
-                  <p className="mainblock-footer-value">{parseFloat(toValue.toFixed(4))} {toToken.symbol}</p>
-                  <p className="mainblock-footer-subtitle">Minimum received</p>
-                </div>
-              </div>
-              <div>
                 <div className="swap-confirm-wrap">
-                  <p className="mainblock-footer-value">0.03%</p>
-                  <p className="mainblock-footer-subtitle">Price Impact</p>
-                </div>
-                <div>
-                  <p className="mainblock-footer-value">0.003 {toToken.symbol}</p>
+                  <p className="mainblock-footer-value">{(fromValue * 0.03) / 100} {fromToken.symbol}</p>
                   <p className="mainblock-footer-subtitle">Liquidity Provider Fee</p>
                 </div>
-              </div>
+                {/*<div>*/}
+                {/*  <p className="mainblock-footer-value">{parseFloat(toValue.toFixed(4))} {toToken.symbol}</p>*/}
+                {/*  <p className="mainblock-footer-subtitle">Minimum received</p>*/}
+                {/*</div>*/}
+              {/*</div>*/}
+              {/*<div>*/}
+              {/*  /!*<div className="swap-confirm-wrap">*!/*/}
+              {/*  /!*  <p className="mainblock-footer-value">0.03%</p>*!/*/}
+              {/*  /!*  <p className="mainblock-footer-subtitle">Price Impact</p>*!/*/}
+              {/*  /!*</div>*!/*/}
+              {/*  <div>*/}
+              {/*    <p className="mainblock-footer-value">0.003 {toToken.symbol}</p>*/}
+              {/*    <p className="mainblock-footer-subtitle">Liquidity Provider Fee</p>*/}
+              {/*  </div>*/}
+              {/*</div>*/}
             </div>
           </div>
         }
