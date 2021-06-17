@@ -17,6 +17,7 @@ function AddLiquidity () {
 
   const pairsList = useSelector(state => state.walletReducer.pairsList);
 
+
   const fromToken = useSelector(state => state.poolReducer.fromToken);
   const toToken = useSelector(state => state.poolReducer.toToken);
 

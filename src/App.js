@@ -128,6 +128,8 @@ function App() {
       dispatch(setWallet({id: msgiAddress, balance: msigBalance}));
 
 
+      //dispatch(setWallet({id: msgiAddress, balance: msigBalance}));
+
       let tokenList = await getAllClientWallets(pubKey.address);
       let liquidityList = [];
       console.log('token list',tokenList,"pubKey.address",pubKey.address);

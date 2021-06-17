@@ -12,6 +12,7 @@ import ManageConfirmPopup from '../../components/ManageConfirmPopup/ManageConfir
 import WaitingPopup from '../../components/WaitingPopup/WaitingPopup';
 import './Manage.scss';
 import {setPoolAsyncIsWaiting} from "../../store/actions/pool";
+import {setTransactionsList} from "../../store/actions/wallet";
 
 function Manage() {
   const dispatch = useDispatch();
@@ -24,6 +25,8 @@ function Manage() {
   const balance = useSelector(state => state.manageReducer.balance);
   const pairId = useSelector(state => state.manageReducer.pairId);
   const manageAsyncIsWaiting = useSelector(state => state.manageReducer.manageAsyncIsWaiting);
+
+  const transactionsList = useSelector(state => state.walletReducer.transactionsList);
 
   const [managePopupIsVisible, setManagePopupIsVisible] = useState(true);
   const [manageRemoveIsVisible, setManageRemoveIsVisible] = useState(false);
@@ -60,6 +63,27 @@ function Manage() {
     if(returnStatus.code) {
       dispatch(setPoolAsyncIsWaiting(false))
       switch (returnStatus.text) {
+    try {
+      let res = await returnLiquidity(curExt, pairId, ((balance.toFixed(2) * rangeValue) / 100 * 1000000000).toFixed(0));
+      if(!res.code) {
+        let olderLength = transactionsList.length;
+        let newLength = transactionsList.push({
+          type: "returnLiquidity",
+          fromValue: qtyA,
+          fromSymbol: fromToken.symbol,
+          toValue: qtyB,
+          toSymbol: toToken.symbol
+        })
+        let item = newLength - 1
+        console.log(olderLength, newLength, item, transactionsList[item], transactionsList.length);
+        localStorage.setItem("currentElement", item);
+        localStorage.setItem("lastType", "returnLiquidity");
+        if (transactionsList.length) await dispatch(setTransactionsList(transactionsList));
+      }
+
+    } catch(e) {
+      console.log(e);
+      switch (e.text) {
         case 'Canceled by user.':
           dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
           break;
