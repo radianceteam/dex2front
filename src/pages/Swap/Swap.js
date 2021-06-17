@@ -25,7 +25,7 @@ function Swap () {
 
   const fromValue = useSelector(state => state.swapReducer.fromInputValue);
   const toValue = useSelector(state => state.swapReducer.toInputValue);
-
+  const pairId = useSelector(state => state.swapReducer.pairId);
   const swapAsyncIsWaiting = useSelector(state => state.swapReducer.swapAsyncIsWaiting);
   const [swapConfirmPopupIsVisible, setSwapConfirmPopupIsVisible] = useState(false);
 
@@ -42,6 +42,23 @@ function Swap () {
       dispatch(showPopup({type: 'error', message: 'Fields should not be empty'}));
     }
   }
+
+  // function getAmountOut(amountIn) {
+  //   if(!amountIn){
+  //     return 0
+  //   }
+  //   let reserves = pairsList.filter(item=>item.pairAddress === pairId)
+  //   console.log("reserves",reserves)
+  //   let rootIn = reserves[0].reserveA
+  //   let rootOut = reserves[0].reservetB
+  //   console.log("rootIn",rootIn,"amountIn",amountIn,"rootOut",rootOut)
+  //   let amountInWithFee = amountIn * 997;
+  //   let numerator = amountInWithFee * rootOut;
+  //   let denominator = amountInWithFee + rootIn * 1000;
+  //   return (numerator/denominator).toFixed(4);
+  //   // return 1;
+  // }
+
 
   return (
     <div className="container">

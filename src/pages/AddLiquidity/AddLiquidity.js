@@ -239,6 +239,7 @@ console.log("qtyA, qtyB, reserveA, reserveB,totalSupplyBefore",qtyA, qtyB, reser
           hideConfirmPopup={setPoolConfirmPopupIsVisible.bind(this, false)}
           rateAB={rateAB}
           rateBA={rateBA}
+          lpAmount={(getTotalLP(fromValue*1000000000,toValue*1000000000,ratesData.reservesA*1000000000,ratesData.reservesB*1000000000, ratesData.totalSupply*1000000000)/1000000000).toFixed(4)}
         /> }
 
       { poolAsyncIsWaiting && <WaitingPopup text={`Supplying ${fromValue} ${fromToken.symbol} and ${toValue} ${toToken.symbol}`} /> }

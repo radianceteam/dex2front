@@ -16,8 +16,9 @@ function ManageConfirmPopup(props) {
   const balance = useSelector(state => state.manageReducer.balance);
   const pairId = useSelector(state => state.manageReducer.pairId);
   const pairS = useSelector(state => state.walletReducer.pairsList);
-
+  console.log("curPair",pairS,"pairId",pairId)
   let curPair = pairS.filter(item=>item.pairAddress === pairId)
+
   let poolShare = (balance*100)/(curPair[0].totalSupply/1000000000)
 console.log("poolShare",poolShare,"curPair[0].totalSupply",curPair[0].totalSupply)
   let pooledTokensA = (curPair[0].reserveA/1000000000)*poolShare
@@ -76,12 +77,12 @@ console.log("poolShare",poolShare,"curPair[0].totalSupply",curPair[0].totalSuppl
               </div>
               <div>
                 <div className="swap-confirm-wrap">
-                  <p className="mainblock-footer-value">{pooledTokensA.toFixed(4)}</p>
-                  <p className="mainblock-footer-subtitle">Pooled {fromToken.symbol}</p>
+                  <p className="mainblock-footer-value">{(pooledTokensA/100).toFixed(4)}</p>
+                  <p className="mainblock-footer-subtitle">Your pooled {fromToken.symbol}</p>
                 </div>
                 <div>
-                  <p className="mainblock-footer-value">{pooledTokensB.toFixed(4)}</p>
-                  <p className="mainblock-footer-subtitle">Pooled {toToken.symbol}</p>
+                  <p className="mainblock-footer-value">{(pooledTokensB/100).toFixed(4)}</p>
+                  <p className="mainblock-footer-subtitle">Your pooled {toToken.symbol}</p>
                 </div>
 
               </div>
