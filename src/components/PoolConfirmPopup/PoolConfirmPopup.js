@@ -95,7 +95,7 @@ function PoolConfirmPopup(props) {
           <>
             <p className="confirm-subtitle">You will receive</p>
             <div className="confirm-block">
-              <span className="confirm-value">3.2582</span>
+              <span className="confirm-value">~{props.lpAmount}</span>
               <img className="confirm-icon" src={iconGenerator(fromToken.symbol)} alt={fromToken.symbol}/>
               <img className="confirm-icon" src={iconGenerator(toToken.symbol)} alt={toToken.symbol}/>
               <span className="confirm-token">{fromToken.symbol}/{toToken.symbol}</span>

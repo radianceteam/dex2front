@@ -9,15 +9,16 @@ function LiquidityItem({symbol, balance}) {
   const history = useHistory();
   const dispatch = useDispatch();
   const symbols = symbol.split('/');
-  
+
   const pairsList = useSelector(state => state.walletReducer.pairsList);
 
   const handleClick = () => {
-    const fromToken = symbols[0].replaceAll('DS-', '');    
+    const fromToken = symbols[0].replaceAll('DS-W', '');
     dispatch(setManageBalance(balance));
-
+// console.log("pairsList",pairsList,"fromToken",fromToken,"symbols",symbols)
     pairsList.forEach(i => {
       if(i.symbolA.includes(fromToken) && i.symbolB.includes(symbols[1])) {
+
         dispatch(setManageFromToken({symbol: fromToken, reserve: i.reserveA}));
         dispatch(setManageToToken({symbol: symbols[1], reserve: i.reservetB}));
         dispatch(setManagePairId(i.pairAddress))
@@ -33,7 +34,7 @@ function LiquidityItem({symbol, balance}) {
     })
     history.push('/manage');
   }
-  
+
   return (
     <div className="liquidity-item">
       <div>

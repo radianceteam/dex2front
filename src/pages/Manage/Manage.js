@@ -25,9 +25,7 @@ function Manage() {
   const balance = useSelector(state => state.manageReducer.balance);
   const pairId = useSelector(state => state.manageReducer.pairId);
   const manageAsyncIsWaiting = useSelector(state => state.manageReducer.manageAsyncIsWaiting);
-
   const transactionsList = useSelector(state => state.walletReducer.transactionsList);
-
   const [managePopupIsVisible, setManagePopupIsVisible] = useState(true);
   const [manageRemoveIsVisible, setManageRemoveIsVisible] = useState(false);
 

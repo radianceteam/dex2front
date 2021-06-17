@@ -15,11 +15,11 @@ function getFullName(name){
     return "fEthereum"
   }else if(name === "WBTC"){
     return "Bitcoin"
-  }else if(name === "DS-TON/USDT"){
+  }else if(name === "DS-WTON/USDT"){
     return "Pool tokens of TON/USDT pair"
-  }else if(name === "DS-TON/ETH"){
+  }else if(name === "DS-WTON/WETH"){
     return "Pool tokens of TON/ETH pair"
-  }else if(name === "DS-TON/BTC"){
+  }else if(name === "DS-WTON/WBTC"){
     return "Pool tokens of TON/BTC pair"
   }else if(name === "USDT"){
     return "Tether"
