@@ -12,11 +12,11 @@ function getFullName(name){
   if(name === "TON"){
     return "TON Crystal"
   }else if(name === "fBTC"){
-    return "Bitcoin"
+    return "fBitcoin"
   }else if(name === "WETH"){
     return "Ethereum"
   }else if(name === "fETH"){
-    return "Ethereum"
+    return "fEthereum"
   }else if(name === "WBTC"){
     return "Bitcoin"
   }else if(name === "DS-TON/USDT"){
@@ -26,7 +26,7 @@ function getFullName(name){
   }else if(name === "DS-TON/BTC"){
     return "Pool tokens of TON/BTC pair"
   }else if(name === "USDT"){
-    return "USDT Tether"
+    return "Tether"
   }else{
     return "default tokens"
   }
