@@ -22,14 +22,16 @@ function ClientWallets(props) {
         toArr.push({
             symbol: i.symbol,
             balance: i.balance,
-            walletAddress: i.walletAddress
+            walletAddress: i.walletAddress,
+            lp: false
         })
     })
     LPTokenList.map((i) => {
         toArr.push({
             symbol: i.symbol,
             balance: i.balance,
-            walletAddress: i.walletAddress
+            walletAddress: i.walletAddress,
+            lp: true
         })
     })
     console.log(LPTokenList);
@@ -58,6 +60,7 @@ function ClientWallets(props) {
                                             walletAddress={item.walletAddress}
                                             symbol={item.symbol}
                                             balance={item.balance}
+                                            lp={item.lp}
                                             key={item.symbol}
                                         />
                                     ))

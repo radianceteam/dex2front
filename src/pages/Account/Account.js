@@ -16,6 +16,7 @@ function Account() {
   const curExt = useSelector(state => state.appReducer.curExt);
   const extensionIsSelected = useSelector(state => state.appReducer.extensionIsSelected);
   const wallet = useSelector(state => state.walletReducer.wallet);
+
   const pubKey = useSelector(state => state.walletReducer.pubKey);
   const transactionsList = useSelector(state => state.walletReducer.transactionsList);
 
@@ -39,6 +40,7 @@ function Account() {
     localStorage.setItem('pubKey', JSON.stringify({}));
     localStorage.setItem('wallet', JSON.stringify({}));
     // dispatch(setTransactionsList([]));
+    history.push("/account");
     // history.goBack()
   }
 
@@ -55,7 +57,7 @@ function Account() {
               <svg className="logo" width="39" height="35" viewBox="0 0 39 35" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M37.8278 9.26675L30.435 1.21075C30.3129 1.07679 30.1371 1 29.9564 1H9.04421C8.86354 1 8.68775 1.07679 8.56568 1.21075L1.17283 9.26675C0.957979 9.50037 0.941703 9.85163 1.13377 10.1049L18.9827 33.7419C19.1048 33.9052 19.2969 34 19.5003 34C19.7038 34 19.8958 33.9036 20.0179 33.7419L37.8669 10.1032C38.0573 9.85163 38.0427 9.49874 37.8278 9.26675ZM22.5034 2.307L24.5689 9.05599H14.4334L16.4989 2.307H22.5034ZM24.6144 10.3614L19.5003 30.6802L14.3862 10.3614H24.6144ZM13.0434 10.3614L18.0859 30.3911L2.96163 10.3614H13.0434ZM25.9573 10.3614H36.039L20.9148 30.3911L25.9573 10.3614ZM35.8649 9.05599H25.9312L23.8657 2.307H29.6683L35.8649 9.05599ZM9.33068 2.307H15.1333L13.0678 9.05599H3.13579L9.33068 2.307Z" fill="white" stroke="white"/>
               </svg>
-              <span className="account-title">{curExt._extLib.name} Account</span>
+              <span className="account-title">{curExt._extLib.name} Extension</span>
             </>
           }
           button={
@@ -65,7 +67,7 @@ function Account() {
           }
           content={
             <div className="account-body">
-              <p className="account-body-title">{curExt._extLib.name} wallet</p>
+              <p className="account-body-title">Gas wallet</p>
               <p className="account-wallet-key">{wallet.id.slice(0, 5)}...{wallet.id.slice(-4)}</p>
               <div className="account-wrapper">
                 <button className="account-btn" onClick={() => navigator.clipboard.writeText(wallet.id)}>
@@ -97,6 +99,25 @@ function Account() {
                         <path d="M13.1921 6.58954L9.03188 11.3053L6.80469 9.07375C6.42649 8.6948 5.79615 8.6948 5.39693 9.07375C5.01873 9.45269 5.01873 10.0843 5.39693 10.4843L8.38053 13.4737C8.56964 13.6632 8.82177 13.7685 9.07391 13.7685C9.09492 13.7685 9.09492 13.7685 9.11593 13.7685C9.38907 13.7685 9.64121 13.6422 9.83031 13.4316L14.6839 7.8948C15.0411 7.47375 14.9991 6.84217 14.5999 6.48427C14.1796 6.12638 13.5493 6.16848 13.1921 6.58954Z" fill="white"/>
                       </svg>
                     </li>
+                  )) }
+                  { transactionsList.map((i, index) => i.type === "processLiquidity" && (
+                      <li className="account-footer-list-item" key={index}>
+                        <span>Process liquidity: {i.fromValue.toFixed(4)} {i.fromSymbol} and {i.toValue.toFixed(4)} {i.toSymbol}</span>
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M5.73312 0H14.3057C17.4574 0 19.9998 2.54737 19.9998 5.70526V14.2947C19.9998 17.4526 17.4364 20 14.3057 20H5.73312C2.58143 20 0.0390625 17.4316 0.0390625 14.2947V5.70526C0.0390625 2.54737 2.58143 0 5.73312 0Z" fill="#49EC9F"/>
+                          <path d="M13.1921 6.58954L9.03188 11.3053L6.80469 9.07375C6.42649 8.6948 5.79615 8.6948 5.39693 9.07375C5.01873 9.45269 5.01873 10.0843 5.39693 10.4843L8.38053 13.4737C8.56964 13.6632 8.82177 13.7685 9.07391 13.7685C9.09492 13.7685 9.09492 13.7685 9.11593 13.7685C9.38907 13.7685 9.64121 13.6422 9.83031 13.4316L14.6839 7.8948C15.0411 7.47375 14.9991 6.84217 14.5999 6.48427C14.1796 6.12638 13.5493 6.16848 13.1921 6.58954Z" fill="white"/>
+                        </svg>
+                      </li>
+                  )) }
+
+                  { transactionsList.map((i, index) => i.type === "returnLiquidity" && (
+                      <li className="account-footer-list-item" key={index}>
+                        <span>Return liquidity: {i.fromValue.toFixed(4)} {i.fromSymbol} and {i.toValue.toFixed(4)} {i.toSymbol}</span>
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M5.73312 0H14.3057C17.4574 0 19.9998 2.54737 19.9998 5.70526V14.2947C19.9998 17.4526 17.4364 20 14.3057 20H5.73312C2.58143 20 0.0390625 17.4316 0.0390625 14.2947V5.70526C0.0390625 2.54737 2.58143 0 5.73312 0Z" fill="#49EC9F"/>
+                          <path d="M13.1921 6.58954L9.03188 11.3053L6.80469 9.07375C6.42649 8.6948 5.79615 8.6948 5.39693 9.07375C5.01873 9.45269 5.01873 10.0843 5.39693 10.4843L8.38053 13.4737C8.56964 13.6632 8.82177 13.7685 9.07391 13.7685C9.09492 13.7685 9.09492 13.7685 9.11593 13.7685C9.38907 13.7685 9.64121 13.6422 9.83031 13.4316L14.6839 7.8948C15.0411 7.47375 14.9991 6.84217 14.5999 6.48427C14.1796 6.12638 13.5493 6.16848 13.1921 6.58954Z" fill="white"/>
+                        </svg>
+                      </li>
                   )) }
                 </ul>
               </div>

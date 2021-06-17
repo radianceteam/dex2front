@@ -7,11 +7,44 @@
 .poolExplorer__reserve {
   display: flex;
   align-items: center;
-  justify-content: space-between;
 }
 
 .poolExplorer__icon {
   width: 25px;
+}
+
+.poolExplorer__icon_margin {
+  width: 25px;
+  margin: 5px;
+}
+
+.poolExplorer__box {
+  display: flex;
+  align-items: center;
+  padding-top: 10px;
+  justify-content: center;
+}
+
+.poolExplorer__pair_rate {
+  height: 64px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+
+.poolExplorer__fixed_width {
+  width: 55%;
+}
+
+.poolExplorer__box_pair {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.poolExplorer__box_text {
+  margin-right: 10px;
+  margin-left: 10px;
 }
 
 .poolExplorer__pair {
@@ -26,7 +59,7 @@
 }
 
 .select-item {
-  padding: 30px 0;
+  padding-top: 20px;
   border-bottom: 1px solid var(--select-item-border-color);
   display: flex;
   align-items: center;
@@ -79,6 +112,12 @@
     font-weight: 700;
     color: var(--icons-color);
   }
+}
+
+.rate {
+  font-size: 16px;
+  margin: 0;
+  transition: .0s;
 }
 
 @media screen and (max-width: 481px) {

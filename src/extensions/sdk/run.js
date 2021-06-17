@@ -6,7 +6,12 @@ import {DEXrootContract} from "../contracts/DEXRoot.js";
 import {DEXclientContract} from "../contracts/DEXClient.js";
 import {RootTokenContract} from "../contracts/RootTokenContract.js";
 import {SafeMultisigWallet} from "../msig/SafeMultisigWallet.js";
-import {getRootCreators, getShardConnectPairQUERY, checkPubKey, getClientBalance} from "../webhook/script"
+import {
+    getRootCreators,
+    getShardConnectPairQUERY,
+    checkPubKey,
+    getClientBalance
+} from "../webhook/script"
 
 TonClient.useBinaryLibrary(libWeb);
 
@@ -28,7 +33,7 @@ function getShard(string) {
  * @return   callback         onSharding()
  */
 export async function setCreator(curExt) {
-    const {name, address, pubkey, contract, runMethod, callMethod, internal} = curExt._extLib
+    const {name, address, pubkey, contract, runMethod, callMethod, SendTransfer, internal} = curExt._extLib
 
     let checkClientExists = await checkPubKey(pubkey)
 
@@ -68,6 +73,8 @@ export async function setCreator(curExt) {
         }
     }
 }
+
+
 /**
  * Function to get shard id to deploy dex client
  * @author   max_akkerman
@@ -125,13 +132,13 @@ export async function createDEXclient(curExt, shardData) {
             pubkey: shardData.keys,
             souint: shardData.clientSoArg
         }, rootContract).catch(e => {
-                let ecode = '106';
-                let found = e.text.match(ecode);
-                if(found){
-                    return new UserException("y are not registered at dex root, pls transfer some funds to dex root address")
-                }else{
-                    return e
-                }
+            let ecode = '106';
+            let found = e.text.match(ecode);
+            if(found){
+                return new UserException("y are not registered at dex root, pls transfer some funds to dex root address")
+            }else{
+                return e
+            }
             }
         )
 
@@ -278,7 +285,7 @@ export async function processLiquidity(curExt,pairAddr, qtyA, qtyB) {
     console.log("pairAddr",pairAddr, "qtyA",qtyA, "qtyB",qtyB)
     try {
         const clientContract = await contract(DEXclientContract.abi, getClientAddressFromRoot.dexclient);
-        const processLiquidity = await callMethod("processLiquidity", {pairAddr:pairAddr, qtyA:qtyA, qtyB:qtyB}, clientContract)
+        const processLiquidity = await callMethod("processLiquidity", {pairAddr:pairAddr, qtyA:Number(qtyA).toFixed(0), qtyB:Number(qtyB).toFixed(0)}, clientContract)
         return processLiquidity
     } catch (e) {
         console.log("catch E processLiquidity", e);
@@ -363,6 +370,8 @@ export async function connectToPairStep2DeployWallets(connectionData) {
     }
     try{
         let amountOfWallets = 0
+        console.log(4,111);
+
         for (const item of newArr) {
 
             let soUint = await getShardConnectPairQUERY(clientAdr,targetShard,item)
@@ -370,9 +379,12 @@ export async function connectToPairStep2DeployWallets(connectionData) {
             amountOfWallets++
         }
     return {status:"success",amountOfWallets:amountOfWallets}
+        // )
+        console.log(4,112);
     }catch (e) {
         console.log("this",e)
         return e
     }
 }
+
 

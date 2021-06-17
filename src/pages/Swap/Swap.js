@@ -102,5 +102,3 @@ function Swap () {
     </div>
   )
 }
-
-export default Swap;
