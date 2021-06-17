@@ -91,8 +91,15 @@ function Input(props) {
   function changeValue() {
     if(location.pathname.includes('swap')) {
       if(props.type === 'from') {
-        dispatch(setSwapFromInputValue(value));
-        dispatch(setSwapToInputValue(parseFloat((value * swapRate).toFixed(4))));
+        if(value > props.token.balance) {
+          dispatch(setSwapFromInputValue(Number(props.token.balance).toFixed(4)));
+          dispatch(setSwapToInputValue(parseFloat((Number(props.token.balance) * swapRate).toFixed(4))));
+        }
+        else  {
+          dispatch(setSwapFromInputValue(value));
+          dispatch(setSwapToInputValue(parseFloat((value * swapRate).toFixed(4))));
+        }
+
       // } else if(props.type === 'to') {
         // dispatch(setSwapToInputValue(value));
         // dispatch(setSwapFromInputValue(parseFloat((value / swapRate).toFixed(4))));

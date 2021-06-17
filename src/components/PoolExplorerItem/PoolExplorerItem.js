@@ -5,19 +5,7 @@ import './PoolExplorerItem.scss';
 
 function PoolExplorerItem(props) {
   const walletIsConnected = useSelector(state => state.appReducer.walletIsConnected);
-  const [isVisible, setVisible] = useState(false);
 
-  async function copyAddress() {
-    await navigator.clipboard.writeText(props.pairAddress);
-    await setVisible(true);
-    await timer();
-  }
-
-  function timer() {
-    setTimeout(() => {
-      setVisible(false);
-    }, 1000)
-  }
   return (
       <React.Fragment>
         <div className="poolExplorer__box">
@@ -32,7 +20,7 @@ function PoolExplorerItem(props) {
             <b>{props.pair.symbolB}</b>
           </div>
           </div>
-        <div className="select-item" onClick={copyAddress}>
+        <div className="select-item">
           {/*<div className="select-item-wrapper">*/}
           {/*    <div className="poolExplorer__pair_block">*/}
           {/*      <div className="poolExplorer__pair">*/}
@@ -47,16 +35,16 @@ function PoolExplorerItem(props) {
           {/*</div>*/}
           <div className="poolExplorer__pair_rate">
             <div className="poolExplorer__reserve">
-              <span className="select-item-descr">{!isVisible &&  <div>
+              <span className="select-item-descr"><div>
                 1 {props.pair.symbolA} = <b>{parseFloat(props.pair.rateAB).toFixed(4)}</b> {props.pair.symbolB}
               </div>
-              }</span>
+              </span>
             </div>
             <div className="poolExplorer__reserve">
-               <span className="select-item-descr">{!isVisible &&  <div>
+               <span className="select-item-descr"><div>
                  1 {props.pair.symbolB} = <b>{parseFloat(props.pair.rateBA).toFixed(4)}</b> {props.pair.symbolA}
                </div>
-               }</span>
+               </span>
             </div>
           </div>
 

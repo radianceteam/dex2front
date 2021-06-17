@@ -12,6 +12,7 @@
     display: inline-flex;
     align-self: center;
     margin-right: 40px;
+    user-select: none;
 
     &:last-of-type {
       margin-right: 0;
