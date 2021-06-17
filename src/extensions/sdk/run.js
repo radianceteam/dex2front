@@ -285,7 +285,7 @@ export async function processLiquidity(curExt,pairAddr, qtyA, qtyB) {
     console.log("pairAddr",pairAddr, "qtyA",qtyA, "qtyB",qtyB)
     try {
         const clientContract = await contract(DEXclientContract.abi, getClientAddressFromRoot.dexclient);
-        const processLiquidity = await callMethod("processLiquidity", {pairAddr:pairAddr, qtyA:qtyA, qtyB:qtyB}, clientContract)
+        const processLiquidity = await callMethod("processLiquidity", {pairAddr:pairAddr, qtyA:Number(qtyA).toFixed(0), qtyB:Number(qtyB).toFixed(0)}, clientContract)
         return processLiquidity
     } catch (e) {
         console.log("catch E processLiquidity", e);

@@ -4,6 +4,7 @@ import { hidePopup } from '../../store/actions/app';
 import CloseBtn from '../CloseBtn/CloseBtn';
 import MainBlock from '../MainBlock/MainBlock';
 import './Popup.scss';
+import chrome from '../../images/icons/chrome.svg' ;
 
 function Popup(props) {
   const dispatch = useDispatch();
@@ -38,7 +39,14 @@ function Popup(props) {
                 <a target="_blank" href={`https://net.ton.live/messages/messageDetails?id=${props.link}`} className="popup-link">View on ton.live</a>
               </>
             )}
-
+              {props.type === 'chrome' && (
+                  <>
+                      <img width={86} height={86} src={chrome} alt="Chrome logo"/>
+                      <p className="popup-title">Please use the desktop version of Google Chrome for <a className="popup-link">trade.defiswap.com</a></p>
+                      <button className="btn popup-btn" onClick={() => dispatch(hidePopup())}>Okay, i understand</button>
+                      <a target="_blank" href={`https://www.google.com/intl/en_us/chrome/`} className="popup-link">Download Google Chrome</a>
+                  </>
+              )}
             {props.type === 'error' && (
               <>
                 <svg width="87" height="86" viewBox="0 0 87 86" fill="none" xmlns="http://www.w3.org/2000/svg">

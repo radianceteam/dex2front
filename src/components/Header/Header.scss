@@ -32,13 +32,21 @@
     font-size: 20px;
     padding: 15px;
     margin-left: 30px;
+    :first-of-type {
+      margin-left: 0;
+    }
   }
 }
 
 @media screen and (max-width: 1025px) {
   .header {
     padding: 30px;
+    flex-direction: column;
 
+    &-wrap {
+      display: flex;
+      margin-bottom: 15px;
+    }
     &-btn {
       padding: 10px;
     }

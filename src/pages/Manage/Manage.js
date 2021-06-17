@@ -58,46 +58,25 @@ function Manage() {
 
 
       console.log("NUMMMM",Number(((balance.toFixed() * rangeValue) / 100) * 1000000000))
-      let returnStatus = await returnLiquidity(curExt, pairId, ((balance.toFixed() * rangeValue) / 100) * 1000000000);
+        let returnStatus = await returnLiquidity(curExt, pairId, ((balance.toFixed() * rangeValue) / 100) * 1000000000);
 
-    if(returnStatus.code) {
-      dispatch(setPoolAsyncIsWaiting(false))
-      switch (returnStatus.text) {
-    try {
-      let res = await returnLiquidity(curExt, pairId, ((balance.toFixed(2) * rangeValue) / 100 * 1000000000).toFixed(0));
-      if(!res.code) {
-        let olderLength = transactionsList.length;
-        let newLength = transactionsList.push({
-          type: "returnLiquidity",
-          fromValue: qtyA,
-          fromSymbol: fromToken.symbol,
-          toValue: qtyB,
-          toSymbol: toToken.symbol
-        })
-        let item = newLength - 1
-        console.log(olderLength, newLength, item, transactionsList[item], transactionsList.length);
-        localStorage.setItem("currentElement", item);
-        localStorage.setItem("lastType", "returnLiquidity");
-        if (transactionsList.length) await dispatch(setTransactionsList(transactionsList));
+          if(returnStatus.code) {
+            dispatch(setPoolAsyncIsWaiting(false))
+            switch (returnStatus.text) {
+              case 'Canceled by user.':
+                dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
+                break;
+              case 'Rejected by user':
+                dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
+                break;
+              default:
+                dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
+                break;
+            }
+          }
+          // dispatch(setManageAsyncIsWaiting(false));
+
       }
-
-    } catch(e) {
-      console.log(e);
-      switch (e.text) {
-        case 'Canceled by user.':
-          dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
-          break;
-        case 'Rejected by user':
-          dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
-          break;
-        default:
-          dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
-          break;
-      }
-    }
-      // dispatch(setManageAsyncIsWaiting(false));
-
-  }
 
   return(
     <div className="container">
