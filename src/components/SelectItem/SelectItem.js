@@ -10,13 +10,13 @@ import './SelectItem.scss';
 function getFullName(name){
   console.log("name",name)
   if(name === "TON"){
-    return "FreeTON Crystal"
+    return "TON Crystal"
   }else if(name === "fBTC"){
     return "Bitcoin"
   }else if(name === "WETH"){
-    return "Ether"
+    return "Ethereum"
   }else if(name === "fETH"){
-    return "Ether"
+    return "Ethereum"
   }else if(name === "WBTC"){
     return "Bitcoin"
   }else if(name === "DS-TON/USDT"){
@@ -26,7 +26,7 @@ function getFullName(name){
   }else if(name === "DS-TON/BTC"){
     return "Pool tokens of TON/BTC pair"
   }else if(name === "USDT"){
-    return "USDT Tether (erc-20)"
+    return "USDT Tether"
   }else{
     return "default tokens"
   }

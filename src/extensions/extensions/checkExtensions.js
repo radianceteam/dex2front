@@ -81,7 +81,7 @@ function getProvider() {
 async function broxus() {
 
     await ton.ensureInitialized();
-    const {accountInteraction} = await ton.api.requestPermissions({
+    const {accountInteraction} = await ton.requestPermissions({
         permissions: ['tonClient', 'accountInteraction']
     });
     if (accountInteraction == null) {
@@ -90,7 +90,7 @@ async function broxus() {
     let curExtenson = {};
 
     curExtenson.name = "broxus";
-    curExtenson.address = accountInteraction.address;
+    curExtenson.address = accountInteraction.address._address;
     curExtenson.pubkey = accountInteraction.publicKey;
     curExtenson.contract = (contractAbi, contractAddress) => {
         return new Contract(contractAbi, new AddressLiteral(contractAddress))

@@ -22,6 +22,7 @@ function AddLiquidity () {
 
   const fromValue = useSelector(state => state.poolReducer.fromInputValue);
   const toValue = useSelector(state => state.poolReducer.toInputValue);
+  const pairId = useSelector(state => state.poolReducer.pairId);
 
   const poolAsyncIsWaiting = useSelector(state => state.poolReducer.poolAsyncIsWaiting);
   const [poolConfirmPopupIsVisible, setPoolConfirmPopupIsVisible] = useState(false);
@@ -31,8 +32,86 @@ function AddLiquidity () {
 
   const [fromTokenSymbol, setFromTokenSymbol] = useState('');
   const [toTokenSymbol, setTotTokenSymbol] = useState('');
+  const [ratesData, setRatesData] = useState({});
+
+  function qtyOneForOther(amountIn, reserveIn, reserveOut) {
+    return Math.floor((amountIn *  reserveOut) / reserveIn);
+  }
+
+
+  function acceptForProvide(amountA, amountB, reserveA, reserveB) {
+
+    console.log("amountA, amountB, reserveA, reserveB",amountA, amountB, reserveA, reserveB)
+    let argA = qtyOneForOther(amountB, reserveB, reserveA);
+    let argB = qtyOneForOther(amountA, reserveA, reserveB);
+    let minAmountA = Math.min(amountA, argA);
+    let minAmountB = Math.min(amountB, argB);
+    let crmin = Math.min(reserveA, reserveB);
+    let crmax = Math.max(reserveA, reserveB);
+    let crquotient = ~~(crmax/crmin);
+    let crremainder = crmax%crmin;
+    let amountMin = Math.min(minAmountA,minAmountB);
+    let amountOther = amountMin * crquotient + (amountMin * crremainder) / crmin ;
+    let acceptForProvideA = minAmountA < minAmountB ? amountMin : amountOther;
+    let acceptForProvideB = minAmountB < minAmountA ? amountMin : amountOther;
+
+    console.log("Math.floor(acceptForProvideA), Math.floor(acceptForProvideB)",Math.floor(acceptForProvideA), Math.floor(acceptForProvideB))
+    return [Math.floor(acceptForProvideA), Math.floor(acceptForProvideB)];
+  }
+
+  function qtyForProvide(amountA, amountB, reserveA, reserveB) {
+    let argA = qtyOneForOther(amountB, reserveB, reserveA);
+    let argB = qtyOneForOther(amountA, reserveA, reserveB);
+    let min = 1;
+    let minAmountA = Math.min(amountA, argA);
+    let minAmountB = Math.min(amountB, argB);
+    let crmin = Math.min(reserveA, reserveB);
+    let crmax = Math.max(reserveA, reserveB);
+    let crquotient = ~~(crmax/crmin);
+    let crremainder = crmax%crmin;
+    let amountMin = Math.min(minAmountA,minAmountB)+1;
+    let amountOther = amountMin * crquotient + (amountMin * crremainder) / crmin ;
+    let acceptForProvideA = minAmountA < minAmountB ? amountMin : amountOther;
+    let acceptForProvideB = minAmountB < minAmountA ? amountMin : amountOther;
+    return [Math.floor(acceptForProvideA), Math.floor(acceptForProvideB)];
+  }
+
+
+  function getTotalLP (qtyA, qtyB, reserveA, reserveB,totalSupplyBefore) {
+
+console.log("qtyA, qtyB, reserveA, reserveB,totalSupplyBefore",qtyA, qtyB, reserveA, reserveB,totalSupplyBefore)
+    let qtyArr = qtyForProvide(qtyA, qtyB, reserveA, reserveB);
+    let provideArr = acceptForProvide(qtyArr[0], qtyArr[1], reserveA, reserveB);
+   let  expectLiquidityTokens = Math.min(Math.floor((provideArr[0] * totalSupplyBefore) / reserveA), Math.floor((provideArr[1] * totalSupplyBefore) / reserveB));
+   console.log("expectLiquidityTokens",expectLiquidityTokens)
+  return expectLiquidityTokens
+  }
+
 
   useEffect(() => {
+
+    if(!pairId){
+
+    }else{
+      let curPair = pairsList.filter(item=>item.pairAddress === pairId)
+
+      let totalSupply = curPair[0].totalSupply
+      let reservesA = curPair[0].reserveA
+      let reservesB = curPair[0].reservetB
+      let symbA = curPair[0].symbolA
+      let symbB = curPair[0].symbolB
+      console.log("curPair",curPair)
+      setRatesData({totalSupply:+totalSupply/1000000000,reservesA:+reservesA/1000000000,reservesB:+reservesB/1000000000,symbA:symbA,symbB:symbB})
+    }
+
+  }, [pairId]);
+
+
+
+  useEffect(() => {
+
+
+
     if(fromToken && toToken) {
       pairsList.forEach(i => {
         if(i.symbolA === fromToken.symbol && i.symbolB === toToken.symbol) {
@@ -54,6 +133,9 @@ function AddLiquidity () {
   }, [fromToken, toToken]);
 
   function handleConfirm() {
+
+
+
     if(fromToken.symbol && toToken.symbol && fromValue) {
       // if(fromValue > fromToken.balance ) {
       //   dispatch(showPopup({type: 'error', message: 'Excess of balance'}));
@@ -65,6 +147,11 @@ function AddLiquidity () {
     }
   }
 
+  function mixPercentValue(fromValue, totalSup){
+    let percOfTotal = ((fromValue*100)/(totalSup+fromValue)).toFixed(6)
+    console.log("totalSup",totalSup)
+    return +percOfTotal
+  }
   return (
     <div className="container">
       { !poolAsyncIsWaiting && (
@@ -97,20 +184,47 @@ function AddLiquidity () {
                 readOnly
               />
               { (fromToken.symbol && toToken.symbol) && (
+                  <div style={{"display":"flex", "flexDirection":"row","justifyContent":"space-evenly","marginLeft": "-50px", "marginRight": "-50px"}}>
+                    <div className="add-liquidity-wrapper">
+
+                      <div>
+                        <span>{(getTotalLP(fromValue*1000000000,toValue*1000000000,ratesData.reservesA*1000000000,ratesData.reservesB*1000000000, ratesData.totalSupply*1000000000)/1000000000).toFixed(4)}</span>
+                        You will receive LP tokens
+                      </div>
+
+
+                      <div>
+                        <span>{parseFloat(rateBA.toFixed(4))}</span>
+                        {fromTokenSymbol} per 1 {toTokenSymbol}
+                      </div>
+
+                      <div>
+                        <span>{parseFloat(rateAB.toFixed(4))}</span>
+                        {toTokenSymbol} per 1 {fromTokenSymbol}
+                      </div>
+
+
+                    </div>
+
                 <div className="add-liquidity-wrapper">
                   <div>
-                    <span>{parseFloat(rateBA.toFixed(4))}</span>
-                    {fromTokenSymbol} per 1 {toTokenSymbol}
+                    <span>{`${(mixPercentValue(fromValue, ratesData.totalSupply)).toFixed(4)} %`}</span>
+                    Your share of pool
                   </div>
                   <div>
-                    <span>{parseFloat(rateAB.toFixed(4))}</span>
-                    {toTokenSymbol} per 1 {fromTokenSymbol}
+                    <span>{parseFloat(ratesData.reservesA).toFixed(4)}</span>
+                    {toTokenSymbol} deposited
                   </div>
+
                   <div>
-                    <span>&lt;0.01%</span>
-                    Share of Pool
+                    <span>{parseFloat(ratesData.reservesB).toFixed(4)}</span>
+                    {fromTokenSymbol} deposited
                   </div>
                 </div>
+
+
+
+                  </div>
               )}
               { walletIsConnected ?
                 <button onClick={() => handleConfirm()} className={(fromToken.symbol && toToken.symbol && fromValue && toValue) ? "btn mainblock-btn" : "btn mainblock-btn btn--disabled"}>Supply</button> :
@@ -120,8 +234,8 @@ function AddLiquidity () {
           }
       />)}
 
-      { poolConfirmPopupIsVisible && 
-        <PoolConfirmPopup 
+      { poolConfirmPopupIsVisible &&
+        <PoolConfirmPopup
           hideConfirmPopup={setPoolConfirmPopupIsVisible.bind(this, false)}
           rateAB={rateAB}
           rateBA={rateBA}

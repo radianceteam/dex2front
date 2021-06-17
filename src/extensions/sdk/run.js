@@ -136,6 +136,7 @@ export async function createDEXclient(curExt, shardData) {
         )
 
         let checkDexClientExists =  await checkPubKey(pubkey);
+        console.log("checkDexClientExists",checkDexClientExists)
         while(!checkDexClientExists.status){
             checkDexClientExists =  await checkPubKey(pubkey);
         }
@@ -155,7 +156,7 @@ export async function createDEXclient(curExt, shardData) {
 
 export async function transfer(SendTransfer,addressTo,amount) {
     try {
-        const transfer = await SendTransfer(addressTo,amount)
+        const transfer = await SendTransfer(addressTo,amount.toString())
         return transfer
     } catch(e) {
         console.log("e",e)
@@ -259,11 +260,13 @@ export async function returnLiquidity(curExt,pairAddr, tokens) {
  */
 
 export async function processLiquidity(curExt,pairAddr, qtyA, qtyB) {
+
+    console.log("qtyA",qtyA,"qtyB",qtyB)
     // let curExt = {};
     // await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
     const {pubkey, contract, SendTransfer, callMethod} = curExt._extLib
     let getClientAddressFromRoot = await checkPubKey(pubkey)
-    console.log("getClientAddressFromRoot",getClientAddressFromRoot)
+
     if(getClientAddressFromRoot.status === false){
         return getClientAddressFromRoot
     }
@@ -281,6 +284,7 @@ export async function processLiquidity(curExt,pairAddr, qtyA, qtyB) {
         console.log("catch E processLiquidity", e);
         return e
     }
+
 }
 
 /**
@@ -291,7 +295,7 @@ export async function processLiquidity(curExt,pairAddr, qtyA, qtyB) {
  */
 
 export async function connectToPair(curExt,pairAddr) {
-    console.log("pairAddr",pairAddr,"curExt",curExt)
+    // console.log("pairAddr",pairAddr,"curExt",curExt)
     const {contract,callMethod,runMethod,pubkey,SendTransfer} = curExt._extLib
     let getClientAddressFromRoot = await checkPubKey(pubkey)
     if(getClientAddressFromRoot.status === false){
@@ -302,10 +306,22 @@ export async function connectToPair(curExt,pairAddr) {
     if(6000000000 > (checkClientBalance*1000000000)){
         await transfer(SendTransfer,getClientAddressFromRoot.dexclient,8000000000)
     }
+    console.log(1,1)
     try {
+        console.log(1, 2)
         const clientContract = await contract(DEXclientContract.abi, getClientAddressFromRoot.dexclient);
+        console.log(1, getClientAddressFromRoot.dexclient)
         await callMethod("connectPair", {pairAddr: pairAddr}, clientContract)
-        return await getClientForConnect({pairAddr: pairAddr, runMethod:runMethod,callMethod:callMethod,contract:contract,clientAddress:getClientAddressFromRoot.dexclient,clientContract:clientContract})
+        console.log("pairAddr", pairAddr, "curExt._extLib", curExt._extLib, "getClientAddressFromRoot.dexclient", getClientAddressFromRoot.dexclient)
+        return await getClientForConnect({
+            pairAddr: pairAddr,
+            runMethod: runMethod,
+            callMethod: callMethod,
+            contract: contract,
+            clientAddress: getClientAddressFromRoot.dexclient,
+            clientContract: clientContract
+        })
+
     } catch (e) {
         return e
     }
@@ -313,9 +329,13 @@ export async function connectToPair(curExt,pairAddr) {
 
 export async function getClientForConnect(data) {
     const {pairAddr, clientAddress, contract, runMethod, callMethod,clientContract} = data
+
+    console.log("data",data)
     try {
         let soUINT = await runMethod("soUINT", {}, clientContract)
+        console.log("soUINT",soUINT)
         let pairs = await runMethod("pairs", {}, clientContract)
+        console.log("pairs",pairs)
         let clientRoots = await runMethod("getAllDataPreparation", {}, clientContract)
         let curPair = null
         while (!curPair){

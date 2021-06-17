@@ -6,6 +6,7 @@ import { showPopup } from '../../store/actions/app';
 import { iconGenerator } from '../../iconGenerator';
 import MainBlock from '../MainBlock/MainBlock';
 import CloseBtn from '../CloseBtn/CloseBtn';
+import {setSwapAsyncIsWaiting} from "../../store/actions/swap";
 
 function PoolConfirmPopup(props) {
   const dispatch = useDispatch();
@@ -24,23 +25,27 @@ function PoolConfirmPopup(props) {
     dispatch(setPoolAsyncIsWaiting(true));
     props.hideConfirmPopup();
 
-    try {
-      await processLiquidity(curExt, pairId, fromValue * 1000000000, toValue * 1000000000);
-    } catch(e) {
-      console.log(e);
-      switch (e.text) {
-        case 'Canceled by user.':
-          dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
-          break;
-        case 'Rejected by user':
-          dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
-          break;
-        default:
-          dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
-          break;
-      }
-      dispatch(setPoolAsyncIsWaiting(false));
-    }
+      let poolStatus = await processLiquidity(curExt, pairId, fromValue * 1000000000, toValue * 1000000000);
+      console.log("poolStatus",poolStatus)
+
+     if(poolStatus.code){
+       dispatch(setPoolAsyncIsWaiting(false))
+       switch (poolStatus.text) {
+
+         case 'Canceled by user.':
+           dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
+           break;
+         case 'Rejected by user':
+           dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
+           break;
+         default:
+           dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
+           break;
+
+       }
+     }
+    // dispatch(setPoolAsyncIsWaiting(false))
+
   }
 
   return (

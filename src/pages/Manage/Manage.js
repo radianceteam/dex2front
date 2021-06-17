@@ -11,6 +11,7 @@ import MainBlock from '../../components/MainBlock/MainBlock';
 import ManageConfirmPopup from '../../components/ManageConfirmPopup/ManageConfirmPopup';
 import WaitingPopup from '../../components/WaitingPopup/WaitingPopup';
 import './Manage.scss';
+import {setPoolAsyncIsWaiting} from "../../store/actions/pool";
 
 function Manage() {
   const dispatch = useDispatch();
@@ -52,12 +53,13 @@ function Manage() {
   const handleRemove = async () => {
     dispatch(setManageAsyncIsWaiting(true));
 
-    try {
+
       console.log("NUMMMM",Number(((balance.toFixed() * rangeValue) / 100) * 1000000000))
-      await returnLiquidity(curExt, pairId, ((balance.toFixed() * rangeValue) / 100) * 1000000000);
-    } catch(e) {
-      console.log(e);
-      switch (e.text) {
+      let returnStatus = await returnLiquidity(curExt, pairId, ((balance.toFixed() * rangeValue) / 100) * 1000000000);
+
+    if(returnStatus.code) {
+      dispatch(setPoolAsyncIsWaiting(false))
+      switch (returnStatus.text) {
         case 'Canceled by user.':
           dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
           break;
@@ -68,8 +70,9 @@ function Manage() {
           dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
           break;
       }
-      dispatch(setManageAsyncIsWaiting(false));
     }
+      // dispatch(setManageAsyncIsWaiting(false));
+
   }
 
   return(

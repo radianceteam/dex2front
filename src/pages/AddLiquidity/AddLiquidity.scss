@@ -4,10 +4,12 @@
     justify-content: space-between;
     color: var(--popup-title-color);
     margin-top: 40px;
+    flex-direction: column;
 
     div {
       display: flex;
       flex-direction: column;
+      margin: 10px;
     }
 
     span {
@@ -40,7 +42,7 @@
     div {
       text-align: center;
       margin-top: 20px;
-      
+
       &:first-of-type {
         margin-top: 0;
       }
