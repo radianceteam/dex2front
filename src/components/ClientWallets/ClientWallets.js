@@ -34,7 +34,7 @@ function ClientWallets(props) {
             lp: true
         })
     })
-    console.log(LPTokenList);
+    //console.log(LPTokenList);
 
 
     function handleClose() {

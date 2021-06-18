@@ -29,7 +29,6 @@ function PoolConfirmPopup(props) {
     props.hideConfirmPopup();
 
       let poolStatus = await processLiquidity(curExt, pairId, fromValue * 1000000000, toValue * 1000000000);
-      console.log("poolStatus",poolStatus)
 
      if(poolStatus.code){
        dispatch(setPoolAsyncIsWaiting(false))
@@ -50,7 +49,6 @@ function PoolConfirmPopup(props) {
     // dispatch(setPoolAsyncIsWaiting(false))
 
     try {
-      console.log(fromValue, toValue)
       await processLiquidity(curExt, pairId, fromValue * 1000000000, toValue * 1000000000);
       let olderLength = transactionsList.length;
       let newLength = transactionsList.push({
@@ -61,7 +59,6 @@ function PoolConfirmPopup(props) {
         toSymbol: toToken.symbol
       })
       let item = newLength - 1
-      console.log(olderLength, newLength, item, transactionsList[item], transactionsList.length);
       localStorage.setItem("currentElement", item);
       localStorage.setItem("lastType", "swap");
       if (transactionsList.length) await dispatch(setTransactionsList(transactionsList));

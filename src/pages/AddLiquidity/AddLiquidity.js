@@ -42,7 +42,7 @@ function AddLiquidity () {
 
   function acceptForProvide(amountA, amountB, reserveA, reserveB) {
 
-    console.log("amountA, amountB, reserveA, reserveB",amountA, amountB, reserveA, reserveB)
+
     let argA = qtyOneForOther(amountB, reserveB, reserveA);
     let argB = qtyOneForOther(amountA, reserveA, reserveB);
     let minAmountA = Math.min(amountA, argA);
@@ -56,7 +56,6 @@ function AddLiquidity () {
     let acceptForProvideA = minAmountA < minAmountB ? amountMin : amountOther;
     let acceptForProvideB = minAmountB < minAmountA ? amountMin : amountOther;
 
-    console.log("Math.floor(acceptForProvideA), Math.floor(acceptForProvideB)",Math.floor(acceptForProvideA), Math.floor(acceptForProvideB))
     return [Math.floor(acceptForProvideA), Math.floor(acceptForProvideB)];
   }
 
@@ -80,11 +79,11 @@ function AddLiquidity () {
 
   function getTotalLP (qtyA, qtyB, reserveA, reserveB,totalSupplyBefore) {
 
-console.log("qtyA, qtyB, reserveA, reserveB,totalSupplyBefore",qtyA, qtyB, reserveA, reserveB,totalSupplyBefore)
+//console.log("qtyA, qtyB, reserveA, reserveB,totalSupplyBefore",qtyA, qtyB, reserveA, reserveB,totalSupplyBefore)
     let qtyArr = qtyForProvide(qtyA, qtyB, reserveA, reserveB);
     let provideArr = acceptForProvide(qtyArr[0], qtyArr[1], reserveA, reserveB);
    let  expectLiquidityTokens = Math.min(Math.floor((provideArr[0] * totalSupplyBefore) / reserveA), Math.floor((provideArr[1] * totalSupplyBefore) / reserveB));
-   console.log("expectLiquidityTokens",expectLiquidityTokens)
+   //console.log("expectLiquidityTokens",expectLiquidityTokens)
   return expectLiquidityTokens
   }
 
@@ -101,7 +100,7 @@ console.log("qtyA, qtyB, reserveA, reserveB,totalSupplyBefore",qtyA, qtyB, reser
       let reservesB = curPair[0].reservetB
       let symbA = curPair[0].symbolA
       let symbB = curPair[0].symbolB
-      console.log("curPair",curPair)
+      //console.log("curPair",curPair)
       setRatesData({totalSupply:+totalSupply/1000000000,reservesA:+reservesA/1000000000,reservesB:+reservesB/1000000000,symbA:symbA,symbB:symbB})
     }
 
@@ -150,7 +149,7 @@ console.log("qtyA, qtyB, reserveA, reserveB,totalSupplyBefore",qtyA, qtyB, reser
 
   function mixPercentValue(fromValue, totalSup){
     let percOfTotal = ((fromValue*100)/(totalSup+fromValue)).toFixed(6)
-    console.log("totalSup",totalSup)
+    //console.log("totalSup",totalSup)
     return +percOfTotal
   }
   return (

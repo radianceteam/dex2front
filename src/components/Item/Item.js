@@ -4,7 +4,6 @@ import { iconGenerator } from '../../iconGenerator';
 import './Item.scss';
 
 function getFullName(name){
-  console.log("name",name)
   if(name === "TON"){
     return "TON Crystal"
   }else if(name === "fBTC"){

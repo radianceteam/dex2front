@@ -39,7 +39,7 @@ function Input(props) {
 
   const swapRate = useSelector(state => state.swapReducer.rate);
   const poolRate = useSelector(state => state.poolReducer.rate);
-  console.log(pairsList, swapRate, poolRate, poolFromToken, poolToToken, poolFromValue, swapFromValue, swapFromToken, poolToValue, swapToValue);
+  //console.log(pairsList, swapRate, poolRate, poolFromToken, poolToToken, poolFromValue, swapFromValue, swapFromToken, poolToValue, swapToValue);
   const [value, setValue] = useState(props.value);
 
   useEffect(async () => {
@@ -91,7 +91,7 @@ function Input(props) {
   function changeValue() {
     if(location.pathname.includes('swap')) {
       if(props.type === 'from') {
-        if(value > props.token.balance) {
+        if(props.token.balance && value > props.token.balance) {
           dispatch(setSwapFromInputValue(Number(props.token.balance).toFixed(4)));
           dispatch(setSwapToInputValue(parseFloat((Number(props.token.balance) * swapRate).toFixed(4))));
         }

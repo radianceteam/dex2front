@@ -25,12 +25,10 @@ function ConnectWallet() {
 
     useEffect(async () => {
         let pubKey = await checkPubKey(curExt._extLib.pubkey);
-        console.log(pubKey);
         if(!pubKey.status) {
             try {
                 let tranferToDex = await transfer(curExt._extLib.SendTransfer,Radiance.networks['2'].dexroot,10000000000)
                 let dexCLientStatus = await setCreator(curExt);
-                console.log("dexCLientStatus",dexCLientStatus)
             } catch (err) {
                 console.log(err);
                 dispatch(closeConnecting());
@@ -39,13 +37,10 @@ function ConnectWallet() {
         }
         pubKey = await checkPubKey(curExt._extLib.pubkey);
         try {
-
-
             let msgiAddress = curExt._extLib.address;
             let msigBalance = await getClientBalance(msgiAddress);
 
             let tokenList = await getAllClientWallets(pubKey.dexclient);
-            console.log("tokenList",tokenList)
             let liquidityList = [];
 
             if(tokenList.length) {
@@ -65,12 +60,12 @@ function ConnectWallet() {
                 localStorage.setItem('tokenList', JSON.stringify(tokenList));
                 localStorage.setItem('liquidityList', JSON.stringify(liquidityList));
             }
-
+            const clientBalance = await getClientBalance(pubKey.dexclient);
             dispatch(setPubKey(pubKey));
-            dispatch(setWallet({id: msgiAddress, balance: msigBalance}));
+            dispatch(setWallet({id: pubKey.dexclient, balance: clientBalance}));
 
             localStorage.setItem('pubKey', JSON.stringify(pubKey));
-            localStorage.setItem('wallet', JSON.stringify({id: msgiAddress, balance: msigBalance}));
+            localStorage.setItem('wallet', JSON.stringify({id: pubKey.dexclient, balance: clientBalance}));
             tokenList.forEach(i => {
                 if(swapFromToken.symbol === i.symbol) {
                     swapFromToken.balance = i.balance;

@@ -39,12 +39,10 @@ function ExtensionsList() {
     extensionsList.forEach(async i => {
       if(i.name === name) {
         if(i.available) {
-          console.log("extensionsList",extensionsList)
           let curExt = await getCurrentExtension(name);
           dispatch(setCurExt(curExt));
           dispatch(connectWallet());
         } else {
-          console.log("should be here",extensionsList)
           dispatch(showPopup({type: 'extension', message: i.name, link: i.link}));
         }
       }
