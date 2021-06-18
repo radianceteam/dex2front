@@ -42,7 +42,7 @@ function Popup(props) {
               {props.type === 'chrome' && (
                   <>
                       <img width={86} height={86} src={chrome} alt="Chrome logo"/>
-                      <p className="popup-title">Please use the desktop version of Google Chrome for <a className="popup-link">trade.defiswap.com</a></p>
+                      <p className="popup-title">Please use the desktop version of Google Chrome for <a className="popup-link">trade.defispace.com</a></p>
                       <button className="btn popup-btn" onClick={() => dispatch(hidePopup())}>Okay, i understand</button>
                       <a target="_blank" href={`https://www.google.com/intl/en_us/chrome/`} className="popup-link">Download Google Chrome</a>
                   </>
