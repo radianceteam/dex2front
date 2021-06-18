@@ -35,15 +35,14 @@ function App() {
   const subscribeData = useSelector(state => state.walletReducer.subscribeData);
   const curExt = useSelector(state => state.appReducer.curExt);
 
+  const chrome = localStorage.getItem("chrome");
+  if(chrome === null) showChromePopup();
+  else if(chrome === "false") showChromePopup();
 
-  const mediaMatch = window.matchMedia('(min-width: 768px)');
-  const [matches, setMatches] = useState(mediaMatch.matches);
-
-  useEffect(() => {
-    const handler = e => setMatches(e.matches);
-    mediaMatch.addListener(handler);
-    return () => mediaMatch.removeListener(handler);
-  });
+  function showChromePopup() {
+    dispatch(showPopup({type: 'chrome'}));
+    localStorage.setItem("chrome", "true");
+  }
 
   useEffect(async () => {
     const theme = localStorage.getItem('appTheme') === null ? 'light' : localStorage.getItem('appTheme');
@@ -51,15 +50,10 @@ function App() {
 
     const extensionsList = await checkExtensions();
 
-    console.log("1",2)
     dispatch(setExtensionsList(extensionsList));
-    console.log("1",3)
 
     const curExtname = localStorage.getItem('extName') === null ? {} : localStorage.getItem('extName');
-    //
-    // console.log("1",curExtname)
     let curExtt = await getCurrentExtension(curExtname)
-    // console.log("1",5)
     dispatch(setCurExt(curExtt));
 
     const wallet = localStorage.getItem('wallet') === null ? {} : JSON.parse(localStorage.getItem('wallet'));
@@ -68,25 +62,21 @@ function App() {
       dispatch(setWalletIsConnected(true));
     }
     const pairs = await getAllPairsWoithoutProvider();
-    console.log("pairs",pairs)
     dispatch(setPairsList(pairs));
 
     const pubKey = localStorage.getItem('pubKey') === null ? {} : JSON.parse(localStorage.getItem('pubKey'));
 
-    console.log("1",6)
     if(pubKey.status) dispatch(setPubKey(pubKey));
 
     // const tokenList = getAllClientWallets(pubKey.address)
 
     // const tokenList = localStorage.getItem('tokenList') === null ? tokenList : JSON.parse(localStorage.getItem('tokenList'));
-    console.log("pubKey.address",pubKey)
 
 
     let tokenList = await getAllClientWallets(pubKey.dexclient);
     let liquidityList = [];
     // console.log('token list',tokenList,"pubKey.address",pubKey.address);
     if(tokenList.length) {
-      console.log('token list');
       tokenList.forEach(async item => await subscribe(item.walletAddress));
 
       liquidityList = tokenList.filter(i => i.symbol.includes('/'));
@@ -119,21 +109,15 @@ function App() {
 
   useEffect(async () => {
     if(subscribeData.dst) {
-      const clientBalance = await getClientBalance(pubKey.address);
+      const clientBalance = await getClientBalance(pubKey.dexclient);
 
       let item = localStorage.getItem("currentElement");
       if(transactionsList[item]) transactionsList[item].toValue = subscribeData.amountOfTokens / 1e9;
       if (transactionsList.length) dispatch(setTransactionsList(transactionsList));
-      let msgiAddress = curExt._extLib.address;
-      let msigBalance = await getClientBalance(msgiAddress);
-      dispatch(setWallet({id: msgiAddress, balance: msigBalance}));
-
-
+      dispatch(setWallet({id: pubKey.dexclient, balance: clientBalance}));
       let tokenList = await getAllClientWallets(pubKey.address);
       let liquidityList = [];
-      console.log('token list',tokenList,"pubKey.address",pubKey.address);
       if(tokenList.length) {
-        console.log('token list');
         tokenList.forEach(async item => await subscribe(item.walletAddress));
 
         liquidityList = tokenList.filter(i => i.symbol.includes('/'));
@@ -201,11 +185,7 @@ function App() {
 
   return (
     <>
-      {!matches && <div className="mobileBlock">
-        <p className="account-body-title" style={{"marginTop": "50px"}}>
-          Oops, soon we will support mobile wallets, wait for updates
-        </p>
-      </div>}
+
       <Header />
       <Switch location={location}>
         <Route path="/account" component={Account} />

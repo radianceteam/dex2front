@@ -22,6 +22,7 @@ function Wallet() {
     // }
 
     history.push('/account');
+
   }
 
   return (
