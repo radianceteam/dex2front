@@ -76,7 +76,7 @@ function SwapConfirmPopup(props) {
         dispatch(setSwapAsyncIsWaiting(false));
         pairIsConnected = true;
       } catch(e) {
-        dispatch(showPopup({type: 'error', message: '222Oops, something went wrong. Please try again.'}));
+        dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
       }
     }
 
