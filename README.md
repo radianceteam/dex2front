@@ -26,7 +26,7 @@ Globally allows dex client to connect to pair including sharding optimization of
 
 ## API methods
 
-###getCurrentExtension()
+### getCurrentExtension()
 Returns object with unified current extension main methods
 
 ```
@@ -93,7 +93,7 @@ async function extraton() {
     return curExtenson
 }
 ```
-###setCreator()
+### setCreator()
 Function to deploy dex client - it is performed in several stages:
 
 + first step - check client exists on dex root as creator(need to send few tons as pay for register your pubkey on dex root)
@@ -103,7 +103,7 @@ Function to deploy dex client - it is performed in several stages:
 
 Dex client will be deployes in few seconds.
 
-###connectToPair()
+### connectToPair()
 
 Function to connect to dex pair - it is performed in several stages:
 
@@ -111,7 +111,7 @@ Function to connect to dex pair - it is performed in several stages:
 + second step - get shard arg for all wallets that need to deploy - depends on pair token roots
 + last step - deploy wallets that client does not have
 
-###swapA()/swapB()
+### swapA()/swapB()
 Allows user to use processSwapA/processSwapB call method on dex client smart contract
 ```
 export async function swapA(curExt,pairAddr, qtyA) {
@@ -133,7 +133,7 @@ export async function swapA(curExt,pairAddr, qtyA) {
     }
 }
 ```
-###processLiquidity()
+### processLiquidity()
 Push liquidity to pair, it turns out LP tokens for some amount of qtyA & qtyB tokens
 ```
 
@@ -156,7 +156,7 @@ export async function processLiquidity(curExt,pairAddr, qtyA, qtyB) {
     }
 }
 ```
-###returnLiquidity()
+### returnLiquidity()
 Return liquidity from pair, it turns out tokens of pair for LP tokens or pair
 ```
 export async function returnLiquidity(curExt,pairAddr, tokens) {
