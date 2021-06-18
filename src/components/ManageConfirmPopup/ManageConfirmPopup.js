@@ -16,11 +16,9 @@ function ManageConfirmPopup(props) {
   const balance = useSelector(state => state.manageReducer.balance);
   const pairId = useSelector(state => state.manageReducer.pairId);
   const pairS = useSelector(state => state.walletReducer.pairsList);
-  console.log("curPair",pairS,"pairId",pairId)
   let curPair = pairS.filter(item=>item.pairAddress === pairId)
 
   let poolShare = (balance*100)/(curPair[0].totalSupply/1000000000)
-console.log("poolShare",poolShare,"curPair[0].totalSupply",curPair[0].totalSupply)
   let pooledTokensA = (curPair[0].reserveA/1000000000)*poolShare
   let pooledTokensB = (curPair[0].reservetB/1000000000)*poolShare
   const handleSupplyClick = () => {

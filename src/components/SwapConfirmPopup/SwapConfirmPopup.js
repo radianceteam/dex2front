@@ -37,20 +37,16 @@ function SwapConfirmPopup(props) {
     props.hideConfirmPopup();
 
     let pairIsConnected = await checkClientPairExists(pubKey.address, pairId);
-    console.log("pairIsConnected",pairIsConnected)
     if(!pairIsConnected) {
       try {
         let connectRes = await connectToPair(curExt, pairId);
-        console.log("connectRes",connectRes,"pubKey",pubKey);
         let tokenList = await getAllClientWallets(pubKey.address);
         let countT = tokenList.length
         let y = 0
-        console.log("tokenList",tokenList);
         while(tokenList.length < countT){
 
           tokenList = await getAllClientWallets(pubKey.address);
           y++
-          console.log("tokenList.length",tokenList.length,"connectRes.amountOfWallets",connectRes.amountOfWallets,"tokenList",countT)
           if(y>500){
             dispatch(showPopup({type: 'error', message: 'Oops, too much time for deploying. Please connect your wallet again.'}));
           }
@@ -62,7 +58,6 @@ function SwapConfirmPopup(props) {
         let liquidityList = [];
 
         if(tokenList.length) {
-          console.log('token list');
           tokenList.forEach(async item => await subscribe(item.walletAddress));
 
           liquidityList = tokenList.filter(i => i.symbol.includes('/'));
@@ -81,7 +76,7 @@ function SwapConfirmPopup(props) {
         dispatch(setSwapAsyncIsWaiting(false));
         pairIsConnected = true;
       } catch(e) {
-        dispatch(showPopup({type: 'error', message: '222Oops, something went wrong. Please try again.'}));
+        dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
       }
     }
 
@@ -90,7 +85,14 @@ function SwapConfirmPopup(props) {
         await pairsList.forEach(async i => {
           if(fromToken.symbol === i.symbolA && toToken.symbol === i.symbolB) {
             let res = await swapA(curExt, pairId, fromValue * 1000000000);
-
+            if(res.code) {
+              if(res.code === 1000) {
+                dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
+              }
+              else {
+                dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
+              }
+            }
             if(!res.code) {
               let olderLength = transactionsList.length;
               let newLength = transactionsList.push({
@@ -101,14 +103,24 @@ function SwapConfirmPopup(props) {
                 toSymbol: toToken.symbol
               })
               let item = newLength - 1
-              console.log(olderLength, newLength, item, transactionsList[item], transactionsList.length);
               localStorage.setItem("currentElement", item);
+              localStorage.setItem("lastType", "swap");
               if (transactionsList.length) await dispatch(setTransactionsList(transactionsList));
             }else{
               dispatch(setSwapAsyncIsWaiting(false))
             }
           } else if(fromToken.symbol === i.symbolB && toToken.symbol === i.symbolA) {
             let res = await swapB(curExt, pairId, fromValue * 1000000000);
+            if(res.code) {
+              if(res.code === 1000) {
+                dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
+                dispatch(setSwapAsyncIsWaiting(false));
+              }
+              else {
+                dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
+                dispatch(setSwapAsyncIsWaiting(false));
+              }
+            }
             if(!res.code) {
               let olderLength = transactionsList.length;
               let newLength = transactionsList.push({
@@ -120,6 +132,7 @@ function SwapConfirmPopup(props) {
               })
               let item = (newLength - olderLength) - 1
               localStorage.setItem("currentElement", item);
+              localStorage.setItem("lastType", "swap");
               if (transactionsList.length) await dispatch(setTransactionsList(transactionsList));
             }else{
               dispatch(setSwapAsyncIsWaiting(false))

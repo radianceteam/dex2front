@@ -39,7 +39,7 @@ function Input(props) {
 
   const swapRate = useSelector(state => state.swapReducer.rate);
   const poolRate = useSelector(state => state.poolReducer.rate);
-  console.log(pairsList, swapRate, poolRate, poolFromToken, poolToToken, poolFromValue, swapFromValue, swapFromToken, poolToValue, swapToValue);
+  //console.log(pairsList, swapRate, poolRate, poolFromToken, poolToToken, poolFromValue, swapFromValue, swapFromToken, poolToValue, swapToValue);
   const [value, setValue] = useState(props.value);
 
   useEffect(async () => {
@@ -91,8 +91,15 @@ function Input(props) {
   function changeValue() {
     if(location.pathname.includes('swap')) {
       if(props.type === 'from') {
-        dispatch(setSwapFromInputValue(value));
-        dispatch(setSwapToInputValue(parseFloat((value * swapRate).toFixed(4))));
+        if(props.token.balance && value > props.token.balance) {
+          dispatch(setSwapFromInputValue(Number(props.token.balance).toFixed(4)));
+          dispatch(setSwapToInputValue(parseFloat((Number(props.token.balance) * swapRate).toFixed(4))));
+        }
+        else  {
+          dispatch(setSwapFromInputValue(value));
+          dispatch(setSwapToInputValue(parseFloat((value * swapRate).toFixed(4))));
+        }
+
       // } else if(props.type === 'to') {
         // dispatch(setSwapToInputValue(value));
         // dispatch(setSwapFromInputValue(parseFloat((value / swapRate).toFixed(4))));
@@ -124,6 +131,7 @@ function Input(props) {
             onChange={event => setValue(+event.target.value)}
             onKeyPress={event => handleKeyPress(event)}
             min="0"
+            autoFocus={props.autoFocus || false}
             placeholder="0"
             readOnly={props.readOnly}
           />
@@ -137,7 +145,7 @@ function Input(props) {
             </button>
           ) : (
             <>
-              { (walletIsConnected && props.type === 'from') && <button className="input-max" onClick={() => setValue(props.token.balance)}>MAX</button> }
+              { (walletIsConnected && props.type === 'from') && <button className="input-max" onClick={() => setValue(parseFloat(props.token.balance).toFixed(4))}>MAX</button> }
               <button className="input-select" onClick={() => handleClick()}>
                 <img src={iconGenerator(props.token.symbol)} alt={props.token.symbol} className="input-token-img"/>
                 <span>{props.token && props.token.symbol}</span>
