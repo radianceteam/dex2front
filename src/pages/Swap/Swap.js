@@ -72,7 +72,6 @@ function Swap () {
                 type={'from'}
                 text={'From'}
                 token={fromToken}
-                autoFocus={true}
                 value={fromValue}
               />
               <SwapBtn
@@ -104,4 +103,4 @@ function Swap () {
   )
 }
 
-export default Swap
+export default Swap;

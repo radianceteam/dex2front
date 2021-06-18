@@ -7,7 +7,6 @@ import { iconGenerator } from '../../iconGenerator';
 import MainBlock from '../MainBlock/MainBlock';
 import CloseBtn from '../CloseBtn/CloseBtn';
 import {setSwapAsyncIsWaiting} from "../../store/actions/swap";
-import {setTransactionsList} from "../../store/actions/wallet";
 
 function PoolConfirmPopup(props) {
   const dispatch = useDispatch();
@@ -16,8 +15,6 @@ function PoolConfirmPopup(props) {
 
   const fromToken = useSelector(state => state.poolReducer.fromToken);
   const toToken = useSelector(state => state.poolReducer.toToken);
-
-  const transactionsList = useSelector(state => state.walletReducer.transactionsList);
 
   const fromValue = useSelector(state => state.poolReducer.fromInputValue);
   const toValue = useSelector(state => state.poolReducer.toInputValue);
@@ -29,6 +26,7 @@ function PoolConfirmPopup(props) {
     props.hideConfirmPopup();
 
       let poolStatus = await processLiquidity(curExt, pairId, fromValue * 1000000000, toValue * 1000000000);
+      console.log("poolStatus",poolStatus)
 
      if(poolStatus.code){
        dispatch(setPoolAsyncIsWaiting(false))
@@ -48,35 +46,6 @@ function PoolConfirmPopup(props) {
      }
     // dispatch(setPoolAsyncIsWaiting(false))
 
-    try {
-      await processLiquidity(curExt, pairId, fromValue * 1000000000, toValue * 1000000000);
-      let olderLength = transactionsList.length;
-      let newLength = transactionsList.push({
-        type: "processLiquidity",
-        fromValue: fromValue,
-        fromSymbol: fromToken.symbol,
-        toValue: toValue * 1000000000,
-        toSymbol: toToken.symbol
-      })
-      let item = newLength - 1
-      localStorage.setItem("currentElement", item);
-      localStorage.setItem("lastType", "swap");
-      if (transactionsList.length) await dispatch(setTransactionsList(transactionsList));
-    } catch(e) {
-      console.log(e);
-      switch (e.text) {
-        case 'Canceled by user.':
-          dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
-          break;
-        case 'Rejected by user':
-          dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
-          break;
-        default:
-          dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
-          break;
-      }
-      dispatch(setPoolAsyncIsWaiting(false));
-    }
   }
 
   return (
@@ -95,48 +64,48 @@ function PoolConfirmPopup(props) {
               <span className="confirm-value">~{props.lpAmount}</span>
               <img className="confirm-icon" src={iconGenerator(fromToken.symbol)} alt={fromToken.symbol}/>
               <img className="confirm-icon" src={iconGenerator(toToken.symbol)} alt={toToken.symbol}/>
-              <span className="confirm-token">{fromToken.symbol}/{toToken.symbol}</span>
+              <span className="confirm-token">{fromToken.symbol}/{toToken.symbol} Pool Tokens</span>
             </div>
-            <p className="confirm-text">Output is estimated. If the price changes by more than 0.5% your transaction will revert</p>
+            <p className="confirm-text">Outpoot is estimated. If the price changes by more than 0.5% your transaction will revert</p>
             <button className="btn popup-btn" onClick={() => handleSuply()}>Confirm Supply</button>
           </>
         }
-        footer={
-          <div className="mainblock-footer">
-            <div className="mainblock-footer-wrap">
-              <div>
-                <div  className="pool-confirm-wrap">
-                  <p className="mainblock-footer-value">{fromValue}</p>
-                  <p className="mainblock-footer-subtitle">{fromToken.symbol} deposited</p>
-                </div>
-                <div>
-                  <p className="mainblock-footer-value">{parseFloat(props.rateBA.toFixed(4))}</p>
-                  <p className="mainblock-footer-subtitle">{fromToken.symbol} per {toToken.symbol}</p>
-                </div>
-              </div>
-              <div>
-                <div  className="pool-confirm-wrap">
-                  <p className="mainblock-footer-value">{toValue}</p>
-                  <p className="mainblock-footer-subtitle">{toToken.symbol} deposited</p>
-                </div>
-                <div>
-                  <p className="mainblock-footer-value">{parseFloat(props.rateAB.toFixed(4))}</p>
-                  <p className="mainblock-footer-subtitle">{toToken.symbol} per {fromToken.symbol}</p>
-                </div>
-              </div>
-              <div>
-                <div  className="pool-confirm-wrap">
-                  <p className="mainblock-footer-value">999785</p>
-                  <p className="mainblock-footer-subtitle">Rates</p>
-                </div>
-                <div>
-                  <p className="mainblock-footer-value">&lt;0.01%</p>
-                  <p className="mainblock-footer-subtitle">Share of Pool</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        }
+        // footer={
+        //   <div className="mainblock-footer">
+        //     <div className="mainblock-footer-wrap">
+        //       <div>
+        //         <div  className="pool-confirm-wrap">
+        //           <p className="mainblock-footer-value">0.0001</p>
+        //           <p className="mainblock-footer-subtitle">{fromToken.symbol} deposited</p>
+        //         </div>
+        //         <div>
+        //           <p className="mainblock-footer-value">{parseFloat(props.rateBA.toFixed(4))}</p>
+        //           <p className="mainblock-footer-subtitle">{fromToken.symbol} per {toToken.symbol}</p>
+        //         </div>
+        //       </div>
+        //       <div>
+        //         <div  className="pool-confirm-wrap">
+        //           <p className="mainblock-footer-value">10000003</p>
+        //           <p className="mainblock-footer-subtitle">{toToken.symbol} deposited</p>
+        //         </div>
+        //         <div>
+        //           <p className="mainblock-footer-value">{parseFloat(props.rateAB.toFixed(4))}</p>
+        //           <p className="mainblock-footer-subtitle">{toToken.symbol} per {fromToken.symbol}</p>
+        //         </div>
+        //       </div>
+        //       <div>
+        //         <div  className="pool-confirm-wrap">
+        //           <p className="mainblock-footer-value">999785</p>
+        //           <p className="mainblock-footer-subtitle">Rates</p>
+        //         </div>
+        //         <div>
+        //           <p className="mainblock-footer-value">&lt;0.01%</p>
+        //           <p className="mainblock-footer-subtitle">Share of Pool</p>
+        //         </div>
+        //       </div>
+        //     </div>
+        //   </div>
+        // }
       />
     </div>
   )

@@ -72,6 +72,7 @@ function App() {
 
     // const tokenList = localStorage.getItem('tokenList') === null ? tokenList : JSON.parse(localStorage.getItem('tokenList'));
 
+
     let tokenList = await getAllClientWallets(pubKey.dexclient);
     let liquidityList = [];
     // console.log('token list',tokenList,"pubKey.address",pubKey.address);
